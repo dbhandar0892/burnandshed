@@ -102,9 +102,36 @@ export default {
           "100%": { transform: "translateY(50px) scale(0.9)", opacity: "0" },
         },
         "burn": {
-          "0%": { transform: "scale(1)", opacity: "1" },
-          "50%": { transform: "scale(1.1)", opacity: "0.5", filter: "blur(1px)" },
-          "100%": { transform: "scale(0.8)", opacity: "0", filter: "blur(3px)" },
+          "0%": { 
+            transform: "scale(1) rotate(0deg)", 
+            opacity: "1",
+            filter: "brightness(1) contrast(1) blur(0px)",
+          },
+          "20%": { 
+            transform: "scale(1.02) rotate(-1deg)", 
+            opacity: "0.9",
+            filter: "brightness(1.2) contrast(1.1) blur(0px) sepia(0.3)",
+          },
+          "40%": { 
+            transform: "scale(0.98) rotate(1deg)", 
+            opacity: "0.7",
+            filter: "brightness(0.8) contrast(1.3) blur(0.5px) sepia(0.7) hue-rotate(-20deg)",
+          },
+          "60%": { 
+            transform: "scale(0.95) rotate(-2deg)", 
+            opacity: "0.5",
+            filter: "brightness(0.4) contrast(1.5) blur(1px) sepia(1) hue-rotate(-30deg)",
+          },
+          "80%": { 
+            transform: "scale(0.85) rotate(3deg)", 
+            opacity: "0.2",
+            filter: "brightness(0.2) contrast(2) blur(2px) grayscale(1)",
+          },
+          "100%": { 
+            transform: "scale(0.7) rotate(-5deg) translateY(20px)", 
+            opacity: "0",
+            filter: "brightness(0) contrast(3) blur(4px) grayscale(1)",
+          },
         },
         "breathe": {
           "0%, 100%": { transform: "scale(1)" },
