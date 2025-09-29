@@ -6,28 +6,28 @@ import { toast } from 'sonner';
 
 export const VentBox = () => {
   const [text, setText] = useState('');
-  const [isShredding, setIsShredding] = useState(false);
+  const [isShedding, setIsShedding] = useState(false);
 
-  const handleShred = () => {
+  const handleShed = () => {
     if (!text.trim()) {
-      toast.error('Write something to shred first!');
+      toast.error('Write something to shed first!');
       return;
     }
 
-    setIsShredding(true);
+    setIsShedding(true);
     
-    // Play shredding sound effect (simulated)
-    toast.success('📄 Shredded and gone forever!');
+    // Play shedding sound effect (simulated)
+    toast.success('🍃 Shed away and released!');
     
     // Increment tracker count in localStorage
-    const currentCount = parseInt(localStorage.getItem('shredCount') || '0');
-    localStorage.setItem('shredCount', (currentCount + 1).toString());
+    const currentCount = parseInt(localStorage.getItem('shedCount') || '0');
+    localStorage.setItem('shedCount', (currentCount + 1).toString());
     
     // Clear after animation
     setTimeout(() => {
       setText('');
-      setIsShredding(false);
-    }, 800);
+      setIsShedding(false);
+    }, 1200);
   };
 
   return (
@@ -38,7 +38,7 @@ export const VentBox = () => {
           <Scissors className="h-8 w-8 text-primary-foreground" />
         </div>
         <h2 className="text-2xl font-bold text-foreground">Vent Box</h2>
-        <p className="text-muted-foreground">Write what's bothering you, then shred it away</p>
+        <p className="text-muted-foreground">Write what's bothering you, then shed it away like old skin</p>
       </div>
 
       {/* Text Input */}
@@ -48,25 +48,25 @@ export const VentBox = () => {
           onChange={(e) => setText(e.target.value)}
           placeholder="Type your frustrations here... Let it all out!"
           className={`min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all ${
-            isShredding ? 'animate-shred' : ''
+            isShedding ? 'animate-shed' : ''
           }`}
-          disabled={isShredding}
+          disabled={isShedding}
         />
         
         <Button
-          onClick={handleShred}
-          disabled={isShredding || !text.trim()}
+          onClick={handleShed}
+          disabled={isShedding || !text.trim()}
           className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 text-lg font-semibold rounded-lg shadow-soft"
         >
-          {isShredding ? (
+          {isShedding ? (
             <>
-              <Scissors className="mr-2 h-5 w-5 animate-spin" />
-              Shredding...
+              <Scissors className="mr-2 h-5 w-5 animate-pulse" />
+              Shedding...
             </>
           ) : (
             <>
               <Scissors className="mr-2 h-5 w-5" />
-              Shred It Away
+              Shed It Away
             </>
           )}
         </Button>
@@ -75,7 +75,7 @@ export const VentBox = () => {
       {/* Privacy Note */}
       <div className="text-center">
         <p className="text-xs text-muted-foreground">
-          🔒 Your words are never saved. Complete privacy guaranteed.
+          🔒 Your words shed away like old skin. Complete privacy guaranteed.
         </p>
       </div>
     </div>

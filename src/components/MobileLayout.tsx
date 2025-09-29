@@ -7,7 +7,7 @@ import { BreathingReset } from './tabs/BreathingReset';
 import { LetGoTracker } from './tabs/LetGoTracker';
 
 const tabs = [
-  { id: 'vent', icon: Scissors, label: 'Shred It', component: VentBox },
+  { id: 'vent', icon: Scissors, label: 'Shed It', component: VentBox },
   { id: 'burn', icon: Flame, label: 'Burn It', component: BurnNote },
   { id: 'laugh', icon: Laugh, label: 'Laugh', component: LaughBreak },
   { id: 'breathe', icon: Wind, label: 'Breathe', component: BreathingReset },

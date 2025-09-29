@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Trophy, Medal, Star, Award } from 'lucide-react';
 
 interface Stats {
-  shredCount: number;
+  shedCount: number;
   burnCount: number;
   totalCount: number;
 }
@@ -19,24 +19,24 @@ interface BadgeData {
 }
 
 export const LetGoTracker = () => {
-  const [stats, setStats] = useState<Stats>({ shredCount: 0, burnCount: 0, totalCount: 0 });
+  const [stats, setStats] = useState<Stats>({ shedCount: 0, burnCount: 0, totalCount: 0 });
 
   useEffect(() => {
-    const shredCount = parseInt(localStorage.getItem('shredCount') || '0');
+    const shedCount = parseInt(localStorage.getItem('shedCount') || '0');
     const burnCount = parseInt(localStorage.getItem('burnCount') || '0');
-    const totalCount = shredCount + burnCount;
+    const totalCount = shedCount + burnCount;
     
-    setStats({ shredCount, burnCount, totalCount });
+    setStats({ shedCount, burnCount, totalCount });
   }, []);
 
   // Refresh stats every few seconds to catch updates
   useEffect(() => {
     const interval = setInterval(() => {
-      const shredCount = parseInt(localStorage.getItem('shredCount') || '0');
+      const shedCount = parseInt(localStorage.getItem('shedCount') || '0');
       const burnCount = parseInt(localStorage.getItem('burnCount') || '0');
-      const totalCount = shredCount + burnCount;
+      const totalCount = shedCount + burnCount;
       
-      setStats({ shredCount, burnCount, totalCount });
+      setStats({ shedCount, burnCount, totalCount });
     }, 1000);
 
     return () => clearInterval(interval);
@@ -109,8 +109,8 @@ export const LetGoTracker = () => {
         <div className="grid grid-cols-2 gap-4">
           <Card className="p-4 bg-card border-border shadow-soft">
             <div className="text-center space-y-2">
-              <div className="text-2xl font-bold text-primary">{stats.shredCount}</div>
-              <div className="text-sm font-medium text-foreground">Shredded</div>
+              <div className="text-2xl font-bold text-primary">{stats.shedCount}</div>
+              <div className="text-sm font-medium text-foreground">Shed</div>
             </div>
           </Card>
           

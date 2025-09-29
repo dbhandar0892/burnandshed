@@ -94,10 +94,12 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "shred": {
-          "0%": { transform: "translateY(0) rotate(0deg)", opacity: "1" },
-          "50%": { transform: "translateY(-20px) rotate(5deg)", opacity: "0.7" },
-          "100%": { transform: "translateY(100px) rotate(15deg)", opacity: "0" },
+        "shed": {
+          "0%": { transform: "translateY(0) scale(1)", opacity: "1" },
+          "25%": { transform: "translateY(-10px) scale(1.02)", opacity: "0.8" },
+          "50%": { transform: "translateY(20px) scale(0.98)", opacity: "0.6" },
+          "75%": { transform: "translateY(-5px) scale(1.01)", opacity: "0.3" },
+          "100%": { transform: "translateY(50px) scale(0.9)", opacity: "0" },
         },
         "burn": {
           "0%": { transform: "scale(1)", opacity: "1" },
@@ -116,7 +118,7 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "shred": "shred 0.8s ease-out forwards",
+        "shed": "shed 1.2s ease-out forwards",
         "burn": "burn 1s ease-out forwards",
         "breathe": "breathe 4s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
