@@ -47,7 +47,7 @@ export const VentBox = () => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Type your frustrations here... Let it all out!"
-          className={`min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all ${
+          className={`min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl ${
             isShedding ? 'animate-shed' : ''
           }`}
           disabled={isShedding}
