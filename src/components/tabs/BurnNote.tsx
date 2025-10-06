@@ -49,7 +49,7 @@ export const BurnNote = () => {
       <div className="flex-1 space-y-4">
         {isBurning ? (
           <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
-            <div className="text-sm leading-relaxed whitespace-pre-wrap">
+            <div className="text-2xl leading-relaxed whitespace-pre-wrap">
               {text.split('').map((char, index) => (
                 <span
                   key={index}
@@ -70,7 +70,7 @@ export const BurnNote = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Pour out your anger and frustration here..."
-            className="min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all"
+            className="min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl"
             disabled={isBurning}
           />
         )}
