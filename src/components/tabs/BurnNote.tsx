@@ -16,6 +16,10 @@ export const BurnNote = () => {
 
     setIsBurning(true);
     
+    // Calculate animation duration based on text length
+    const charCount = text.length;
+    const totalDuration = Math.min(charCount * 50 + 1000, 4000); // Max 4 seconds
+    
     // Play burning sound effect (simulated)
     toast.success('🔥 Burned to ashes and released!');
     
@@ -27,7 +31,7 @@ export const BurnNote = () => {
     setTimeout(() => {
       setText('');
       setIsBurning(false);
-    }, 1000);
+    }, totalDuration);
   };
 
   return (
@@ -43,15 +47,33 @@ export const BurnNote = () => {
 
       {/* Text Input */}
       <div className="flex-1 space-y-4">
-        <Textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Pour out your anger and frustration here..."
-          className={`min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all ${
-            isBurning ? 'animate-burn' : ''
-          }`}
-          disabled={isBurning}
-        />
+        {isBurning ? (
+          <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
+            <div className="text-sm leading-relaxed whitespace-pre-wrap">
+              {text.split('').map((char, index) => (
+                <span
+                  key={index}
+                  className="inline-block animate-burn-letter"
+                  style={{
+                    animationDelay: `${index * 50}ms`,
+                    animationDuration: '1s',
+                    animationFillMode: 'forwards',
+                  }}
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <Textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Pour out your anger and frustration here..."
+            className="min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all"
+            disabled={isBurning}
+          />
+        )}
         
         <Button
           onClick={handleBurn}

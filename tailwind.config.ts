@@ -133,6 +133,50 @@ export default {
             filter: "brightness(0) contrast(3) blur(4px) grayscale(1)",
           },
         },
+        "burn-letter": {
+          "0%": {
+            opacity: "1",
+            transform: "translateY(0) scale(1) rotate(0deg)",
+            filter: "brightness(1) contrast(1) blur(0px)",
+            textShadow: "0 0 0px transparent",
+          },
+          "15%": {
+            opacity: "1",
+            transform: "translateY(-2px) scale(1.05) rotate(-1deg)",
+            filter: "brightness(1.3) contrast(1.2) blur(0px) sepia(0.2)",
+            textShadow: "0 0 8px hsl(25 95% 60% / 0.6), 0 0 15px hsl(15 85% 50% / 0.4)",
+          },
+          "30%": {
+            opacity: "0.95",
+            transform: "translateY(-1px) scale(1.03) rotate(1deg)",
+            filter: "brightness(1.1) contrast(1.3) blur(0.3px) sepia(0.5) hue-rotate(-10deg)",
+            textShadow: "0 0 10px hsl(25 95% 60% / 0.8), 0 0 20px hsl(15 85% 50% / 0.5)",
+          },
+          "50%": {
+            opacity: "0.8",
+            transform: "translateY(2px) scale(0.95) rotate(-2deg)",
+            filter: "brightness(0.7) contrast(1.5) blur(0.8px) sepia(0.8) hue-rotate(-25deg)",
+            textShadow: "0 0 6px hsl(15 85% 50% / 0.6), 0 0 12px hsl(0 70% 40% / 0.4)",
+          },
+          "70%": {
+            opacity: "0.5",
+            transform: "translateY(5px) scale(0.85) rotate(2deg)",
+            filter: "brightness(0.4) contrast(2) blur(1.5px) sepia(1) hue-rotate(-35deg) grayscale(0.3)",
+            textShadow: "0 0 4px hsl(0 60% 30% / 0.4)",
+          },
+          "85%": {
+            opacity: "0.2",
+            transform: "translateY(10px) scale(0.7) rotate(-3deg)",
+            filter: "brightness(0.2) contrast(2.5) blur(2px) grayscale(0.8)",
+            textShadow: "0 0 2px hsl(0 0% 20% / 0.2)",
+          },
+          "100%": {
+            opacity: "0",
+            transform: "translateY(15px) scale(0.5) rotate(5deg)",
+            filter: "brightness(0) contrast(3) blur(3px) grayscale(1)",
+            textShadow: "0 0 0px transparent",
+          },
+        },
         "breathe": {
           "0%, 100%": { transform: "scale(1)" },
           "50%": { transform: "scale(1.2)" },
@@ -147,6 +191,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "shed": "shed 1.2s ease-out forwards",
         "burn": "burn 1s ease-out forwards",
+        "burn-letter": "burn-letter 1s ease-out forwards",
         "breathe": "breathe 4s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
       },
