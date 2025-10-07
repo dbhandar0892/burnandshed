@@ -88,16 +88,16 @@ export const BurnNote = () => {
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
-                    {/* Flame effect above character */}
+                    {/* Flame effect below character */}
                     <span
-                      className="absolute -top-6 left-0 w-full h-6 pointer-events-none animate-flame-flicker opacity-0"
+                      className="absolute -bottom-6 left-0 w-full h-6 pointer-events-none animate-flame-flicker opacity-0"
                       style={{
                         animationDelay: `${charDelay}ms`,
                         animationDuration: '0.15s',
                         animationIterationCount: '3',
                       }}
                     >
-                      <div className="w-full h-full bg-gradient-to-t from-orange-500 via-yellow-400 to-transparent rounded-t-full blur-sm"
+                      <div className="w-full h-full bg-gradient-to-b from-orange-500 via-yellow-400 to-transparent rounded-b-full blur-sm"
                         style={{ 
                           boxShadow: '0 0 10px rgba(255, 165, 0, 0.6)' 
                         }}
