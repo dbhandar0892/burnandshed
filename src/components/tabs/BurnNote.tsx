@@ -16,12 +16,16 @@ export const BurnNote = () => {
 
     setIsBurning(true);
     
-    // Calculate animation duration based on text length
-    const charCount = text.length;
-    const totalDuration = Math.min(charCount * 50 + 1000, 4000); // Max 4 seconds
+    // Calculate animation duration based on word count
+    const words = text.trim().split(/\s+/);
+    const matchstickDuration = 2000; // 2s for matchstick animation
+    const wordBurnDuration = 1200; // 1.2s per word
+    const totalDuration = matchstickDuration + (words.length * 400) + wordBurnDuration;
     
     // Play burning sound effect (simulated)
-    toast.success('🔥 Burned to ashes and released!');
+    setTimeout(() => {
+      toast.success('🔥 Burned to ashes and released!');
+    }, matchstickDuration);
     
     // Increment tracker count in localStorage
     const currentCount = parseInt(localStorage.getItem('burnCount') || '0');
@@ -49,20 +53,75 @@ export const BurnNote = () => {
       <div className="flex-1 space-y-4">
         {isBurning ? (
           <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
-            <div className="text-2xl leading-relaxed whitespace-pre-wrap">
-              {text.split('').map((char, index) => (
-                <span
-                  key={index}
-                  className="inline-block animate-burn-letter"
-                  style={{
-                    animationDelay: `${index * 50}ms`,
-                    animationDuration: '1s',
-                    animationFillMode: 'forwards',
+            {/* Matchstick Animation */}
+            <div 
+              className="absolute top-2 left-2 z-10 animate-matchstick-light"
+              style={{ transformOrigin: 'bottom right' }}
+            >
+              <div className="relative w-2 h-16 bg-gradient-to-b from-amber-800 to-amber-900 rounded-sm">
+                {/* Matchstick head */}
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-600 rounded-full" />
+                {/* Flame on matchstick */}
+                <div 
+                  className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-6 animate-flame-flicker"
+                  style={{ 
+                    animationDelay: '0.4s',
+                    transformOrigin: 'bottom center'
                   }}
                 >
-                  {char === ' ' ? '\u00A0' : char}
-                </span>
-              ))}
+                  <div className="absolute inset-0 bg-gradient-to-t from-orange-500 via-yellow-400 to-yellow-200 rounded-t-full blur-[1px]" 
+                    style={{ 
+                      boxShadow: '0 0 20px rgba(255, 165, 0, 0.8), 0 0 40px rgba(255, 100, 0, 0.6)' 
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Burning Text */}
+            <div className="text-2xl leading-relaxed whitespace-pre-wrap">
+              {text.split(/(\s+)/).map((word, wordIndex) => {
+                const isSpace = /^\s+$/.test(word);
+                if (isSpace) {
+                  return <span key={wordIndex}>{word}</span>;
+                }
+                
+                const matchstickDelay = 2000; // matchstick animation time
+                const wordDelay = matchstickDelay + (wordIndex * 400);
+                
+                return (
+                  <span key={wordIndex} className="relative inline-block">
+                    {/* Flame effect above word */}
+                    <span
+                      className="absolute -top-8 left-0 w-full h-8 pointer-events-none animate-flame-flicker opacity-0"
+                      style={{
+                        animationDelay: `${wordDelay}ms`,
+                        animationDuration: '0.2s',
+                        animationIterationCount: '4',
+                      }}
+                    >
+                      <div className="w-full h-full bg-gradient-to-t from-orange-500 via-yellow-400 to-transparent rounded-t-full blur-sm"
+                        style={{ 
+                          boxShadow: '0 0 15px rgba(255, 165, 0, 0.6)' 
+                        }}
+                      />
+                    </span>
+                    
+                    {/* Word that burns */}
+                    <span
+                      className="inline-block animate-burn-word"
+                      style={{
+                        animationDelay: `${wordDelay}ms`,
+                        animationDuration: '1.2s',
+                        animationFillMode: 'forwards',
+                        textShadow: '0 0 20px rgba(255, 100, 0, 0.8), 0 0 30px rgba(255, 165, 0, 0.6)',
+                      }}
+                    >
+                      {word}
+                    </span>
+                  </span>
+                );
+              })}
             </div>
           </div>
         ) : (

@@ -222,6 +222,94 @@ export default {
             textShadow: "0 0 0px transparent",
           },
         },
+        "matchstick-light": {
+          "0%": {
+            transform: "translateX(-100px) translateY(100px) rotate(-45deg)",
+            opacity: "0",
+          },
+          "20%": {
+            transform: "translateX(0) translateY(0) rotate(-45deg)",
+            opacity: "1",
+          },
+          "40%": {
+            transform: "translateX(0) translateY(0) rotate(-45deg)",
+            opacity: "1",
+          },
+          "60%": {
+            transform: "translateX(20px) translateY(-10px) rotate(-30deg)",
+            opacity: "1",
+          },
+          "80%": {
+            transform: "translateX(20px) translateY(-10px) rotate(-30deg)",
+            opacity: "1",
+          },
+          "100%": {
+            transform: "translateX(20px) translateY(-10px) rotate(-30deg)",
+            opacity: "0",
+          },
+        },
+        "flame-flicker": {
+          "0%, 100%": {
+            transform: "scaleY(1) scaleX(1)",
+            opacity: "0.9",
+          },
+          "25%": {
+            transform: "scaleY(1.1) scaleX(0.95)",
+            opacity: "1",
+          },
+          "50%": {
+            transform: "scaleY(0.95) scaleX(1.05)",
+            opacity: "0.85",
+          },
+          "75%": {
+            transform: "scaleY(1.05) scaleX(0.9)",
+            opacity: "0.95",
+          },
+        },
+        "burn-word": {
+          "0%": {
+            opacity: "1",
+            transform: "scale(1)",
+            filter: "brightness(1) contrast(1) blur(0px)",
+            color: "inherit",
+          },
+          "10%": {
+            opacity: "1",
+            transform: "scale(1.08)",
+            filter: "brightness(1.5) contrast(1.2) blur(0px) sepia(0.3)",
+            color: "hsl(45 100% 60%)",
+          },
+          "25%": {
+            opacity: "1",
+            transform: "scale(1.05)",
+            filter: "brightness(1.4) contrast(1.4) blur(0.5px) sepia(0.6) hue-rotate(-15deg)",
+            color: "hsl(30 100% 55%)",
+          },
+          "40%": {
+            opacity: "0.95",
+            transform: "scale(1) rotate(-1deg)",
+            filter: "brightness(1.1) contrast(1.6) blur(1px) sepia(0.8) hue-rotate(-25deg)",
+            color: "hsl(15 100% 50%)",
+          },
+          "60%": {
+            opacity: "0.7",
+            transform: "scale(0.92) rotate(1deg)",
+            filter: "brightness(0.6) contrast(2) blur(1.5px) sepia(1) hue-rotate(-35deg)",
+            color: "hsl(0 80% 35%)",
+          },
+          "80%": {
+            opacity: "0.3",
+            transform: "scale(0.8) translateY(5px)",
+            filter: "brightness(0.3) contrast(2.5) blur(2px) grayscale(0.6)",
+            color: "hsl(0 20% 20%)",
+          },
+          "100%": {
+            opacity: "0",
+            transform: "scale(0.6) translateY(15px)",
+            filter: "brightness(0) contrast(3) blur(3px) grayscale(1)",
+            color: "hsl(0 0% 10%)",
+          },
+        },
         "breathe": {
           "0%, 100%": { transform: "scale(1)" },
           "50%": { transform: "scale(1.2)" },
@@ -239,6 +327,9 @@ export default {
         "shred-confetti": "shred-confetti 2s cubic-bezier(0.4, 0, 0.2, 1) forwards",
         "burn": "burn 1s ease-out forwards",
         "burn-letter": "burn-letter 1s ease-out forwards",
+        "burn-word": "burn-word 1.2s ease-out forwards",
+        "matchstick-light": "matchstick-light 2s ease-in-out forwards",
+        "flame-flicker": "flame-flicker 0.3s ease-in-out infinite",
         "breathe": "breathe 4s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
       },
