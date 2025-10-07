@@ -16,11 +16,11 @@ export const BurnNote = () => {
 
     setIsBurning(true);
     
-    // Calculate animation duration based on word count
-    const words = text.trim().split(/\s+/);
+    // Calculate animation duration based on character count
+    const chars = text.length;
     const matchstickDuration = 2000; // 2s for matchstick animation
-    const wordBurnDuration = 1200; // 1.2s per word
-    const totalDuration = matchstickDuration + (words.length * 400) + wordBurnDuration;
+    const charBurnDuration = 80; // 80ms per character
+    const totalDuration = matchstickDuration + (chars * charBurnDuration) + 1200;
     
     // Play burning sound effect (simulated)
     setTimeout(() => {
@@ -55,8 +55,8 @@ export const BurnNote = () => {
           <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
             {/* Matchstick Animation */}
             <div 
-              className="absolute top-2 left-2 z-10 animate-matchstick-light"
-              style={{ transformOrigin: 'bottom right' }}
+              className="absolute bottom-2 left-2 z-10 animate-matchstick-light"
+              style={{ transformOrigin: 'top right' }}
             >
               <div className="relative w-2 h-16 bg-gradient-to-b from-amber-800 to-amber-900 rounded-sm">
                 {/* Matchstick head */}
@@ -80,44 +80,38 @@ export const BurnNote = () => {
             
             {/* Burning Text */}
             <div className="text-2xl leading-relaxed whitespace-pre-wrap">
-              {text.split(/(\s+)/).map((word, wordIndex) => {
-                const isSpace = /^\s+$/.test(word);
-                if (isSpace) {
-                  return <span key={wordIndex}>{word}</span>;
-                }
-                
+              {text.split('').map((char, charIndex) => {
                 const matchstickDelay = 2000; // matchstick animation time
-                const wordDelay = matchstickDelay + (wordIndex * 400);
+                const charDelay = matchstickDelay + (charIndex * 80);
                 
                 return (
-                  <span key={wordIndex} className="relative inline-block">
-                    {/* Flame effect above word */}
+                  <span key={charIndex} className="relative inline-block">
+                    {/* Flame effect above character */}
                     <span
-                      className="absolute -top-8 left-0 w-full h-8 pointer-events-none animate-flame-flicker opacity-0"
+                      className="absolute -top-6 left-0 w-full h-6 pointer-events-none animate-flame-flicker opacity-0"
                       style={{
-                        animationDelay: `${wordDelay}ms`,
-                        animationDuration: '0.2s',
-                        animationIterationCount: '4',
+                        animationDelay: `${charDelay}ms`,
+                        animationDuration: '0.15s',
+                        animationIterationCount: '3',
                       }}
                     >
                       <div className="w-full h-full bg-gradient-to-t from-orange-500 via-yellow-400 to-transparent rounded-t-full blur-sm"
                         style={{ 
-                          boxShadow: '0 0 15px rgba(255, 165, 0, 0.6)' 
+                          boxShadow: '0 0 10px rgba(255, 165, 0, 0.6)' 
                         }}
                       />
                     </span>
                     
-                    {/* Word that burns */}
+                    {/* Character that burns */}
                     <span
-                      className="inline-block animate-burn-word"
+                      className="inline-block animate-burn-letter"
                       style={{
-                        animationDelay: `${wordDelay}ms`,
-                        animationDuration: '1.2s',
+                        animationDelay: `${charDelay}ms`,
+                        animationDuration: '1s',
                         animationFillMode: 'forwards',
-                        textShadow: '0 0 20px rgba(255, 100, 0, 0.8), 0 0 30px rgba(255, 165, 0, 0.6)',
                       }}
                     >
-                      {word}
+                      {char}
                     </span>
                   </span>
                 );
