@@ -101,6 +101,51 @@ export default {
           "75%": { transform: "translateY(-5px) scale(1.01)", opacity: "0.3" },
           "100%": { transform: "translateY(50px) scale(0.9)", opacity: "0" },
         },
+        "shred-strip": {
+          "0%": {
+            transform: "translateY(0) translateX(0) rotate(0deg) scaleY(1)",
+            opacity: "1",
+            filter: "blur(0px)",
+          },
+          "10%": {
+            transform: "translateY(-5px) translateX(0) rotate(0deg) scaleY(0.98)",
+            opacity: "1",
+            filter: "blur(0px)",
+          },
+          "30%": {
+            transform: "translateY(20px) translateX(var(--shred-x)) rotate(var(--shred-rotate)) scaleY(0.95)",
+            opacity: "0.9",
+            filter: "blur(0.3px)",
+          },
+          "60%": {
+            transform: "translateY(80px) translateX(calc(var(--shred-x) * 1.5)) rotate(calc(var(--shred-rotate) * 2)) scaleY(0.85)",
+            opacity: "0.6",
+            filter: "blur(0.8px)",
+          },
+          "100%": {
+            transform: "translateY(150px) translateX(calc(var(--shred-x) * 2)) rotate(calc(var(--shred-rotate) * 3)) scaleY(0.7)",
+            opacity: "0",
+            filter: "blur(2px)",
+          },
+        },
+        "shred-confetti": {
+          "0%": {
+            transform: "translateY(0) translateX(0) rotate(0deg) scale(1)",
+            opacity: "1",
+          },
+          "20%": {
+            transform: "translateY(30px) translateX(var(--confetti-x)) rotate(var(--confetti-rotate)) scale(0.95)",
+            opacity: "1",
+          },
+          "50%": {
+            transform: "translateY(100px) translateX(calc(var(--confetti-x) * 2)) rotate(calc(var(--confetti-rotate) * 3)) scale(0.7)",
+            opacity: "0.7",
+          },
+          "100%": {
+            transform: "translateY(200px) translateX(calc(var(--confetti-x) * 3)) rotate(calc(var(--confetti-rotate) * 6)) scale(0.3)",
+            opacity: "0",
+          },
+        },
         "burn": {
           "0%": { 
             transform: "scale(1) rotate(0deg)", 
@@ -190,6 +235,8 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "shed": "shed 1.2s ease-out forwards",
+        "shred-strip": "shred-strip 1.5s cubic-bezier(0.4, 0, 0.6, 1) forwards",
+        "shred-confetti": "shred-confetti 2s cubic-bezier(0.4, 0, 0.2, 1) forwards",
         "burn": "burn 1s ease-out forwards",
         "burn-letter": "burn-letter 1s ease-out forwards",
         "breathe": "breathe 4s ease-in-out infinite",

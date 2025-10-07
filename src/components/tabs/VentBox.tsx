@@ -16,18 +16,18 @@ export const VentBox = () => {
 
     setIsShedding(true);
     
-    // Play shedding sound effect (simulated)
-    toast.success('🍃 Shed away and released!');
+    // Play shredding sound effect (simulated)
+    toast.success('🗑️ Shredded and released!');
     
     // Increment tracker count in localStorage
     const currentCount = parseInt(localStorage.getItem('shedCount') || '0');
     localStorage.setItem('shedCount', (currentCount + 1).toString());
     
-    // Clear after animation
+    // Clear after animation completes
     setTimeout(() => {
       setText('');
       setIsShedding(false);
-    }, 1200);
+    }, 2000);
   };
 
   return (
@@ -41,17 +41,48 @@ export const VentBox = () => {
         <p className="text-muted-foreground">Write what's bothering you, then shed it away like old skin</p>
       </div>
 
-      {/* Text Input */}
-      <div className="flex-1 space-y-4">
-        <Textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Type your frustrations here... Let it all out!"
-          className={`min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl ${
-            isShedding ? 'animate-shed' : ''
-          }`}
-          disabled={isShedding}
-        />
+      {/* Text Input / Shredding Animation */}
+      <div className="flex-1 space-y-4 relative overflow-hidden">
+        {!isShedding ? (
+          <Textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Type your frustrations here... Let it all out!"
+            className="min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl"
+            disabled={isShedding}
+          />
+        ) : (
+          <div className="min-h-[200px] bg-card border border-border rounded-md p-3 relative overflow-visible">
+            <div className="relative flex flex-wrap gap-0 text-2xl leading-relaxed">
+              {text.split('').map((char, index) => {
+                const totalChars = text.length;
+                const stripWidth = 3;
+                const stripIndex = Math.floor(index / stripWidth);
+                const randomX = (Math.random() - 0.5) * 40;
+                const randomRotate = (Math.random() - 0.5) * 180;
+                const delay = stripIndex * 50;
+                const isSpace = char === ' ';
+                
+                return (
+                  <span
+                    key={index}
+                    className="inline-block animate-shred-strip"
+                    style={{
+                      animationDelay: `${delay}ms`,
+                      animationDuration: '1.5s',
+                      animationFillMode: 'forwards',
+                      // @ts-ignore - CSS custom properties
+                      '--shred-x': `${randomX}px`,
+                      '--shred-rotate': `${randomRotate}deg`,
+                    }}
+                  >
+                    {isSpace ? '\u00A0' : char}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        )}
         
         <Button
           onClick={handleShed}
