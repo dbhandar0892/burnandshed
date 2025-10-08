@@ -182,43 +182,55 @@ export default {
           "0%": {
             opacity: "1",
             transform: "translateY(0) scale(1) rotate(0deg)",
-            filter: "brightness(1) contrast(1) blur(0px)",
+            filter: "brightness(1) contrast(1) blur(0px) saturate(1)",
             textShadow: "0 0 0px transparent",
           },
-          "15%": {
+          "10%": {
             opacity: "1",
-            transform: "translateY(-2px) scale(1.05) rotate(-1deg)",
-            filter: "brightness(1.3) contrast(1.2) blur(0px) sepia(0.2)",
-            textShadow: "0 0 8px hsl(25 95% 60% / 0.6), 0 0 15px hsl(15 85% 50% / 0.4)",
+            transform: "translateY(-1px) scale(1.02) rotate(0deg)",
+            filter: "brightness(1.2) contrast(1.1) blur(0px) saturate(1.2) sepia(0.1)",
+            textShadow: "0 0 4px hsl(45 100% 60% / 0.4)",
           },
-          "30%": {
+          "20%": {
+            opacity: "1",
+            transform: "translateY(-2px) scale(1.04) rotate(-0.5deg)",
+            filter: "brightness(1.3) contrast(1.2) blur(0px) saturate(1.3) sepia(0.3) hue-rotate(-5deg)",
+            textShadow: "0 0 8px hsl(35 100% 55% / 0.6), 0 0 12px hsl(25 95% 50% / 0.4)",
+          },
+          "35%": {
             opacity: "0.95",
-            transform: "translateY(-1px) scale(1.03) rotate(1deg)",
-            filter: "brightness(1.1) contrast(1.3) blur(0.3px) sepia(0.5) hue-rotate(-10deg)",
-            textShadow: "0 0 10px hsl(25 95% 60% / 0.8), 0 0 20px hsl(15 85% 50% / 0.5)",
+            transform: "translateY(0px) scale(1.03) rotate(1deg)",
+            filter: "brightness(1.1) contrast(1.4) blur(0.2px) saturate(1.1) sepia(0.6) hue-rotate(-15deg)",
+            textShadow: "0 0 10px hsl(25 95% 50% / 0.7), 0 0 18px hsl(15 85% 45% / 0.5), 0 0 2px hsl(0 0% 10% / 0.8)",
           },
           "50%": {
-            opacity: "0.8",
-            transform: "translateY(2px) scale(0.95) rotate(-2deg)",
-            filter: "brightness(0.7) contrast(1.5) blur(0.8px) sepia(0.8) hue-rotate(-25deg)",
-            textShadow: "0 0 6px hsl(15 85% 50% / 0.6), 0 0 12px hsl(0 70% 40% / 0.4)",
+            opacity: "0.85",
+            transform: "translateY(2px) scale(0.98) rotate(-1.5deg)",
+            filter: "brightness(0.7) contrast(1.7) blur(0.5px) saturate(0.9) sepia(0.85) hue-rotate(-30deg)",
+            textShadow: "0 0 8px hsl(15 85% 45% / 0.6), 0 0 14px hsl(5 75% 40% / 0.4), 0 0 3px hsl(0 0% 5% / 1)",
           },
-          "70%": {
-            opacity: "0.5",
-            transform: "translateY(5px) scale(0.85) rotate(2deg)",
-            filter: "brightness(0.4) contrast(2) blur(1.5px) sepia(1) hue-rotate(-35deg) grayscale(0.3)",
-            textShadow: "0 0 4px hsl(0 60% 30% / 0.4)",
+          "65%": {
+            opacity: "0.65",
+            transform: "translateY(4px) scale(0.92) rotate(2deg)",
+            filter: "brightness(0.45) contrast(2) blur(1px) saturate(0.7) sepia(1) hue-rotate(-40deg) grayscale(0.2)",
+            textShadow: "0 0 6px hsl(5 70% 35% / 0.5), 0 0 10px hsl(0 60% 30% / 0.3), 0 0 4px hsl(0 0% 0% / 1)",
           },
-          "85%": {
+          "78%": {
+            opacity: "0.4",
+            transform: "translateY(7px) scale(0.85) rotate(-2.5deg)",
+            filter: "brightness(0.25) contrast(2.3) blur(1.5px) saturate(0.5) grayscale(0.5)",
+            textShadow: "0 0 4px hsl(0 50% 25% / 0.4), 0 0 2px hsl(0 0% 0% / 1)",
+          },
+          "88%": {
             opacity: "0.2",
-            transform: "translateY(10px) scale(0.7) rotate(-3deg)",
-            filter: "brightness(0.2) contrast(2.5) blur(2px) grayscale(0.8)",
-            textShadow: "0 0 2px hsl(0 0% 20% / 0.2)",
+            transform: "translateY(10px) scale(0.75) rotate(3deg)",
+            filter: "brightness(0.15) contrast(2.5) blur(2px) saturate(0.3) grayscale(0.8)",
+            textShadow: "0 0 2px hsl(0 20% 15% / 0.3)",
           },
           "100%": {
             opacity: "0",
-            transform: "translateY(15px) scale(0.5) rotate(5deg)",
-            filter: "brightness(0) contrast(3) blur(3px) grayscale(1)",
+            transform: "translateY(14px) scale(0.6) rotate(-4deg)",
+            filter: "brightness(0) contrast(3) blur(3px) saturate(0) grayscale(1)",
             textShadow: "0 0 0px transparent",
           },
         },
@@ -318,6 +330,24 @@ export default {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-10px)" },
         },
+        "ember-rise": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(0) translateX(0) scale(1)",
+          },
+          "10%": {
+            opacity: "0.8",
+            transform: "translateY(-5px) translateX(0) scale(1.2)",
+          },
+          "50%": {
+            opacity: "0.6",
+            transform: "translateY(-20px) translateX(3px) scale(0.8)",
+          },
+          "100%": {
+            opacity: "0",
+            transform: "translateY(-40px) translateX(5px) scale(0.3)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -332,6 +362,7 @@ export default {
         "flame-flicker": "flame-flicker 0.3s ease-in-out infinite",
         "breathe": "breathe 4s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
+        "ember-rise": "ember-rise 0.8s ease-out forwards",
       },
     },
   },

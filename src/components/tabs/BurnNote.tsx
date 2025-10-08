@@ -88,28 +88,38 @@ export const BurnNote = () => {
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
-                    {/* Flame effect below character */}
+                    {/* Larger flame effect below character */}
                     <span
-                      className="absolute -bottom-6 left-0 w-full h-6 pointer-events-none animate-flame-flicker opacity-0"
+                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-8 h-10 pointer-events-none animate-flame-flicker opacity-0"
                       style={{
-                        animationDelay: `${charDelay}ms`,
-                        animationDuration: '0.15s',
-                        animationIterationCount: '3',
+                        animationDelay: `${charDelay - 100}ms`,
+                        animationDuration: '0.2s',
+                        animationIterationCount: '5',
                       }}
                     >
-                      <div className="w-full h-full bg-gradient-to-b from-orange-500 via-yellow-400 to-transparent rounded-b-full blur-sm"
+                      <div className="absolute inset-0 bg-gradient-to-t from-orange-600 via-orange-400 to-yellow-300 rounded-t-full blur-[2px]"
                         style={{ 
-                          boxShadow: '0 0 10px rgba(255, 165, 0, 0.6)' 
+                          boxShadow: '0 0 20px rgba(255, 140, 0, 0.8), 0 0 35px rgba(255, 100, 0, 0.5)' 
                         }}
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-red-500 via-orange-500 to-yellow-400 rounded-t-full blur-sm opacity-70" />
                     </span>
+                    
+                    {/* Ember particles */}
+                    <span
+                      className="absolute -bottom-4 left-1/2 w-1 h-1 rounded-full bg-orange-500 pointer-events-none opacity-0"
+                      style={{
+                        animationDelay: `${charDelay + 200}ms`,
+                        animation: 'ember-rise 0.8s ease-out forwards',
+                      }}
+                    />
                     
                     {/* Character that burns */}
                     <span
                       className="inline-block animate-burn-letter"
                       style={{
                         animationDelay: `${charDelay}ms`,
-                        animationDuration: '1s',
+                        animationDuration: '1.2s',
                         animationFillMode: 'forwards',
                       }}
                     >
