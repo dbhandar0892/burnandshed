@@ -88,9 +88,9 @@ export const BurnNote = () => {
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
-                    {/* Larger flame effect below character */}
+                    {/* Larger flame effect above character */}
                     <span
-                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-8 h-10 pointer-events-none animate-flame-flicker opacity-0"
+                      className="absolute -top-8 left-1/2 -translate-x-1/2 w-8 h-10 pointer-events-none animate-flame-flicker opacity-0"
                       style={{
                         animationDelay: `${charDelay - 100}ms`,
                         animationDuration: '0.2s',
