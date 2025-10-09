@@ -118,7 +118,7 @@ export const BurnNote = () => {
                 <img
                   src={squirrelImg}
                   alt="Realistic squirrel character holding a match to ignite the note"
-                  className="w-16 h-16 object-contain drop-shadow-lg select-none pointer-events-none scale-x-[-1]"
+                  className="w-16 h-16 object-contain drop-shadow-lg select-none pointer-events-none"
                   loading="lazy"
                 />
                 {/* Matchstick overlay in paw */}
