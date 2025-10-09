@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
-import lightIgniteVideo from '@/assets/light-ignite.mp4';
+import squirrelImg from '@/assets/squirrel-real.png';
 
 // Function to create burning/crackling sound effect
 const playBurningSound = (duration: number) => {
@@ -107,18 +107,49 @@ export const BurnNote = () => {
       <div className="flex-1 space-y-4">
         {isBurning ? (
           <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
-            {/* Light Ignition Video */}
-            <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-              <video
-                src={lightIgniteVideo}
-                autoPlay
-                muted
-                className="w-full h-full object-cover"
-                style={{
-                  mixBlendMode: 'screen',
-                  opacity: 0.9
-                }}
-              />
+            {/* Animated Character - Realistic Squirrel (Image) */}
+            <div 
+              className="absolute bottom-2 left-2 z-20 animate-character-walk"
+              style={{ 
+                animationDuration: '3s',
+              }}
+            >
+              <div className="relative w-16 h-16">
+                <img
+                  src={squirrelImg}
+                  alt="Realistic squirrel character holding a match to ignite the note"
+                  className="w-16 h-16 object-contain drop-shadow-lg select-none pointer-events-none"
+                  loading="lazy"
+                />
+                {/* Matchstick overlay in paw */}
+                <div 
+                  className="absolute bottom-2 right-0 w-14 h-1 bg-gradient-to-r from-amber-800 via-amber-700 to-amber-800 rounded-full animate-character-strike"
+                  style={{
+                    animationDelay: '1.5s',
+                    transformOrigin: 'left center'
+                  }}
+                >
+                  {/* Match head */}
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-red-700 rounded-full" />
+                  {/* Flame appears after strike */}
+                  <div 
+                    className="absolute -right-1 -top-5 w-7 h-9 animate-flame-flicker opacity-0"
+                    style={{ 
+                      animationDelay: '2s',
+                      animationDuration: '0.3s',
+                      animationFillMode: 'forwards',
+                      transformOrigin: 'bottom center'
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-t from-orange-600 via-yellow-500 to-yellow-200 rounded-t-full blur-[2px]" 
+                      style={{ 
+                        boxShadow: '0 0 30px rgba(255, 165, 0, 1), 0 0 60px rgba(255, 100, 0, 0.8)'
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-red-600 via-orange-500 to-yellow-400 rounded-t-full blur-sm opacity-70" />
+                  </div>
+                </div>
+              </div>
             </div>
                 
             
