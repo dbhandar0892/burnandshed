@@ -88,88 +88,29 @@ export const BurnNote = () => {
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
-                    {/* Multi-layered flame effect above character */}
+                    {/* Larger flame effect above character */}
                     <span
-                      className="absolute -top-10 left-1/2 -translate-x-1/2 w-10 h-12 pointer-events-none opacity-0"
+                      className="absolute -top-8 left-1/2 -translate-x-1/2 w-8 h-10 pointer-events-none animate-flame-flicker opacity-0"
                       style={{
-                        animationDelay: `${charDelay - 150}ms`,
-                        animation: 'flame-flicker 0.15s ease-in-out 8',
+                        animationDelay: `${charDelay - 100}ms`,
+                        animationDuration: '0.2s',
+                        animationIterationCount: '5',
                       }}
                     >
-                      {/* Inner flame core */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-orange-500 via-yellow-400 to-yellow-200 rounded-t-full blur-[1px]"
+                      <div className="absolute inset-0 bg-gradient-to-t from-orange-600 via-orange-400 to-yellow-300 rounded-t-full blur-[2px]"
                         style={{ 
-                          boxShadow: '0 0 25px rgba(255, 165, 0, 0.9), 0 0 45px rgba(255, 100, 0, 0.7)' 
+                          boxShadow: '0 0 20px rgba(255, 140, 0, 0.8), 0 0 35px rgba(255, 100, 0, 0.5)' 
                         }}
                       />
-                      {/* Outer flame glow */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-red-600 via-orange-500 to-yellow-300 rounded-t-full blur-[3px] opacity-80" />
-                      {/* Hot core */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-6 bg-gradient-to-t from-white via-yellow-200 to-orange-400 rounded-full blur-[0.5px]" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-red-500 via-orange-500 to-yellow-400 rounded-t-full blur-sm opacity-70" />
                     </span>
                     
-                    {/* Smoke effect */}
+                    {/* Ember particles */}
                     <span
-                      className="absolute -top-12 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gray-600 pointer-events-none opacity-0"
-                      style={{
-                        animationDelay: `${charDelay + 300}ms`,
-                        animation: 'smoke-rise 2s ease-out forwards',
-                      }}
-                    />
-                    <span
-                      className="absolute -top-12 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-gray-500 pointer-events-none opacity-0"
-                      style={{
-                        animationDelay: `${charDelay + 500}ms`,
-                        animation: 'smoke-rise 2s ease-out forwards',
-                      }}
-                    />
-                    
-                    {/* Multiple ember particles */}
-                    <span
-                      className="absolute -bottom-4 left-1/2 w-1.5 h-1.5 rounded-full bg-orange-500 pointer-events-none opacity-0"
+                      className="absolute -bottom-4 left-1/2 w-1 h-1 rounded-full bg-orange-500 pointer-events-none opacity-0"
                       style={{
                         animationDelay: `${charDelay + 200}ms`,
-                        animation: 'ember-rise 1s ease-out forwards',
-                      }}
-                    />
-                    <span
-                      className="absolute -bottom-4 left-1/4 w-1 h-1 rounded-full bg-red-500 pointer-events-none opacity-0"
-                      style={{
-                        animationDelay: `${charDelay + 350}ms`,
-                        animation: 'ember-rise 1.2s ease-out forwards',
-                      }}
-                    />
-                    <span
-                      className="absolute -bottom-4 left-3/4 w-1 h-1 rounded-full bg-yellow-500 pointer-events-none opacity-0"
-                      style={{
-                        animationDelay: `${charDelay + 450}ms`,
-                        animation: 'ember-rise 0.9s ease-out forwards',
-                      }}
-                    />
-                    
-                    {/* Ash particles */}
-                    <span
-                      className="absolute top-0 left-1/2 w-2 h-2 rounded-sm bg-gray-800 pointer-events-none opacity-0"
-                      style={{
-                        animationDelay: `${charDelay + 800}ms`,
-                        animation: 'ash-float 2.5s ease-out forwards',
-                      }}
-                    />
-                    <span
-                      className="absolute top-0 left-1/3 w-1.5 h-1.5 rounded-sm bg-gray-700 pointer-events-none opacity-0"
-                      style={{
-                        animationDelay: `${charDelay + 900}ms`,
-                        animation: 'ash-float 2.8s ease-out forwards',
-                      }}
-                    />
-                    
-                    {/* Character glow effect */}
-                    <span
-                      className="absolute inset-0 pointer-events-none opacity-0"
-                      style={{
-                        animationDelay: `${charDelay - 50}ms`,
-                        animation: 'pulse 0.3s ease-in-out 3',
-                        boxShadow: '0 0 15px rgba(255, 140, 0, 0.8)',
+                        animation: 'ember-rise 0.8s ease-out forwards',
                       }}
                     />
                     
@@ -178,7 +119,7 @@ export const BurnNote = () => {
                       className="inline-block animate-burn-letter"
                       style={{
                         animationDelay: `${charDelay}ms`,
-                        animationDuration: '1.4s',
+                        animationDuration: '1.2s',
                         animationFillMode: 'forwards',
                       }}
                     >
