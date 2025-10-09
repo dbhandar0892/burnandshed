@@ -16,26 +16,43 @@ const createAmbientMusic = (audioContextRef: React.MutableRefObject<AudioContext
   const oscillators: OscillatorNode[] = [];
   const gainNodes: GainNode[] = [];
   
-  // Frequencies for a calming chord (C major 7th)
-  const frequencies = [130.81, 164.81, 196.00, 246.94]; // C3, E3, G3, B3
+  // Frequencies for a deeply calming chord (A minor 9th - meditative and peaceful)
+  const frequencies = [110.00, 130.81, 164.81, 196.00, 246.94]; // A2, C3, E3, G3, B3
   
   frequencies.forEach((freq, i) => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
     
-    osc.type = 'sine';
+    osc.type = 'triangle'; // Warmer, softer tone
     osc.frequency.setValueAtTime(freq, now);
+    
+    // Add subtle vibrato for organic feel
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.frequency.setValueAtTime(0.2, now);
+    lfoGain.gain.setValueAtTime(2, now);
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
+    lfo.start(now);
+    
+    // Low-pass filter for warmth
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, now);
+    filter.Q.setValueAtTime(1, now);
     
     // Fade in
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.03 / frequencies.length, now + 2);
+    gain.gain.linearRampToValueAtTime(0.025 / frequencies.length, now + 3);
     
-    osc.connect(gain);
+    osc.connect(filter);
+    filter.connect(gain);
     gain.connect(ctx.destination);
     
     osc.start(now);
     
     oscillators.push(osc);
+    oscillators.push(lfo);
     gainNodes.push(gain);
   });
   
