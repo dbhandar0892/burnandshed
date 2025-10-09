@@ -108,9 +108,10 @@ export const BurnNote = () => {
             <div 
               className="absolute bottom-2 z-10"
               style={{ 
-                transformOrigin: 'top left',
+                transformOrigin: 'bottom center',
                 animation: `matchstick-move ${(text.length * 80 + 2000)}ms linear forwards`,
-                right: '8px'
+                right: '8px',
+                transform: 'rotate(-35deg)'
               }}
             >
               <div className="relative w-2 h-16 bg-gradient-to-b from-amber-800 to-amber-900 rounded-sm">

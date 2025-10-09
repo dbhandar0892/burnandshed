@@ -158,13 +158,13 @@ All colors MUST be HSL.
 
   @keyframes matchstick-move {
     0% {
-      transform: translateX(0);
+      transform: translateX(0) rotate(-35deg);
     }
     15% {
-      transform: translateX(0);
+      transform: translateX(0) rotate(-35deg);
     }
     100% {
-      transform: translateX(calc(-100vw + 40px));
+      transform: translateX(calc(-100vw + 40px)) rotate(-35deg);
     }
   }
 
