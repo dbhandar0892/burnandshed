@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
-import lightIgniteVideo from '@/assets/light-ignite.mp4';
+import fireIgniteVideo from '@/assets/fire-ignite.mp4';
 
 // Function to create burning/crackling sound effect
 const playBurningSound = (duration: number) => {
@@ -107,16 +107,16 @@ export const BurnNote = () => {
       <div className="flex-1 space-y-4">
         {isBurning ? (
           <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
-            {/* Light Ignition Video */}
+            {/* Fire Ignition Video */}
             <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
               <video
-                src={lightIgniteVideo}
+                src={fireIgniteVideo}
                 autoPlay
                 muted
                 className="w-full h-full object-cover"
                 style={{
                   mixBlendMode: 'screen',
-                  opacity: 0.9
+                  opacity: 1
                 }}
               />
             </div>
