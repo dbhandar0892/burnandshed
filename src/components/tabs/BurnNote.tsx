@@ -4,6 +4,93 @@ import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Function to create realistic match igniting sound
+const playMatchIgniteSound = () => {
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const now = audioContext.currentTime;
+  
+  // Phase 1: Match strike friction (0-0.2s)
+  const strikeNoise = audioContext.createBufferSource();
+  const strikeBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.2, audioContext.sampleRate);
+  const strikeData = strikeBuffer.getChannelData(0);
+  
+  for (let i = 0; i < strikeData.length; i++) {
+    strikeData[i] = (Math.random() * 2 - 1) * 0.6;
+  }
+  strikeNoise.buffer = strikeBuffer;
+  
+  const strikeFilter = audioContext.createBiquadFilter();
+  strikeFilter.type = 'highpass';
+  strikeFilter.frequency.value = 3000;
+  
+  const strikeGain = audioContext.createGain();
+  strikeGain.gain.setValueAtTime(0.3, now);
+  strikeGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+  
+  strikeNoise.connect(strikeFilter);
+  strikeFilter.connect(strikeGain);
+  strikeGain.connect(audioContext.destination);
+  
+  // Phase 2: Ignition burst (0.15-0.35s)
+  const ignitionOsc = audioContext.createOscillator();
+  ignitionOsc.type = 'sawtooth';
+  ignitionOsc.frequency.setValueAtTime(80, now + 0.15);
+  ignitionOsc.frequency.exponentialRampToValueAtTime(150, now + 0.25);
+  
+  const ignitionFilter = audioContext.createBiquadFilter();
+  ignitionFilter.type = 'bandpass';
+  ignitionFilter.frequency.value = 1000;
+  ignitionFilter.Q.value = 2;
+  
+  const ignitionGain = audioContext.createGain();
+  ignitionGain.gain.setValueAtTime(0, now + 0.15);
+  ignitionGain.gain.linearRampToValueAtTime(0.25, now + 0.18);
+  ignitionGain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+  
+  ignitionOsc.connect(ignitionFilter);
+  ignitionFilter.connect(ignitionGain);
+  ignitionGain.connect(audioContext.destination);
+  
+  // Phase 3: Initial flame whoosh (0.3-0.6s)
+  const flameNoise = audioContext.createBufferSource();
+  const flameBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.3, audioContext.sampleRate);
+  const flameData = flameBuffer.getChannelData(0);
+  
+  for (let i = 0; i < flameData.length; i++) {
+    const decay = 1 - (i / flameData.length);
+    flameData[i] = (Math.random() * 2 - 1) * 0.4 * decay;
+  }
+  flameNoise.buffer = flameBuffer;
+  
+  const flameFilter = audioContext.createBiquadFilter();
+  flameFilter.type = 'lowpass';
+  flameFilter.frequency.value = 1200;
+  
+  const flameGain = audioContext.createGain();
+  flameGain.gain.setValueAtTime(0, now + 0.3);
+  flameGain.gain.linearRampToValueAtTime(0.15, now + 0.35);
+  flameGain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+  
+  flameNoise.connect(flameFilter);
+  flameFilter.connect(flameGain);
+  flameGain.connect(audioContext.destination);
+  
+  // Start all sounds
+  strikeNoise.start(now);
+  strikeNoise.stop(now + 0.2);
+  
+  ignitionOsc.start(now + 0.15);
+  ignitionOsc.stop(now + 0.35);
+  
+  flameNoise.start(now + 0.3);
+  flameNoise.stop(now + 0.6);
+  
+  // Clean up after all sounds finish
+  setTimeout(() => {
+    audioContext.close();
+  }, 700);
+};
+
 // Function to create burning/crackling sound effect
 const playBurningSound = (duration: number) => {
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -59,6 +146,9 @@ export const BurnNote = () => {
     }
 
     setIsBurning(true);
+    
+    // Play match ignite sound immediately
+    playMatchIgniteSound();
     
     // Calculate animation duration based on character count
     const chars = text.length;
