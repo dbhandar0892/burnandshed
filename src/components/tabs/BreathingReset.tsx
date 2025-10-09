@@ -3,19 +3,64 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 
-// Speech synthesis helper
-const speak = (text: string) => {
-  if ('speechSynthesis' in window) {
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.8; // Slightly slower for calmness
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-    
-    window.speechSynthesis.speak(utterance);
+// Soothing ambient music generator using Web Audio API
+const createAmbientMusic = (audioContextRef: React.MutableRefObject<AudioContext | null>) => {
+  if (!audioContextRef.current) {
+    audioContextRef.current = new AudioContext();
   }
+  
+  const ctx = audioContextRef.current;
+  const now = ctx.currentTime;
+  
+  // Create multiple oscillators for ambient pad sound
+  const oscillators: OscillatorNode[] = [];
+  const gainNodes: GainNode[] = [];
+  
+  // Frequencies for a calming chord (C major 7th)
+  const frequencies = [130.81, 164.81, 196.00, 246.94]; // C3, E3, G3, B3
+  
+  frequencies.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    
+    // Fade in
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.03 / frequencies.length, now + 2);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc.start(now);
+    
+    oscillators.push(osc);
+    gainNodes.push(gain);
+  });
+  
+  return { oscillators, gainNodes };
+};
+
+const stopAmbientMusic = (
+  audioContextRef: React.MutableRefObject<AudioContext | null>,
+  oscillators: OscillatorNode[],
+  gainNodes: GainNode[]
+) => {
+  if (!audioContextRef.current) return;
+  
+  const ctx = audioContextRef.current;
+  const now = ctx.currentTime;
+  
+  // Fade out
+  gainNodes.forEach(gain => {
+    gain.gain.linearRampToValueAtTime(0, now + 1);
+  });
+  
+  // Stop oscillators after fade out
+  setTimeout(() => {
+    oscillators.forEach(osc => osc.stop());
+  }, 1000);
 };
 
 export const BreathingReset = () => {
@@ -23,8 +68,10 @@ export const BreathingReset = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [breathePhase, setBreathePhase] = useState<'in' | 'out'>('in');
   const [cycleCount, setCycleCount] = useState(0);
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const hasSpokenRef = useRef(false);
+  const [musicEnabled, setMusicEnabled] = useState(true);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const oscillatorsRef = useRef<OscillatorNode[]>([]);
+  const gainNodesRef = useRef<GainNode[]>([]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -40,25 +87,37 @@ export const BreathingReset = () => {
     return () => clearInterval(interval);
   }, [isActive, timeLeft]);
 
+  // Ambient music control
+  useEffect(() => {
+    if (isActive && musicEnabled) {
+      const { oscillators, gainNodes } = createAmbientMusic(audioContextRef);
+      oscillatorsRef.current = oscillators;
+      gainNodesRef.current = gainNodes;
+    } else if (!isActive || !musicEnabled) {
+      if (oscillatorsRef.current.length > 0) {
+        stopAmbientMusic(audioContextRef, oscillatorsRef.current, gainNodesRef.current);
+        oscillatorsRef.current = [];
+        gainNodesRef.current = [];
+      }
+    }
+
+    return () => {
+      if (oscillatorsRef.current.length > 0) {
+        stopAmbientMusic(audioContextRef, oscillatorsRef.current, gainNodesRef.current);
+        oscillatorsRef.current = [];
+        gainNodesRef.current = [];
+      }
+    };
+  }, [isActive, musicEnabled]);
+
   // Breathing cycle (4 seconds in, 4 seconds out)
   useEffect(() => {
     let phaseInterval: NodeJS.Timeout;
 
     if (isActive) {
-      // Speak the initial phase when starting
-      if (voiceEnabled && !hasSpokenRef.current) {
-        speak('Breathe in');
-        hasSpokenRef.current = true;
-      }
-
       phaseInterval = setInterval(() => {
         setBreathePhase(prev => {
           const nextPhase = prev === 'in' ? 'out' : 'in';
-          
-          // Speak the next phase
-          if (voiceEnabled) {
-            speak(nextPhase === 'in' ? 'Breathe in' : 'Breathe out');
-          }
           
           if (prev === 'out') {
             setCycleCount(count => count + 1);
@@ -67,17 +126,10 @@ export const BreathingReset = () => {
           return nextPhase;
         });
       }, 4000);
-    } else {
-      hasSpokenRef.current = false;
     }
 
-    return () => {
-      clearInterval(phaseInterval);
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, [isActive, voiceEnabled]);
+    return () => clearInterval(phaseInterval);
+  }, [isActive]);
 
   const handleStart = () => {
     setIsActive(true);
@@ -92,14 +144,15 @@ export const BreathingReset = () => {
     setTimeLeft(60);
     setBreathePhase('in');
     setCycleCount(0);
-    hasSpokenRef.current = false;
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+    if (oscillatorsRef.current.length > 0) {
+      stopAmbientMusic(audioContextRef, oscillatorsRef.current, gainNodesRef.current);
+      oscillatorsRef.current = [];
+      gainNodesRef.current = [];
     }
   };
 
-  const toggleVoice = () => {
-    setVoiceEnabled(prev => !prev);
+  const toggleMusic = () => {
+    setMusicEnabled(prev => !prev);
   };
 
   const formatTime = (seconds: number) => {
@@ -179,12 +232,12 @@ export const BreathingReset = () => {
           )}
           
           <Button
-            onClick={toggleVoice}
+            onClick={toggleMusic}
             variant="outline"
             className="h-12 px-6 rounded-lg shadow-soft"
-            title={voiceEnabled ? "Disable voice guide" : "Enable voice guide"}
+            title={musicEnabled ? "Disable ambient music" : "Enable ambient music"}
           >
-            {voiceEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            {musicEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
           </Button>
           
           <Button
