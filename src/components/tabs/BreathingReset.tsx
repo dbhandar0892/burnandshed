@@ -1,13 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Wind, Play, Pause, RotateCcw } from 'lucide-react';
+import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+
+// Speech synthesis helper
+const speak = (text: string) => {
+  if ('speechSynthesis' in window) {
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.8; // Slightly slower for calmness
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    
+    window.speechSynthesis.speak(utterance);
+  }
+};
 
 export const BreathingReset = () => {
   const [isActive, setIsActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
   const [breathePhase, setBreathePhase] = useState<'in' | 'out'>('in');
   const [cycleCount, setCycleCount] = useState(0);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const hasSpokenRef = useRef(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -28,20 +45,39 @@ export const BreathingReset = () => {
     let phaseInterval: NodeJS.Timeout;
 
     if (isActive) {
+      // Speak the initial phase when starting
+      if (voiceEnabled && !hasSpokenRef.current) {
+        speak('Breathe in');
+        hasSpokenRef.current = true;
+      }
+
       phaseInterval = setInterval(() => {
         setBreathePhase(prev => {
-          if (prev === 'in') {
-            return 'out';
-          } else {
-            setCycleCount(count => count + 1);
-            return 'in';
+          const nextPhase = prev === 'in' ? 'out' : 'in';
+          
+          // Speak the next phase
+          if (voiceEnabled) {
+            speak(nextPhase === 'in' ? 'Breathe in' : 'Breathe out');
           }
+          
+          if (prev === 'out') {
+            setCycleCount(count => count + 1);
+          }
+          
+          return nextPhase;
         });
       }, 4000);
+    } else {
+      hasSpokenRef.current = false;
     }
 
-    return () => clearInterval(phaseInterval);
-  }, [isActive]);
+    return () => {
+      clearInterval(phaseInterval);
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [isActive, voiceEnabled]);
 
   const handleStart = () => {
     setIsActive(true);
@@ -56,6 +92,14 @@ export const BreathingReset = () => {
     setTimeLeft(60);
     setBreathePhase('in');
     setCycleCount(0);
+    hasSpokenRef.current = false;
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  };
+
+  const toggleVoice = () => {
+    setVoiceEnabled(prev => !prev);
   };
 
   const formatTime = (seconds: number) => {
@@ -133,6 +177,15 @@ export const BreathingReset = () => {
               Pause
             </Button>
           )}
+          
+          <Button
+            onClick={toggleVoice}
+            variant="outline"
+            className="h-12 px-6 rounded-lg shadow-soft"
+            title={voiceEnabled ? "Disable voice guide" : "Enable voice guide"}
+          >
+            {voiceEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+          </Button>
           
           <Button
             onClick={handleReset}
