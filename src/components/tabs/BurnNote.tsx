@@ -104,25 +104,24 @@ export const BurnNote = () => {
       <div className="flex-1 space-y-4">
         {isBurning ? (
           <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
-            {/* Matchstick Animation */}
+            {/* Matchstick Animation - stays visible */}
             <div 
-              className="absolute bottom-2 right-2 z-10 animate-matchstick-light"
+              className="absolute bottom-2 right-2 z-10"
               style={{ transformOrigin: 'top left' }}
             >
               <div className="relative w-2 h-16 bg-gradient-to-b from-amber-800 to-amber-900 rounded-sm">
                 {/* Matchstick head */}
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-600 rounded-full" />
-                {/* Flame on matchstick */}
+                {/* Flame on matchstick - stays lit */}
                 <div 
-                  className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-6 animate-flame-flicker"
+                  className="absolute -top-8 left-1/2 -translate-x-1/2 w-6 h-8 animate-flame-flicker"
                   style={{ 
-                    animationDelay: '0.4s',
                     transformOrigin: 'bottom center'
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-orange-500 via-yellow-400 to-yellow-200 rounded-t-full blur-[1px]" 
                     style={{ 
-                      boxShadow: '0 0 20px rgba(255, 165, 0, 0.8), 0 0 40px rgba(255, 100, 0, 0.6)' 
+                      boxShadow: '0 0 25px rgba(255, 165, 0, 0.9), 0 0 45px rgba(255, 100, 0, 0.7)' 
                     }}
                   />
                 </div>
@@ -155,8 +154,8 @@ export const BurnNote = () => {
                       className="absolute left-1/2 -translate-x-1/2 pointer-events-none animate-flame-flicker opacity-0"
                       style={{
                         bottom: `${flameHeight}px`,
-                        width: `${8 * flameScale}px`,
-                        height: `${10 * flameScale}px`,
+                        width: `${12 * flameScale}px`,
+                        height: `${16 * flameScale}px`,
                         animationDelay: `${charDelay - 100}ms`,
                         animationDuration: `${150 + Math.random() * 100}ms`,
                         animationIterationCount: '4',
@@ -164,7 +163,7 @@ export const BurnNote = () => {
                     >
                       <div className="absolute inset-0 bg-gradient-to-t from-red-600 via-orange-500 to-yellow-300 rounded-t-full blur-[2px]"
                         style={{ 
-                          boxShadow: '0 0 15px rgba(255, 140, 0, 0.9), 0 0 30px rgba(255, 100, 0, 0.6)' 
+                          boxShadow: '0 0 25px rgba(255, 140, 0, 0.9), 0 0 40px rgba(255, 100, 0, 0.7)' 
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-orange-700 via-orange-400 to-yellow-200 rounded-t-full blur-sm opacity-80" />
