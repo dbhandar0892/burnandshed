@@ -114,7 +114,7 @@ export const BurnNote = () => {
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-600 rounded-full" />
                 {/* Flame on matchstick */}
                 <div 
-                  className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-6 animate-flame-flicker"
+                  className="absolute -top-4 left-1/2 -translate-x-1/2 w-3 h-4 animate-flame-flicker"
                   style={{ 
                     animationDelay: '0.4s',
                     transformOrigin: 'bottom center'
