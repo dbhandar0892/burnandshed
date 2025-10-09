@@ -1,12 +1,56 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Function to create burning/crackling sound effect
+const playBurningSound = (duration: number) => {
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  
+  // Create noise buffer for crackling effect
+  const bufferSize = audioContext.sampleRate * duration / 1000;
+  const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+  const output = noiseBuffer.getChannelData(0);
+  
+  // Generate crackling noise pattern
+  for (let i = 0; i < bufferSize; i++) {
+    const intensity = Math.sin(i / 500) * 0.5 + 0.5; // Varying intensity
+    output[i] = (Math.random() * 2 - 1) * intensity * 0.3;
+  }
+  
+  // Create source
+  const noiseSource = audioContext.createBufferSource();
+  noiseSource.buffer = noiseBuffer;
+  
+  // Create filter for more realistic fire sound
+  const filter = audioContext.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 2000;
+  
+  // Create gain for volume control
+  const gainNode = audioContext.createGain();
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.2);
+  gainNode.gain.setValueAtTime(0.15, audioContext.currentTime + duration / 1000 - 0.5);
+  gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration / 1000);
+  
+  // Connect nodes
+  noiseSource.connect(filter);
+  filter.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  // Play
+  noiseSource.start(audioContext.currentTime);
+  noiseSource.stop(audioContext.currentTime + duration / 1000);
+  
+  return { audioContext, source: noiseSource };
+};
+
 export const BurnNote = () => {
   const [text, setText] = useState('');
   const [isBurning, setIsBurning] = useState(false);
+  const audioContextRef = useRef<{ audioContext: AudioContext; source: AudioBufferSourceNode } | null>(null);
 
   const handleBurn = () => {
     if (!text.trim()) {
@@ -22,7 +66,9 @@ export const BurnNote = () => {
     const charBurnDuration = 80; // 80ms per character
     const totalDuration = matchstickDuration + (chars * charBurnDuration) + 1200;
     
-    // Play burning sound effect (simulated)
+    // Play burning sound effect
+    audioContextRef.current = playBurningSound(totalDuration);
+    
     setTimeout(() => {
       toast.success('🔥 Burned to ashes and released!');
     }, matchstickDuration);
@@ -35,6 +81,11 @@ export const BurnNote = () => {
     setTimeout(() => {
       setText('');
       setIsBurning(false);
+      // Clean up audio context
+      if (audioContextRef.current) {
+        audioContextRef.current.audioContext.close();
+        audioContextRef.current = null;
+      }
     }, totalDuration);
   };
 
