@@ -4,102 +4,155 @@ import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Function to create matchstick lighting sound effect
+// Function to create realistic matchstick lighting sound effect
 const playMatchstickSound = () => {
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-  const duration = 0.5; // Short strike sound
+  const now = audioContext.currentTime;
   
-  // Create oscillator for the "strike" sound
-  const oscillator = audioContext.createOscillator();
-  oscillator.type = 'sawtooth';
-  oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + duration);
-  
-  // Create noise for friction effect
-  const bufferSize = audioContext.sampleRate * duration;
-  const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-  const output = noiseBuffer.getChannelData(0);
-  
-  for (let i = 0; i < bufferSize; i++) {
-    output[i] = (Math.random() * 2 - 1) * 0.3;
+  // 1. Initial strike/scratch sound (0-0.1s)
+  const scratchNoise = audioContext.createBufferSource();
+  const scratchBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.1, audioContext.sampleRate);
+  const scratchData = scratchBuffer.getChannelData(0);
+  for (let i = 0; i < scratchData.length; i++) {
+    scratchData[i] = (Math.random() * 2 - 1) * 0.8;
   }
+  scratchNoise.buffer = scratchBuffer;
   
-  const noiseSource = audioContext.createBufferSource();
-  noiseSource.buffer = noiseBuffer;
+  const scratchFilter = audioContext.createBiquadFilter();
+  scratchFilter.type = 'highpass';
+  scratchFilter.frequency.value = 4000;
   
-  // Filter for the noise
-  const noiseFilter = audioContext.createBiquadFilter();
-  noiseFilter.type = 'highpass';
-  noiseFilter.frequency.value = 3000;
+  const scratchGain = audioContext.createGain();
+  scratchGain.gain.setValueAtTime(0.4, now);
+  scratchGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
   
-  // Gain nodes
-  const strikeGain = audioContext.createGain();
-  strikeGain.gain.setValueAtTime(0.2, audioContext.currentTime);
-  strikeGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+  scratchNoise.connect(scratchFilter);
+  scratchFilter.connect(scratchGain);
+  scratchGain.connect(audioContext.destination);
   
-  const noiseGain = audioContext.createGain();
-  noiseGain.gain.setValueAtTime(0.3, audioContext.currentTime);
-  noiseGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+  // 2. Ignition spark sound (0.05-0.2s)
+  const sparkOsc = audioContext.createOscillator();
+  sparkOsc.type = 'square';
+  sparkOsc.frequency.setValueAtTime(1200, now + 0.05);
+  sparkOsc.frequency.exponentialRampToValueAtTime(800, now + 0.2);
   
-  // Connect oscillator (strike sound)
-  oscillator.connect(strikeGain);
-  strikeGain.connect(audioContext.destination);
+  const sparkGain = audioContext.createGain();
+  sparkGain.gain.setValueAtTime(0, now + 0.05);
+  sparkGain.gain.linearRampToValueAtTime(0.15, now + 0.08);
+  sparkGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
   
-  // Connect noise (friction sound)
-  noiseSource.connect(noiseFilter);
-  noiseFilter.connect(noiseGain);
-  noiseGain.connect(audioContext.destination);
+  sparkOsc.connect(sparkGain);
+  sparkGain.connect(audioContext.destination);
   
-  // Play
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + duration);
-  noiseSource.start(audioContext.currentTime);
-  noiseSource.stop(audioContext.currentTime + duration);
+  // 3. Flame whoosh (0.15-0.6s)
+  const whooshNoise = audioContext.createBufferSource();
+  const whooshBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.45, audioContext.sampleRate);
+  const whooshData = whooshBuffer.getChannelData(0);
+  for (let i = 0; i < whooshData.length; i++) {
+    const env = Math.sin((i / whooshData.length) * Math.PI);
+    whooshData[i] = (Math.random() * 2 - 1) * env * 0.5;
+  }
+  whooshNoise.buffer = whooshBuffer;
   
-  setTimeout(() => audioContext.close(), duration * 1000 + 100);
+  const whooshFilter = audioContext.createBiquadFilter();
+  whooshFilter.type = 'bandpass';
+  whooshFilter.frequency.value = 800;
+  whooshFilter.Q.value = 2;
+  
+  const whooshGain = audioContext.createGain();
+  whooshGain.gain.setValueAtTime(0, now + 0.15);
+  whooshGain.gain.linearRampToValueAtTime(0.25, now + 0.25);
+  whooshGain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+  
+  whooshNoise.connect(whooshFilter);
+  whooshFilter.connect(whooshGain);
+  whooshGain.connect(audioContext.destination);
+  
+  // Play all sounds
+  scratchNoise.start(now);
+  scratchNoise.stop(now + 0.1);
+  sparkOsc.start(now + 0.05);
+  sparkOsc.stop(now + 0.2);
+  whooshNoise.start(now + 0.15);
+  whooshNoise.stop(now + 0.6);
+  
+  setTimeout(() => audioContext.close(), 700);
 };
 
-// Function to create burning/crackling sound effect
+// Function to create realistic burning/crackling sound effect
 const playBurningSound = (duration: number) => {
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const durationInSeconds = duration / 1000;
   
-  // Create noise buffer for crackling effect
-  const bufferSize = audioContext.sampleRate * duration / 1000;
-  const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-  const output = noiseBuffer.getChannelData(0);
+  // Base crackling layer with varied intensity
+  const bufferSize = audioContext.sampleRate * durationInSeconds;
+  const crackleBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+  const crackleData = crackleBuffer.getChannelData(0);
   
-  // Generate crackling noise pattern
+  // Generate realistic crackling pattern
   for (let i = 0; i < bufferSize; i++) {
-    const intensity = Math.sin(i / 500) * 0.5 + 0.5; // Varying intensity
-    output[i] = (Math.random() * 2 - 1) * intensity * 0.3;
+    // Low frequency rumble
+    const rumble = Math.sin(i / 200) * 0.15;
+    // Random crackles with varying intensity
+    const crackle = (Math.random() * 2 - 1) * (Math.random() > 0.95 ? 0.8 : 0.2);
+    // Mid-frequency hiss
+    const hiss = (Math.random() * 2 - 1) * 0.1;
+    
+    crackleData[i] = rumble + crackle + hiss;
   }
   
-  // Create source
-  const noiseSource = audioContext.createBufferSource();
-  noiseSource.buffer = noiseBuffer;
+  const crackleSource = audioContext.createBufferSource();
+  crackleSource.buffer = crackleBuffer;
   
-  // Create filter for more realistic fire sound
-  const filter = audioContext.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 2000;
+  // Multiple filters for realistic fire sound
+  const lowFilter = audioContext.createBiquadFilter();
+  lowFilter.type = 'lowpass';
+  lowFilter.frequency.value = 3000;
+  lowFilter.Q.value = 1;
   
-  // Create gain for volume control
-  const gainNode = audioContext.createGain();
-  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-  gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.2);
-  gainNode.gain.setValueAtTime(0.15, audioContext.currentTime + duration / 1000 - 0.5);
-  gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration / 1000);
+  const highFilter = audioContext.createBiquadFilter();
+  highFilter.type = 'highpass';
+  highFilter.frequency.value = 100;
   
-  // Connect nodes
-  noiseSource.connect(filter);
-  filter.connect(gainNode);
-  gainNode.connect(audioContext.destination);
+  // Main gain with fade in/out
+  const mainGain = audioContext.createGain();
+  mainGain.gain.setValueAtTime(0, audioContext.currentTime);
+  mainGain.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.3);
+  mainGain.gain.setValueAtTime(0.3, audioContext.currentTime + durationInSeconds - 0.5);
+  mainGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + durationInSeconds);
+  
+  // Add random pops/snaps
+  const popsPerSecond = 3;
+  const totalPops = Math.floor(durationInSeconds * popsPerSecond);
+  
+  for (let i = 0; i < totalPops; i++) {
+    const popTime = audioContext.currentTime + (Math.random() * durationInSeconds);
+    const popOsc = audioContext.createOscillator();
+    popOsc.type = 'sine';
+    popOsc.frequency.setValueAtTime(300 + Math.random() * 400, popTime);
+    
+    const popGain = audioContext.createGain();
+    popGain.gain.setValueAtTime(0, popTime);
+    popGain.gain.linearRampToValueAtTime(0.4, popTime + 0.01);
+    popGain.gain.exponentialRampToValueAtTime(0.01, popTime + 0.08);
+    
+    popOsc.connect(popGain);
+    popGain.connect(audioContext.destination);
+    popOsc.start(popTime);
+    popOsc.stop(popTime + 0.08);
+  }
+  
+  // Connect main crackling sound
+  crackleSource.connect(highFilter);
+  highFilter.connect(lowFilter);
+  lowFilter.connect(mainGain);
+  mainGain.connect(audioContext.destination);
   
   // Play
-  noiseSource.start(audioContext.currentTime);
-  noiseSource.stop(audioContext.currentTime + duration / 1000);
+  crackleSource.start(audioContext.currentTime);
+  crackleSource.stop(audioContext.currentTime + durationInSeconds);
   
-  return { audioContext, source: noiseSource };
+  return { audioContext, source: crackleSource };
 };
 
 export const BurnNote = () => {
