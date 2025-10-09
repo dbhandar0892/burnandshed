@@ -4,6 +4,61 @@ import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Function to create matchstick lighting sound effect
+const playMatchstickSound = () => {
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const duration = 0.5; // Short strike sound
+  
+  // Create oscillator for the "strike" sound
+  const oscillator = audioContext.createOscillator();
+  oscillator.type = 'sawtooth';
+  oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + duration);
+  
+  // Create noise for friction effect
+  const bufferSize = audioContext.sampleRate * duration;
+  const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+  const output = noiseBuffer.getChannelData(0);
+  
+  for (let i = 0; i < bufferSize; i++) {
+    output[i] = (Math.random() * 2 - 1) * 0.3;
+  }
+  
+  const noiseSource = audioContext.createBufferSource();
+  noiseSource.buffer = noiseBuffer;
+  
+  // Filter for the noise
+  const noiseFilter = audioContext.createBiquadFilter();
+  noiseFilter.type = 'highpass';
+  noiseFilter.frequency.value = 3000;
+  
+  // Gain nodes
+  const strikeGain = audioContext.createGain();
+  strikeGain.gain.setValueAtTime(0.2, audioContext.currentTime);
+  strikeGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+  
+  const noiseGain = audioContext.createGain();
+  noiseGain.gain.setValueAtTime(0.3, audioContext.currentTime);
+  noiseGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+  
+  // Connect oscillator (strike sound)
+  oscillator.connect(strikeGain);
+  strikeGain.connect(audioContext.destination);
+  
+  // Connect noise (friction sound)
+  noiseSource.connect(noiseFilter);
+  noiseFilter.connect(noiseGain);
+  noiseGain.connect(audioContext.destination);
+  
+  // Play
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + duration);
+  noiseSource.start(audioContext.currentTime);
+  noiseSource.stop(audioContext.currentTime + duration);
+  
+  setTimeout(() => audioContext.close(), duration * 1000 + 100);
+};
+
 // Function to create burning/crackling sound effect
 const playBurningSound = (duration: number) => {
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -59,6 +114,9 @@ export const BurnNote = () => {
     }
 
     setIsBurning(true);
+    
+    // Play matchstick lighting sound immediately
+    playMatchstickSound();
     
     // Calculate animation duration based on character count
     const chars = text.length;
