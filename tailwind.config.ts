@@ -348,6 +348,68 @@ export default {
             transform: "translateY(-40px) translateX(5px) scale(0.3)",
           },
         },
+        "character-walk": {
+          "0%": {
+            transform: "translateX(-100px)",
+            opacity: "0",
+          },
+          "20%": {
+            transform: "translateX(0)",
+            opacity: "1",
+          },
+          "100%": {
+            transform: "translateX(0)",
+            opacity: "1",
+          },
+        },
+        "smoke-rise": {
+          "0%": {
+            transform: "translateY(0) translateX(0) scale(0.5)",
+            opacity: "0.7",
+          },
+          "100%": {
+            transform: "translateY(-100px) translateX(10px) scale(1.8)",
+            opacity: "0",
+          },
+        },
+        "burn-edge": {
+          "0%": {
+            opacity: "0",
+            filter: "brightness(1)",
+          },
+          "20%": {
+            opacity: "1",
+            filter: "brightness(2.5)",
+          },
+          "50%": {
+            filter: "brightness(2)",
+          },
+          "100%": {
+            opacity: "0",
+            filter: "brightness(0.5)",
+          },
+        },
+        "ember-glow": {
+          "0%, 100%": {
+            opacity: "0.7",
+            boxShadow: "0 0 12px rgba(255, 100, 0, 0.7)",
+          },
+          "50%": {
+            opacity: "1",
+            boxShadow: "0 0 25px rgba(255, 100, 0, 1)",
+          },
+        },
+        "character-strike": {
+          "0%": {
+            transform: "rotate(0deg)",
+          },
+          "50%": {
+            transform: "rotate(-20deg)",
+          },
+          "100%": {
+            transform: "rotate(0deg)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -363,6 +425,11 @@ export default {
         "breathe": "breathe 4s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
         "ember-rise": "ember-rise 0.8s ease-out forwards",
+        "character-walk": "character-walk 3s ease-in-out forwards",
+        "smoke-rise": "smoke-rise 2s ease-out forwards",
+        "burn-edge": "burn-edge 1s ease-out forwards",
+        "ember-glow": "ember-glow 1s ease-in-out infinite",
+        "character-strike": "character-strike 0.3s ease-in-out",
       },
     },
   },
