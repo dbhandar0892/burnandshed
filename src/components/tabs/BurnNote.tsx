@@ -123,7 +123,7 @@ export const BurnNote = () => {
                 />
                 {/* Matchstick overlay in paw */}
                 <div 
-                  className="absolute bottom-2 right-0 w-14 h-1 bg-gradient-to-r from-amber-800 via-amber-700 to-amber-800 rounded-full animate-character-strike"
+                  className="absolute bottom-2 right-0 w-14 h-1 bg-gradient-to-r from-amber-800 via-amber-700 to-amber-800 rounded-full animate-character-strike scale-x-[-1]"
                   style={{
                     animationDelay: '1.5s',
                     transformOrigin: 'left center'
