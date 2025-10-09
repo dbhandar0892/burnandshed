@@ -106,32 +106,57 @@ export const BurnNote = () => {
       <div className="flex-1 space-y-4">
         {isBurning ? (
           <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
-            {/* Animated Character */}
+            {/* Animated Character - Cute Squirrel */}
             <div 
               className="absolute bottom-2 left-2 z-20 animate-character-walk"
               style={{ 
                 animationDuration: '3s',
               }}
             >
-              {/* Simple stick figure character */}
-              <div className="relative w-8 h-16">
-                {/* Head */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 border-2 border-amber-300" />
+              {/* Cute squirrel character */}
+              <div className="relative w-12 h-16">
+                {/* Big fluffy tail */}
+                <div className="absolute -left-4 top-2 w-10 h-12 bg-gradient-to-br from-orange-600 via-orange-500 to-orange-400 rounded-full transform -rotate-12" 
+                  style={{ 
+                    clipPath: 'ellipse(60% 70% at 40% 50%)',
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+                  }} 
+                />
+                <div className="absolute -left-3 top-3 w-8 h-10 bg-gradient-to-br from-orange-400 to-orange-300 rounded-full transform -rotate-12 opacity-80" 
+                  style={{ clipPath: 'ellipse(50% 60% at 40% 50%)' }} 
+                />
                 
                 {/* Body */}
-                <div className="absolute top-6 left-1/2 -translate-x-1/2 w-1 h-6 bg-amber-300 rounded-full" />
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 w-7 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full" />
+                
+                {/* Head */}
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 border-2 border-orange-600" />
+                
+                {/* Ears */}
+                <div className="absolute top-1 left-1/2 -translate-x-1/2 -translate-x-2 w-2 h-3 bg-orange-500 rounded-t-full" />
+                <div className="absolute top-1 left-1/2 -translate-x-1/2 translate-x-2 w-2 h-3 bg-orange-500 rounded-t-full" />
+                
+                {/* Eyes */}
+                <div className="absolute top-3 left-1/2 -translate-x-1/2 -translate-x-1.5 w-1.5 h-1.5 bg-gray-800 rounded-full" />
+                <div className="absolute top-3 left-1/2 -translate-x-1/2 translate-x-1.5 w-1.5 h-1.5 bg-gray-800 rounded-full" />
+                
+                {/* Nose */}
+                <div className="absolute top-4.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-gray-700 rounded-full" />
+                
+                {/* Belly patch */}
+                <div className="absolute top-8 left-1/2 -translate-x-1/2 w-4 h-5 bg-gradient-to-b from-orange-200 to-orange-300 rounded-full opacity-80" />
                 
                 {/* Arms - one holding matchstick */}
-                <div className="absolute top-7 left-1/2 -translate-x-1/2 w-8 h-1 bg-amber-300 rounded-full" />
+                <div className="absolute top-9 left-1/2 -translate-x-1/2 -translate-x-2 w-1.5 h-3 bg-orange-500 rounded-full" />
                 <div 
-                  className="absolute top-7 right-0 w-10 h-1 bg-amber-300 rounded-full origin-left"
+                  className="absolute top-9 left-1/2 -translate-x-1/2 translate-x-1 w-1.5 h-4 bg-orange-500 rounded-full origin-top"
                   style={{
-                    transform: 'rotate(-45deg)',
+                    transform: 'rotate(-30deg)',
                   }}
                 >
                   {/* Matchstick in hand */}
                   <div 
-                    className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-1 bg-gradient-to-r from-amber-700 to-amber-800 rounded-full animate-character-strike"
+                    className="absolute right-0 top-full w-12 h-1 bg-gradient-to-r from-amber-700 to-amber-800 rounded-full animate-character-strike"
                     style={{
                       animationDelay: '1.5s',
                       transformOrigin: 'left center'
@@ -161,9 +186,15 @@ export const BurnNote = () => {
                 </div>
                 
                 {/* Legs with walking animation */}
-                <div className="absolute top-12 left-1/2 -translate-x-1/2">
-                  <div className="absolute w-1 h-4 bg-amber-300 rounded-full" style={{ transform: 'rotate(20deg)' }} />
-                  <div className="absolute w-1 h-4 bg-amber-300 rounded-full" style={{ transform: 'rotate(-20deg) translateX(4px)' }} />
+                <div className="absolute top-13 left-1/2 -translate-x-1/2">
+                  <div className="absolute -left-1 w-1.5 h-3 bg-orange-600 rounded-full" style={{ transform: 'rotate(10deg)' }} />
+                  <div className="absolute left-1 w-1.5 h-3 bg-orange-600 rounded-full" style={{ transform: 'rotate(-10deg)' }} />
+                </div>
+                
+                {/* Little feet */}
+                <div className="absolute top-15 left-1/2 -translate-x-1/2">
+                  <div className="absolute -left-1.5 w-2 h-1.5 bg-orange-700 rounded-full" />
+                  <div className="absolute left-0.5 w-2 h-1.5 bg-orange-700 rounded-full" />
                 </div>
               </div>
             </div>
