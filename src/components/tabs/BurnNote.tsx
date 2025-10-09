@@ -132,45 +132,68 @@ export const BurnNote = () => {
             {/* Burning Text */}
             <div className="text-2xl leading-relaxed whitespace-pre-wrap">
               {text.split('').map((char, charIndex) => {
-                const matchstickDelay = 2000; // matchstick animation time
-                // Burn from end (last character) to beginning (first character)
+                const matchstickDelay = 2000;
                 const reverseIndex = text.length - 1 - charIndex;
-                const charDelay = matchstickDelay + (reverseIndex * 80);
+                
+                // Add natural variation to burning timing
+                const baseDelay = reverseIndex * 80;
+                const randomOffset = Math.random() * 40 - 20; // ±20ms variation
+                const charDelay = matchstickDelay + baseDelay + randomOffset;
+                
+                // Vary flame size and intensity
+                const flameScale = 0.8 + Math.random() * 0.4; // 0.8-1.2x scale
+                const flameHeight = 8 + Math.random() * 4; // 8-12 units
+                
+                // Random ember direction
+                const emberAngle = -20 + Math.random() * 40; // -20 to 20 degrees
+                const emberDistance = 20 + Math.random() * 30; // 20-50px
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
-                    {/* Larger flame effect below character */}
+                    {/* Dynamic flame effect below character */}
                     <span
-                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-8 h-10 pointer-events-none animate-flame-flicker opacity-0"
+                      className="absolute left-1/2 -translate-x-1/2 pointer-events-none animate-flame-flicker opacity-0"
                       style={{
+                        bottom: `${flameHeight}px`,
+                        width: `${8 * flameScale}px`,
+                        height: `${10 * flameScale}px`,
                         animationDelay: `${charDelay - 100}ms`,
-                        animationDuration: '0.2s',
-                        animationIterationCount: '5',
+                        animationDuration: `${150 + Math.random() * 100}ms`,
+                        animationIterationCount: '4',
                       }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-t from-orange-600 via-orange-400 to-yellow-300 rounded-t-full blur-[2px]"
+                      <div className="absolute inset-0 bg-gradient-to-t from-red-600 via-orange-500 to-yellow-300 rounded-t-full blur-[2px]"
                         style={{ 
-                          boxShadow: '0 0 20px rgba(255, 140, 0, 0.8), 0 0 35px rgba(255, 100, 0, 0.5)' 
+                          boxShadow: '0 0 15px rgba(255, 140, 0, 0.9), 0 0 30px rgba(255, 100, 0, 0.6)' 
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-red-500 via-orange-500 to-yellow-400 rounded-t-full blur-sm opacity-70" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-orange-700 via-orange-400 to-yellow-200 rounded-t-full blur-sm opacity-80" />
                     </span>
                     
-                    {/* Ember particles */}
+                    {/* Multiple ember particles with varied trajectories */}
                     <span
-                      className="absolute -bottom-4 left-1/2 w-1 h-1 rounded-full bg-orange-500 pointer-events-none opacity-0"
+                      className="absolute -bottom-4 left-1/2 w-1 h-1 rounded-full bg-orange-400 pointer-events-none opacity-0"
                       style={{
                         animationDelay: `${charDelay + 200}ms`,
                         animation: 'ember-rise 0.8s ease-out forwards',
+                        transform: `rotate(${emberAngle}deg)`,
+                      }}
+                    />
+                    <span
+                      className="absolute -bottom-4 left-1/2 w-0.5 h-0.5 rounded-full bg-red-500 pointer-events-none opacity-0"
+                      style={{
+                        animationDelay: `${charDelay + 300}ms`,
+                        animation: 'ember-rise 1s ease-out forwards',
+                        transform: `rotate(${-emberAngle}deg)`,
                       }}
                     />
                     
-                    {/* Character that burns */}
+                    {/* Character that burns with natural variation */}
                     <span
                       className="inline-block animate-burn-letter"
                       style={{
                         animationDelay: `${charDelay}ms`,
-                        animationDuration: '1.2s',
+                        animationDuration: `${1100 + Math.random() * 200}ms`,
                         animationFillMode: 'forwards',
                       }}
                     >
