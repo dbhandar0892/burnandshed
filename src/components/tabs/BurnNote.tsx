@@ -116,17 +116,43 @@ export const BurnNote = () => {
               <div className="relative w-2 h-16 bg-gradient-to-b from-amber-800 to-amber-900 rounded-sm">
                 {/* Matchstick head */}
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-600 rounded-full" />
-                {/* Flame on matchstick - stays lit */}
+                {/* Realistic flame on matchstick - stays lit */}
                 <div 
-                  className="absolute -top-8 left-1/2 -translate-x-1/2 w-6 h-8 animate-flame-flicker"
+                  className="absolute -top-10 left-1/2 -translate-x-1/2 w-8 h-12"
                   style={{ 
                     transformOrigin: 'bottom center'
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-orange-500 via-yellow-400 to-yellow-200 rounded-t-full blur-[1px]" 
+                  {/* Outer flame layer - red/orange */}
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-t from-red-600 via-orange-500 to-transparent rounded-t-full blur-[2px] animate-flame-sway"
                     style={{ 
-                      boxShadow: '0 0 25px rgba(255, 165, 0, 0.9), 0 0 45px rgba(255, 100, 0, 0.7)' 
+                      opacity: 0.6,
+                      animationDelay: '0ms',
+                      animationDuration: '300ms'
                     }}
+                  />
+                  {/* Middle flame layer - orange/yellow */}
+                  <div 
+                    className="absolute inset-x-1 inset-y-0 bg-gradient-to-t from-orange-500 via-yellow-400 to-transparent rounded-t-full blur-[1px] animate-flame-sway"
+                    style={{ 
+                      opacity: 0.8,
+                      animationDelay: '50ms',
+                      animationDuration: '250ms'
+                    }}
+                  />
+                  {/* Inner flame core - bright yellow/white */}
+                  <div 
+                    className="absolute inset-x-2 inset-y-1 bg-gradient-to-t from-yellow-300 via-yellow-100 to-white rounded-t-full animate-flame-sway"
+                    style={{ 
+                      opacity: 0.9,
+                      animationDelay: '25ms',
+                      animationDuration: '200ms'
+                    }}
+                  />
+                  {/* Glow effect */}
+                  <div 
+                    className="absolute -inset-2 bg-gradient-radial from-orange-400/50 via-orange-500/20 to-transparent rounded-full blur-xl animate-flame-glow"
                   />
                 </div>
               </div>
