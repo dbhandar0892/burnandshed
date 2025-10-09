@@ -332,21 +332,48 @@ export default {
         },
         "ember-rise": {
           "0%": {
-            opacity: "0",
             transform: "translateY(0) translateX(0) scale(1)",
+            opacity: "0.9"
           },
-          "10%": {
-            opacity: "0.8",
-            transform: "translateY(-5px) translateX(0) scale(1.2)",
+          "30%": {
+            transform: "translateY(-20px) translateX(-5px) scale(0.8)",
+            opacity: "0.7"
           },
-          "50%": {
-            opacity: "0.6",
-            transform: "translateY(-20px) translateX(3px) scale(0.8)",
+          "60%": {
+            transform: "translateY(-45px) translateX(3px) scale(0.4)",
+            opacity: "0.4"
           },
           "100%": {
-            opacity: "0",
-            transform: "translateY(-40px) translateX(5px) scale(0.3)",
+            transform: "translateY(-80px) translateX(-8px) scale(0.1)",
+            opacity: "0"
+          }
+        },
+        "smoke-rise": {
+          "0%": {
+            transform: "translateY(0) translateX(0) scale(0.5)",
+            opacity: "0.6",
+            filter: "blur(2px)"
           },
+          "50%": {
+            transform: "translateY(-50px) translateX(10px) scale(1.2)",
+            opacity: "0.3",
+            filter: "blur(4px)"
+          },
+          "100%": {
+            transform: "translateY(-100px) translateX(-15px) scale(1.8)",
+            opacity: "0",
+            filter: "blur(6px)"
+          }
+        },
+        "ash-float": {
+          "0%": {
+            transform: "translateY(0) translateX(0) rotate(0deg) scale(1)",
+            opacity: "0.7"
+          },
+          "100%": {
+            transform: "translateY(-100px) translateX(20px) rotate(180deg) scale(0.2)",
+            opacity: "0"
+          }
         },
       },
       animation: {
@@ -356,13 +383,15 @@ export default {
         "shred-strip": "shred-strip 1.5s cubic-bezier(0.4, 0, 0.6, 1) forwards",
         "shred-confetti": "shred-confetti 2s cubic-bezier(0.4, 0, 0.2, 1) forwards",
         "burn": "burn 1s ease-out forwards",
-        "burn-letter": "burn-letter 1s ease-out forwards",
+        "burn-letter": "burn-letter 1.4s ease-out forwards",
         "burn-word": "burn-word 1.2s ease-out forwards",
         "matchstick-light": "matchstick-light 2s ease-in-out forwards",
         "flame-flicker": "flame-flicker 0.3s ease-in-out infinite",
         "breathe": "breathe 4s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
-        "ember-rise": "ember-rise 0.8s ease-out forwards",
+        "ember-rise": "ember-rise 1s ease-out forwards",
+        "smoke-rise": "smoke-rise 2s ease-out forwards",
+        "ash-float": "ash-float 2.5s ease-out forwards",
       },
     },
   },
