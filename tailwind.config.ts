@@ -248,15 +248,15 @@ export default {
             opacity: "1",
           },
           "70%": {
-            transform: "translateX(-10px) translateY(-180px) rotate(-20deg)",
+            transform: "translateX(-100%) translateY(-20px) rotate(-20deg)",
             opacity: "1",
           },
           "85%": {
-            transform: "translateX(-10px) translateY(-180px) rotate(-20deg)",
+            transform: "translateX(-100%) translateY(-20px) rotate(-20deg)",
             opacity: "1",
           },
           "100%": {
-            transform: "translateX(-10px) translateY(-180px) rotate(-20deg)",
+            transform: "translateX(-100%) translateY(-20px) rotate(-20deg)",
             opacity: "0",
           },
         },
