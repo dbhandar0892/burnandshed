@@ -106,8 +106,8 @@ export const BurnNote = () => {
           <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
             {/* Matchstick Animation */}
             <div 
-              className="absolute bottom-2 left-2 z-10 animate-matchstick-light"
-              style={{ transformOrigin: 'top right' }}
+              className="absolute bottom-2 right-2 z-10 animate-matchstick-light"
+              style={{ transformOrigin: 'top left' }}
             >
               <div className="relative w-2 h-16 bg-gradient-to-b from-amber-800 to-amber-900 rounded-sm">
                 {/* Matchstick head */}
