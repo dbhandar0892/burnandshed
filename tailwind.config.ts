@@ -350,7 +350,7 @@ export default {
         },
         "character-walk": {
           "0%": {
-            transform: "translateX(100px)",
+            transform: "translateX(-100px)",
             opacity: "0",
           },
           "20%": {
