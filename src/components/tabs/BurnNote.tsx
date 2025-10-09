@@ -64,12 +64,12 @@ export const BurnNote = () => {
     const chars = text.length;
     const matchstickDuration = 2000; // 2s for matchstick animation
     const charBurnDuration = 80; // 80ms per character
-    const totalDuration = matchstickDuration + (chars * charBurnDuration) + 1200;
+    const burningDuration = (chars * charBurnDuration) + 1200;
+    const totalDuration = matchstickDuration + burningDuration;
     
-    // Play burning sound effect
-    audioContextRef.current = playBurningSound(totalDuration);
-    
+    // Start burning sound only when matchstick touches the words
     setTimeout(() => {
+      audioContextRef.current = playBurningSound(burningDuration);
       toast.success('🔥 Burned to ashes and released!');
     }, matchstickDuration);
     
