@@ -239,24 +239,24 @@ export default {
             transform: "translateX(-100px) translateY(100px) rotate(-45deg)",
             opacity: "0",
           },
-          "20%": {
+          "15%": {
             transform: "translateX(0) translateY(0) rotate(-45deg)",
             opacity: "1",
           },
-          "40%": {
+          "30%": {
             transform: "translateX(0) translateY(0) rotate(-45deg)",
             opacity: "1",
           },
-          "60%": {
-            transform: "translateX(20px) translateY(-10px) rotate(-30deg)",
+          "70%": {
+            transform: "translateX(-10px) translateY(-180px) rotate(-20deg)",
             opacity: "1",
           },
-          "80%": {
-            transform: "translateX(20px) translateY(-10px) rotate(-30deg)",
+          "85%": {
+            transform: "translateX(-10px) translateY(-180px) rotate(-20deg)",
             opacity: "1",
           },
           "100%": {
-            transform: "translateX(20px) translateY(-10px) rotate(-30deg)",
+            transform: "translateX(-10px) translateY(-180px) rotate(-20deg)",
             opacity: "0",
           },
         },
