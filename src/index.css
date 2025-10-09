@@ -133,4 +133,27 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  @keyframes ember-rise {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(-50px) scale(0);
+      opacity: 0;
+    }
+  }
+
+  @keyframes matchstick-move {
+    0% {
+      transform: translateX(0);
+    }
+    15% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-100vw + 40px));
+    }
+  }
 }

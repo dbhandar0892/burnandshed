@@ -104,10 +104,14 @@ export const BurnNote = () => {
       <div className="flex-1 space-y-4">
         {isBurning ? (
           <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
-            {/* Matchstick Animation - stays visible */}
+            {/* Matchstick Animation - moves with burning text */}
             <div 
-              className="absolute bottom-2 right-2 z-10"
-              style={{ transformOrigin: 'top left' }}
+              className="absolute bottom-2 z-10"
+              style={{ 
+                transformOrigin: 'top left',
+                animation: `matchstick-move ${(text.length * 80 + 2000)}ms linear forwards`,
+                right: '8px'
+              }}
             >
               <div className="relative w-2 h-16 bg-gradient-to-b from-amber-800 to-amber-900 rounded-sm">
                 {/* Matchstick head */}
