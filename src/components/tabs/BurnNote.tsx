@@ -114,9 +114,11 @@ export const BurnNote = () => {
                 transform: 'rotate(-35deg)'
               }}
             >
-              <div className="relative w-2 h-16 bg-gradient-to-b from-amber-800 to-amber-900 rounded-sm">
-                {/* Matchstick head */}
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-600 rounded-full" />
+              {/* Wooden stick with subtle grain */}
+              <div className="relative w-2 h-16 rounded-sm" style={{ background: 'linear-gradient(to bottom, hsl(var(--wood-light)), hsl(var(--wood-dark)))', boxShadow: '0 6px 12px hsl(var(--foreground) / 0.08)' }}>
+                <div className="absolute inset-0 pointer-events-none" style={{ opacity: 0.15, backgroundImage: 'repeating-linear-gradient(90deg, hsl(0 0% 0% / 0.05) 0, hsl(0 0% 0% / 0.05) 1px, transparent 1px, transparent 4px)' }} />
+                {/* Match head */}
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full shadow-sm" style={{ background: 'radial-gradient(circle at 50% 60%, hsl(var(--fire)) 0%, hsl(var(--ember)) 45%, hsl(var(--charcoal)) 80%)' }} />
                 {/* Realistic flame on matchstick - stays lit */}
                 <div 
                   className="absolute -top-10 left-1/2 -translate-x-1/2 w-8 h-12"
@@ -126,35 +128,42 @@ export const BurnNote = () => {
                 >
                   {/* Outer flame layer - red/orange */}
                   <div 
-                    className="absolute inset-0 bg-gradient-to-t from-red-600 via-orange-500 to-transparent rounded-t-full blur-[2px] animate-flame-sway"
+                    className="absolute inset-0 rounded-t-full blur-[2px]"
                     style={{ 
                       opacity: 0.6,
-                      animationDelay: '0ms',
-                      animationDuration: '300ms'
+                      background: 'linear-gradient(to top, hsl(var(--fire)), hsl(var(--ember)), transparent)',
+                      animation: 'flame-sway 300ms infinite',
+                      animationDelay: '0ms'
                     }}
                   />
                   {/* Middle flame layer - orange/yellow */}
                   <div 
-                    className="absolute inset-x-1 inset-y-0 bg-gradient-to-t from-orange-500 via-yellow-400 to-transparent rounded-t-full blur-[1px] animate-flame-sway"
+                    className="absolute inset-x-1 inset-y-0 rounded-t-full blur-[1px]"
                     style={{ 
                       opacity: 0.8,
-                      animationDelay: '50ms',
-                      animationDuration: '250ms'
+                      background: 'linear-gradient(to top, hsl(var(--ember)), hsl(var(--fire) / 0.85), transparent)',
+                      animation: 'flame-sway 250ms infinite',
+                      animationDelay: '50ms'
                     }}
                   />
-                  {/* Inner flame core - bright yellow/white */}
+                  {/* Inner flame core - bright */}
                   <div 
-                    className="absolute inset-x-2 inset-y-1 bg-gradient-to-t from-yellow-300 via-yellow-100 to-white rounded-t-full animate-flame-sway"
+                    className="absolute inset-x-2 inset-y-1 rounded-t-full"
                     style={{ 
                       opacity: 0.9,
-                      animationDelay: '25ms',
-                      animationDuration: '200ms'
+                      background: 'linear-gradient(to top, hsl(var(--fire) / 0.9), hsl(var(--fire-foreground)), white)',
+                      animation: 'flame-sway 200ms infinite',
+                      animationDelay: '25ms'
                     }}
                   />
                   {/* Glow effect */}
                   <div 
-                    className="absolute -inset-2 bg-gradient-radial from-orange-400/50 via-orange-500/20 to-transparent rounded-full blur-xl animate-flame-glow"
+                    className="absolute -inset-3 rounded-full blur-xl"
+                    style={{ background: 'radial-gradient(closest-side, hsl(var(--fire) / 0.35), hsl(var(--fire) / 0.15), transparent)', animation: 'flame-glow 1200ms ease-in-out infinite' }}
                   />
+
+                  {/* Tip smoke curl */}
+                  <span className="pointer-events-none absolute -top-4 left-1/2 w-3 h-3 rounded-full blur-sm" style={{ background: 'radial-gradient(circle, hsl(0 0% 60% / 0.5), transparent)', animation: 'smoke-rise 1.4s ease-out infinite', opacity: 0.5 }} />
                 </div>
               </div>
             </div>

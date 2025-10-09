@@ -65,6 +65,12 @@ All colors MUST be HSL.
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
+    /* Material tokens */
+    --wood-light: 35 50% 70%;
+    --wood-dark: 30 35% 35%;
+    --charcoal: 0 0% 20%;
+    --ember: 20 90% 55%;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -114,6 +120,12 @@ All colors MUST be HSL.
     --border: 230 15% 20%;
     --input: 230 15% 15%;
     --ring: 240 60% 70%;
+
+    /* Material tokens (dark) */
+    --wood-light: 35 30% 55%;
+    --wood-dark: 30 30% 25%;
+    --charcoal: 0 0% 85%;
+    --ember: 20 85% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -192,5 +204,10 @@ All colors MUST be HSL.
       opacity: 0.8;
       transform: scale(1.1);
     }
+  }
+
+  @keyframes match-sway {
+    0%, 100% { transform: rotate(0deg) translateY(0); }
+    50% { transform: rotate(1.5deg) translateY(-1px); }
   }
 }
