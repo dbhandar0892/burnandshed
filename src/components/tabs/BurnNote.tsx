@@ -114,7 +114,7 @@ export const BurnNote = () => {
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-600 rounded-full" />
                 {/* Flame on matchstick */}
                 <div 
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 w-3 h-4 animate-flame-flicker"
+                  className="absolute -top-6 left-1/2 -translate-x-1/2 w-5 h-7 animate-flame-flicker"
                   style={{ 
                     animationDelay: '0.4s',
                     transformOrigin: 'bottom center'
@@ -141,7 +141,7 @@ export const BurnNote = () => {
                   <span key={charIndex} className="relative inline-block">
                     {/* Larger flame effect below character */}
                     <span
-                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-8 h-10 pointer-events-none animate-flame-flicker opacity-0"
+                      className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-5 h-6 pointer-events-none animate-flame-flicker opacity-0"
                       style={{
                         animationDelay: `${charDelay - 100}ms`,
                         animationDuration: '0.2s',
