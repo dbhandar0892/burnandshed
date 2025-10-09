@@ -109,7 +109,7 @@ export const BurnNote = () => {
           <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
             {/* Animated Character - Realistic Squirrel (Image) */}
             <div 
-              className="absolute bottom-2 left-2 z-20 animate-character-walk"
+              className="absolute bottom-2 right-2 z-20 animate-character-walk"
               style={{ 
                 animationDuration: '3s',
               }}
@@ -118,7 +118,7 @@ export const BurnNote = () => {
                 <img
                   src={squirrelImg}
                   alt="Realistic squirrel character holding a match to ignite the note"
-                  className="w-16 h-16 object-contain drop-shadow-lg select-none pointer-events-none"
+                  className="w-16 h-16 object-contain drop-shadow-lg select-none pointer-events-none scale-x-[-1]"
                   loading="lazy"
                 />
                 {/* Matchstick overlay in paw */}
