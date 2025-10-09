@@ -133,8 +133,9 @@ export const BurnNote = () => {
             <div className="text-2xl leading-relaxed whitespace-pre-wrap">
               {text.split('').map((char, charIndex) => {
                 const matchstickDelay = 2000; // matchstick animation time
-                // Burn from end (last character) to start (first character)
-                const charDelay = matchstickDelay + (charIndex * 80);
+                // Burn from end (last character) to beginning (first character)
+                const reverseIndex = text.length - 1 - charIndex;
+                const charDelay = matchstickDelay + (reverseIndex * 80);
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
