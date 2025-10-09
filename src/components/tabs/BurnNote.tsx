@@ -138,18 +138,21 @@ export const BurnNote = () => {
                 const matchstickDelay = 2000;
                 const reverseIndex = text.length - 1 - charIndex;
                 
-                // Add natural variation to burning timing
+                // More natural variation to burning timing
                 const baseDelay = reverseIndex * 80;
-                const randomOffset = Math.random() * 40 - 20; // ±20ms variation
+                const randomOffset = Math.random() * 80 - 40; // ±40ms variation
                 const charDelay = matchstickDelay + baseDelay + randomOffset;
                 
-                // Vary flame size and intensity
-                const flameScale = 0.8 + Math.random() * 0.4; // 0.8-1.2x scale
-                const flameHeight = 8 + Math.random() * 4; // 8-12 units
+                // Much more varied flame size and intensity
+                const flameScale = 0.7 + Math.random() * 0.8; // 0.7-1.5x scale
+                const flameHeight = 6 + Math.random() * 8; // 6-14 units
+                const flameIntensity = 0.7 + Math.random() * 0.3; // 0.7-1.0
                 
-                // Random ember direction
-                const emberAngle = -20 + Math.random() * 40; // -20 to 20 degrees
-                const emberDistance = 20 + Math.random() * 30; // 20-50px
+                // More varied ember effects
+                const emberAngle = -30 + Math.random() * 60; // -30 to 30 degrees
+                const emberAngle2 = -40 + Math.random() * 80; // -40 to 40 degrees
+                const emberDistance = 30 + Math.random() * 40; // 30-70px
+                const emberDelay = 150 + Math.random() * 200; // 150-350ms
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
@@ -158,36 +161,56 @@ export const BurnNote = () => {
                       className="absolute left-1/2 -translate-x-1/2 pointer-events-none animate-flame-flicker opacity-0"
                       style={{
                         bottom: `${flameHeight}px`,
-                        width: `${12 * flameScale}px`,
-                        height: `${16 * flameScale}px`,
-                        animationDelay: `${charDelay - 100}ms`,
-                        animationDuration: `${150 + Math.random() * 100}ms`,
-                        animationIterationCount: '4',
+                        width: `${14 * flameScale}px`,
+                        height: `${20 * flameScale}px`,
+                        animationDelay: `${charDelay - 120}ms`,
+                        animationDuration: `${120 + Math.random() * 150}ms`,
+                        animationIterationCount: '5',
                       }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-t from-red-600 via-orange-500 to-yellow-300 rounded-t-full blur-[2px]"
+                      <div className="absolute inset-0 bg-gradient-to-t from-red-600 via-orange-500 to-yellow-300 rounded-t-full blur-[3px]"
                         style={{ 
-                          boxShadow: '0 0 25px rgba(255, 140, 0, 0.9), 0 0 40px rgba(255, 100, 0, 0.7)' 
+                          opacity: flameIntensity,
+                          boxShadow: `0 0 ${20 + Math.random() * 15}px rgba(255, 140, 0, ${0.8 + Math.random() * 0.2}), 0 0 ${35 + Math.random() * 20}px rgba(255, 100, 0, ${0.6 + Math.random() * 0.2})` 
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-orange-700 via-orange-400 to-yellow-200 rounded-t-full blur-sm opacity-80" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-orange-700 via-orange-400 to-yellow-100 rounded-t-full blur-sm" 
+                        style={{ opacity: flameIntensity * 0.7 }}
+                      />
                     </span>
                     
                     {/* Multiple ember particles with varied trajectories */}
                     <span
-                      className="absolute -bottom-4 left-1/2 w-1 h-1 rounded-full bg-orange-400 pointer-events-none opacity-0"
+                      className="absolute -bottom-4 left-1/2 w-1.5 h-1.5 rounded-full bg-orange-500 pointer-events-none opacity-0"
                       style={{
-                        animationDelay: `${charDelay + 200}ms`,
-                        animation: 'ember-rise 0.8s ease-out forwards',
+                        animationDelay: `${charDelay + emberDelay}ms`,
+                        animation: 'ember-rise 0.9s ease-out forwards',
                         transform: `rotate(${emberAngle}deg)`,
                       }}
                     />
                     <span
-                      className="absolute -bottom-4 left-1/2 w-0.5 h-0.5 rounded-full bg-red-500 pointer-events-none opacity-0"
+                      className="absolute -bottom-4 left-1/2 w-1 h-1 rounded-full bg-red-500 pointer-events-none opacity-0"
                       style={{
-                        animationDelay: `${charDelay + 300}ms`,
-                        animation: 'ember-rise 1s ease-out forwards',
+                        animationDelay: `${charDelay + emberDelay + 100}ms`,
+                        animation: 'ember-rise 1.1s ease-out forwards',
+                        transform: `rotate(${emberAngle2}deg)`,
+                      }}
+                    />
+                    <span
+                      className="absolute -bottom-4 left-1/2 w-0.5 h-0.5 rounded-full bg-yellow-400 pointer-events-none opacity-0"
+                      style={{
+                        animationDelay: `${charDelay + emberDelay + 50}ms`,
+                        animation: 'ember-rise 0.7s ease-out forwards',
                         transform: `rotate(${-emberAngle}deg)`,
+                      }}
+                    />
+                    
+                    {/* Smoke particle */}
+                    <span
+                      className="absolute -top-2 left-1/2 w-3 h-3 rounded-full bg-gray-400 pointer-events-none opacity-0 blur-sm"
+                      style={{
+                        animationDelay: `${charDelay + 400}ms`,
+                        animation: 'smoke-rise 1.5s ease-out forwards',
                       }}
                     />
                     
@@ -196,7 +219,7 @@ export const BurnNote = () => {
                       className="inline-block animate-burn-letter"
                       style={{
                         animationDelay: `${charDelay}ms`,
-                        animationDuration: `${1100 + Math.random() * 200}ms`,
+                        animationDuration: `${1000 + Math.random() * 400}ms`,
                         animationFillMode: 'forwards',
                       }}
                     >
