@@ -179,46 +179,48 @@ export const BreathingReset = () => {
   };
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="w-16 h-16 bg-gradient-zen rounded-full flex items-center justify-center mx-auto animate-float">
-          <Wind className="h-8 w-8 text-zen-foreground" />
+    <div className="h-full flex flex-col p-6 space-y-8">
+      {/* Header with enhanced styling */}
+      <div className="text-center space-y-3 animate-fade-in">
+        <div className="w-20 h-20 bg-gradient-zen rounded-2xl flex items-center justify-center mx-auto animate-float shadow-zen">
+          <Wind className="h-10 w-10 text-white drop-shadow-md" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground">1-Min Reset</h2>
-        <p className="text-muted-foreground">Focus on your breath and find your center</p>
+        <h2 className="text-3xl font-bold text-foreground tracking-tight">1-Min Reset</h2>
+        <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
+          Focus on your breath and find your center
+        </p>
       </div>
 
       {/* Breathing Circle */}
       <div className="flex-1 flex items-center justify-center">
-        <Card className="p-8 bg-card border-border shadow-medium w-full max-w-sm mx-auto">
-          <div className="text-center space-y-6">
+        <Card className="p-10 bg-card/50 backdrop-blur-sm border-border shadow-large rounded-3xl w-full max-w-sm mx-auto">
+          <div className="text-center space-y-8">
             {/* Animated Circle */}
             <div className="relative flex items-center justify-center">
               <div 
-                className={`w-32 h-32 rounded-full bg-gradient-zen flex items-center justify-center transition-all duration-[4000ms] ${
+                className={`w-40 h-40 rounded-full bg-gradient-zen flex items-center justify-center transition-all duration-[4000ms] shadow-zen ${
                   isActive ? 'animate-breathe' : ''
                 }`}
               >
-                <div className="text-zen-foreground font-bold text-lg">
+                <div className="text-white font-bold text-xl drop-shadow-md">
                   {isActive ? (breathePhase === 'in' ? 'Breathe In' : 'Breathe Out') : 'Ready'}
                 </div>
               </div>
             </div>
 
             {/* Timer */}
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-foreground">
+            <div className="space-y-3">
+              <div className="text-4xl font-bold text-foreground tracking-tight">
                 {formatTime(timeLeft)}
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-base text-muted-foreground font-medium">
                 Breathing cycles: {cycleCount}
               </div>
             </div>
 
             {/* Instructions */}
             {isActive && (
-              <div className="text-sm text-muted-foreground">
+              <div className="text-base text-muted-foreground font-medium animate-fade-in">
                 {breathePhase === 'in' ? 'Inhale slowly through your nose' : 'Exhale gently through your mouth'}
               </div>
             )}
@@ -227,23 +229,23 @@ export const BreathingReset = () => {
       </div>
 
       {/* Controls */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex gap-3">
           {!isActive ? (
             <Button
               onClick={handleStart}
               disabled={timeLeft === 0}
-              className="flex-1 bg-gradient-zen text-zen-foreground hover:opacity-90 h-12 text-lg font-semibold rounded-lg shadow-soft"
+              className="flex-1 bg-gradient-zen text-white hover:opacity-90 h-14 text-lg font-bold rounded-2xl shadow-zen transition-all duration-300 hover:shadow-large hover:scale-[1.02]"
             >
-              <Play className="mr-2 h-5 w-5" />
+              <Play className="mr-2 h-6 w-6" />
               Start
             </Button>
           ) : (
             <Button
               onClick={handlePause}
-              className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/90 h-12 text-lg font-semibold rounded-lg shadow-soft"
+              className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/90 h-14 text-lg font-bold rounded-2xl shadow-medium transition-all duration-300 hover:scale-[1.02]"
             >
-              <Pause className="mr-2 h-5 w-5" />
+              <Pause className="mr-2 h-6 w-6" />
               Pause
             </Button>
           )}
@@ -251,23 +253,23 @@ export const BreathingReset = () => {
           <Button
             onClick={toggleMusic}
             variant="outline"
-            className="h-12 px-6 rounded-lg shadow-soft"
+            className="h-14 px-7 rounded-2xl shadow-soft hover:shadow-medium transition-all duration-300 hover:scale-105"
             title={musicEnabled ? "Disable ambient music" : "Enable ambient music"}
           >
-            {musicEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            {musicEnabled ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
           </Button>
           
           <Button
             onClick={handleReset}
             variant="outline"
-            className="h-12 px-6 rounded-lg shadow-soft"
+            className="h-14 px-7 rounded-2xl shadow-soft hover:shadow-medium transition-all duration-300 hover:scale-105"
           >
-            <RotateCcw className="h-5 w-5" />
+            <RotateCcw className="h-6 w-6" />
           </Button>
         </div>
         
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground">
+        <div className="text-center pt-2">
+          <p className="text-sm text-muted-foreground font-medium">
             🧘‍♀️ Focus on the rhythm. Let each breath calm your mind.
           </p>
         </div>

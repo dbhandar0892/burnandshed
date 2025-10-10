@@ -90,14 +90,16 @@ export const BurnNote = () => {
   };
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="w-16 h-16 bg-gradient-fire rounded-full flex items-center justify-center mx-auto animate-float">
-          <Flame className="h-8 w-8 text-fire-foreground" />
+    <div className="h-full flex flex-col p-6 space-y-8">
+      {/* Header with enhanced styling */}
+      <div className="text-center space-y-3 animate-fade-in">
+        <div className="w-20 h-20 bg-gradient-fire rounded-2xl flex items-center justify-center mx-auto animate-float shadow-fire">
+          <Flame className="h-10 w-10 text-white drop-shadow-md" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground">Burn It Note</h2>
-        <p className="text-muted-foreground">Transform your anger into smoke and let it drift away</p>
+        <h2 className="text-3xl font-bold text-foreground tracking-tight">Burn It Note</h2>
+        <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
+          Transform your anger into smoke and let it drift away
+        </p>
       </div>
 
       {/* Text Input */}
@@ -194,16 +196,16 @@ export const BurnNote = () => {
         <Button
           onClick={handleBurn}
           disabled={isBurning || !text.trim()}
-          className="w-full bg-gradient-fire text-fire-foreground hover:opacity-90 h-14 text-lg font-semibold rounded-lg shadow-soft"
+          className="w-full bg-gradient-fire text-white hover:opacity-90 h-16 text-lg font-bold rounded-2xl shadow-fire transition-all duration-300 hover:shadow-large hover:scale-[1.02]"
         >
           {isBurning ? (
             <>
-              <Flame className="mr-2 h-5 w-5 animate-pulse" />
+              <Flame className="mr-2 h-6 w-6 animate-pulse" />
               Burning...
             </>
           ) : (
             <>
-              <Flame className="mr-2 h-5 w-5" />
+              <Flame className="mr-2 h-6 w-6" />
               Burn It Away
             </>
           )}
@@ -211,8 +213,8 @@ export const BurnNote = () => {
       </div>
 
       {/* Privacy Note */}
-      <div className="text-center">
-        <p className="text-xs text-muted-foreground">
+      <div className="text-center mt-auto pt-4">
+        <p className="text-sm text-muted-foreground font-medium">
           🔒 Your words turn to smoke. Nothing is saved or stored.
         </p>
       </div>

@@ -86,77 +86,81 @@ export const LetGoTracker = () => {
   };
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="w-16 h-16 bg-gradient-success rounded-full flex items-center justify-center mx-auto animate-float">
-          <Trophy className="h-8 w-8 text-success-foreground" />
+    <div className="h-full flex flex-col p-6 space-y-8">
+      {/* Header with enhanced styling */}
+      <div className="text-center space-y-3 animate-fade-in">
+        <div className="w-20 h-20 bg-gradient-success rounded-2xl flex items-center justify-center mx-auto animate-float shadow-success">
+          <Trophy className="h-10 w-10 text-white drop-shadow-md" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground">Let Go Tracker</h2>
-        <p className="text-muted-foreground">Celebrate your progress and mental wellness journey</p>
+        <h2 className="text-3xl font-bold text-foreground tracking-tight">Let Go Tracker</h2>
+        <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
+          Celebrate your progress and mental wellness journey
+        </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="space-y-4">
-        <Card className="p-6 bg-card border-border shadow-soft">
+      {/* Stats Cards with enhanced design */}
+      <div className="space-y-5">
+        <Card className="p-8 bg-gradient-to-br from-card to-muted/30 border-border/50 shadow-large rounded-2xl">
           <div className="text-center space-y-4">
-            <div className="text-4xl font-bold text-primary">{stats.totalCount}</div>
-            <div className="text-lg font-semibold text-foreground">Total Releases</div>
-            <div className="text-sm text-muted-foreground">{getStreakMessage()}</div>
+            <div className="text-5xl font-bold text-primary tracking-tight">{stats.totalCount}</div>
+            <div className="text-xl font-bold text-foreground">Total Releases</div>
+            <div className="text-base text-muted-foreground font-medium">{getStreakMessage()}</div>
           </div>
         </Card>
 
         <div className="grid grid-cols-2 gap-4">
-          <Card className="p-4 bg-card border-border shadow-soft">
-            <div className="text-center space-y-2">
-              <div className="text-2xl font-bold text-primary">{stats.shedCount}</div>
-              <div className="text-sm font-medium text-foreground">Shed</div>
+          <Card className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-medium rounded-2xl transition-all duration-300 hover:shadow-primary hover:scale-105">
+            <div className="text-center space-y-3">
+              <div className="text-3xl font-bold text-primary">{stats.shedCount}</div>
+              <div className="text-sm font-bold text-foreground">Shed</div>
             </div>
           </Card>
           
-          <Card className="p-4 bg-card border-border shadow-soft">
-            <div className="text-center space-y-2">
-              <div className="text-2xl font-bold text-fire">{stats.burnCount}</div>
-              <div className="text-sm font-medium text-foreground">Burned</div>
+          <Card className="p-6 bg-gradient-to-br from-fire/5 to-fire/10 border-fire/20 shadow-medium rounded-2xl transition-all duration-300 hover:shadow-fire hover:scale-105">
+            <div className="text-center space-y-3">
+              <div className="text-3xl font-bold text-fire">{stats.burnCount}</div>
+              <div className="text-sm font-bold text-foreground">Burned</div>
             </div>
           </Card>
         </div>
       </div>
 
-      {/* Badges */}
-      <div className="flex-1 space-y-4">
-        <h3 className="text-lg font-semibold text-foreground">Achievement Badges</h3>
+      {/* Badges with enhanced design */}
+      <div className="flex-1 space-y-5">
+        <h3 className="text-xl font-bold text-foreground tracking-tight">Achievement Badges</h3>
         
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-4">
           {badges.map((badge) => {
             const Icon = badge.icon;
             return (
               <Card 
                 key={badge.id} 
-                className={`p-4 border transition-all ${
+                className={`p-5 border transition-all duration-300 rounded-2xl ${
                   badge.earned 
-                    ? 'bg-gradient-success text-success-foreground border-success shadow-soft' 
-                    : 'bg-muted border-border opacity-60'
+                    ? 'bg-gradient-success text-white border-success/30 shadow-success hover:shadow-large hover:scale-[1.02]' 
+                    : 'bg-muted/50 border-border/50 opacity-70 hover:opacity-90'
                 }`}
               >
-                <div className="flex items-center space-x-3">
-                  <Icon className={`h-8 w-8 ${badge.earned ? 'text-success-foreground' : 'text-muted-foreground'}`} />
+                <div className="flex items-center space-x-4">
+                  <div className={`p-3 rounded-xl ${badge.earned ? 'bg-white/20' : 'bg-muted'}`}>
+                    <Icon className={`h-8 w-8 ${badge.earned ? 'text-white' : 'text-muted-foreground'}`} />
+                  </div>
                   <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <h4 className={`font-semibold ${badge.earned ? 'text-success-foreground' : 'text-foreground'}`}>
+                    <div className="flex items-center space-x-2 mb-1">
+                      <h4 className={`font-bold text-base ${badge.earned ? 'text-white' : 'text-foreground'}`}>
                         {badge.name}
                       </h4>
                       {badge.earned && (
-                        <Badge variant="secondary" className="text-xs">
-                          Earned!
+                        <Badge variant="secondary" className="text-xs font-bold">
+                          ✓ Earned!
                         </Badge>
                       )}
                     </div>
-                    <p className={`text-sm ${badge.earned ? 'text-success-foreground/80' : 'text-muted-foreground'}`}>
+                    <p className={`text-sm font-medium ${badge.earned ? 'text-white/90' : 'text-muted-foreground'}`}>
                       {badge.description}
                     </p>
                     {!badge.earned && (
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-xs text-muted-foreground mt-2 font-medium">
                         Progress: {stats.totalCount}/{badge.requirement}
                       </p>
                     )}
@@ -169,8 +173,8 @@ export const LetGoTracker = () => {
       </div>
 
       {/* Encouragement */}
-      <div className="text-center">
-        <p className="text-xs text-muted-foreground">
+      <div className="text-center mt-auto pt-4">
+        <p className="text-sm text-muted-foreground font-medium">
           🌟 Every release is a step towards emotional freedom
         </p>
       </div>

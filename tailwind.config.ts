@@ -22,6 +22,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          glow: "hsl(var(--primary-glow))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -42,14 +43,17 @@ export default {
         fire: {
           DEFAULT: "hsl(var(--fire))",
           foreground: "hsl(var(--fire-foreground))",
+          glow: "hsl(var(--fire-glow))",
         },
         zen: {
           DEFAULT: "hsl(var(--zen))",
           foreground: "hsl(var(--zen-foreground))",
+          glow: "hsl(var(--zen-glow))",
         },
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
+          glow: "hsl(var(--success-glow))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -84,6 +88,11 @@ export default {
       boxShadow: {
         "soft": "var(--shadow-soft)",
         "medium": "var(--shadow-medium)",
+        "large": "var(--shadow-large)",
+        "primary": "var(--shadow-primary)",
+        "fire": "var(--shadow-fire)",
+        "zen": "var(--shadow-zen)",
+        "success": "var(--shadow-success)",
       },
       keyframes: {
         "accordion-down": {

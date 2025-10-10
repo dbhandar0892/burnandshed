@@ -105,14 +105,16 @@ export const VentBox = () => {
   };
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto animate-float">
-          <Scissors className="h-8 w-8 text-primary-foreground" />
+    <div className="h-full flex flex-col p-6 space-y-8">
+      {/* Header with enhanced styling */}
+      <div className="text-center space-y-3 animate-fade-in">
+        <div className="w-20 h-20 bg-gradient-calm rounded-2xl flex items-center justify-center mx-auto animate-float shadow-primary">
+          <Scissors className="h-10 w-10 text-white drop-shadow-md" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground">Vent Box</h2>
-        <p className="text-muted-foreground">Write what's bothering you, then shed it away like old skin</p>
+        <h2 className="text-3xl font-bold text-foreground tracking-tight">Vent Box</h2>
+        <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
+          Write what's bothering you, then shed it away like old skin
+        </p>
       </div>
 
       {/* Text Input / Shredding Animation */}
@@ -161,16 +163,16 @@ export const VentBox = () => {
         <Button
           onClick={handleShed}
           disabled={isShedding || !text.trim()}
-          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 text-lg font-semibold rounded-lg shadow-soft"
+          className="w-full bg-gradient-calm text-white hover:opacity-90 h-16 text-lg font-bold rounded-2xl shadow-primary transition-all duration-300 hover:shadow-large hover:scale-[1.02]"
         >
           {isShedding ? (
             <>
-              <Scissors className="mr-2 h-5 w-5 animate-pulse" />
+              <Scissors className="mr-2 h-6 w-6 animate-pulse" />
               Shedding...
             </>
           ) : (
             <>
-              <Scissors className="mr-2 h-5 w-5" />
+              <Scissors className="mr-2 h-6 w-6" />
               Shed It Away
             </>
           )}
@@ -178,8 +180,8 @@ export const VentBox = () => {
       </div>
 
       {/* Privacy Note */}
-      <div className="text-center">
-        <p className="text-xs text-muted-foreground">
+      <div className="text-center mt-auto pt-4">
+        <p className="text-sm text-muted-foreground font-medium">
           🔒 Your words shed away like old skin. Complete privacy guaranteed.
         </p>
       </div>

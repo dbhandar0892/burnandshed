@@ -20,21 +20,28 @@ export const MobileLayout = () => {
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || VentBox;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto">
-      {/* Header */}
-      <header className="bg-gradient-calm p-6 text-center shadow-soft">
-        <h1 className="text-2xl font-bold text-white">Forget About It</h1>
-        <p className="text-white/80 text-sm mt-1">Let go and feel better</p>
+    <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto shadow-large">
+      {/* Header with enhanced gradient and depth */}
+      <header className="bg-gradient-calm p-8 text-center shadow-medium relative overflow-hidden">
+        {/* Decorative gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-mesh-calm opacity-40" />
+        
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Forget About It</h1>
+          <p className="text-white/90 text-base font-medium">Let go and feel better</p>
+        </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-hidden">
-        <ActiveComponent />
+      {/* Main Content with smooth transitions */}
+      <main className="flex-1 overflow-hidden bg-gradient-to-b from-background to-muted/20">
+        <div className="h-full animate-fade-in">
+          <ActiveComponent />
+        </div>
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="bg-card border-t border-border p-2">
-        <div className="flex justify-between items-center">
+      {/* Bottom Navigation with modern design */}
+      <nav className="bg-card/80 backdrop-blur-lg border-t border-border/50 p-3 shadow-large">
+        <div className="flex justify-between items-center gap-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -43,14 +50,14 @@ export const MobileLayout = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center justify-center p-3 rounded-lg transition-all ${
+                className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-300 flex-1 ${
                   isActive 
-                    ? 'bg-primary text-primary-foreground shadow-soft' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    ? 'bg-primary text-primary-foreground shadow-primary scale-105' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60 hover:scale-105'
                 }`}
               >
-                <Icon size={20} />
-                <span className="text-xs mt-1 font-medium">{tab.label}</span>
+                <Icon size={22} className={isActive ? 'animate-float' : ''} />
+                <span className="text-[10px] mt-1.5 font-semibold">{tab.label}</span>
               </button>
             );
           })}
