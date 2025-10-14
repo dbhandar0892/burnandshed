@@ -4,6 +4,9 @@ import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 
+// Louder base mix level (total across voices). Tweak to taste but keep under ~0.2 to avoid clipping
+const BASE_VOLUME = 0.06;
+
 // Soothing ambient music generator using Web Audio API
 const createAmbientMusic = (audioContextRef: React.MutableRefObject<AudioContext | null>, volume: number) => {
   if (!audioContextRef.current) {
@@ -43,7 +46,7 @@ const createAmbientMusic = (audioContextRef: React.MutableRefObject<AudioContext
     filter.Q.setValueAtTime(1, now);
     
     // Fade in with volume control
-    const targetVolume = (0.025 / frequencies.length) * volume;
+    const targetVolume = (BASE_VOLUME / frequencies.length) * volume;
     gain.gain.setValueAtTime(0, now);
     gain.gain.linearRampToValueAtTime(targetVolume, now + 3);
     
@@ -88,7 +91,11 @@ export const BreathingReset = () => {
   const [breathePhase, setBreathePhase] = useState<'in' | 'out'>('in');
   const [cycleCount, setCycleCount] = useState(0);
   const [musicEnabled, setMusicEnabled] = useState(true);
-  const [volume, setVolume] = useState(0.7);
+  const [volume, setVolume] = useState(() => {
+    const saved = localStorage.getItem('breathingVolume');
+    const parsed = saved ? parseFloat(saved) : NaN;
+    return Number.isFinite(parsed) ? Math.min(Math.max(parsed, 0), 1) : 1;
+  });
   const audioContextRef = useRef<AudioContext | null>(null);
   const oscillatorsRef = useRef<OscillatorNode[]>([]);
   const gainNodesRef = useRef<GainNode[]>([]);
@@ -136,13 +143,20 @@ export const BreathingReset = () => {
       const ctx = audioContextRef.current;
       const now = ctx.currentTime;
       const frequencies = [110.00, 130.81, 164.81, 196.00, 246.94];
-      const targetVolume = (0.025 / frequencies.length) * volume;
+      const targetVolume = (BASE_VOLUME / frequencies.length) * volume;
       
       gainNodesRef.current.forEach(gain => {
         gain.gain.linearRampToValueAtTime(targetVolume, now + 0.1);
       });
     }
   }, [volume, isActive, musicEnabled]);
+
+  // Persist volume to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('breathingVolume', String(volume));
+    } catch {}
+  }, [volume]);
 
   // Breathing cycle (4 seconds in, 4 seconds out)
   useEffect(() => {
