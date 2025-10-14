@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Slider } from '@/components/ui/slider';
 import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 
 // Soothing ambient music generator using Web Audio API
-const createAmbientMusic = (audioContextRef: React.MutableRefObject<AudioContext | null>) => {
+const createAmbientMusic = (audioContextRef: React.MutableRefObject<AudioContext | null>, volume: number) => {
   if (!audioContextRef.current) {
     audioContextRef.current = new AudioContext();
   }
@@ -41,9 +42,10 @@ const createAmbientMusic = (audioContextRef: React.MutableRefObject<AudioContext
     filter.frequency.setValueAtTime(800, now);
     filter.Q.setValueAtTime(1, now);
     
-    // Fade in
+    // Fade in with volume control
+    const targetVolume = (0.025 / frequencies.length) * volume;
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.025 / frequencies.length, now + 3);
+    gain.gain.linearRampToValueAtTime(targetVolume, now + 3);
     
     osc.connect(filter);
     filter.connect(gain);
@@ -86,6 +88,7 @@ export const BreathingReset = () => {
   const [breathePhase, setBreathePhase] = useState<'in' | 'out'>('in');
   const [cycleCount, setCycleCount] = useState(0);
   const [musicEnabled, setMusicEnabled] = useState(true);
+  const [volume, setVolume] = useState(0.7);
   const audioContextRef = useRef<AudioContext | null>(null);
   const oscillatorsRef = useRef<OscillatorNode[]>([]);
   const gainNodesRef = useRef<GainNode[]>([]);
@@ -107,7 +110,7 @@ export const BreathingReset = () => {
   // Ambient music control
   useEffect(() => {
     if (isActive && musicEnabled) {
-      const { oscillators, gainNodes } = createAmbientMusic(audioContextRef);
+      const { oscillators, gainNodes } = createAmbientMusic(audioContextRef, volume);
       oscillatorsRef.current = oscillators;
       gainNodesRef.current = gainNodes;
     } else if (!isActive || !musicEnabled) {
@@ -125,7 +128,21 @@ export const BreathingReset = () => {
         gainNodesRef.current = [];
       }
     };
-  }, [isActive, musicEnabled]);
+  }, [isActive, musicEnabled, volume]);
+
+  // Update volume in real-time
+  useEffect(() => {
+    if (isActive && musicEnabled && gainNodesRef.current.length > 0 && audioContextRef.current) {
+      const ctx = audioContextRef.current;
+      const now = ctx.currentTime;
+      const frequencies = [110.00, 130.81, 164.81, 196.00, 246.94];
+      const targetVolume = (0.025 / frequencies.length) * volume;
+      
+      gainNodesRef.current.forEach(gain => {
+        gain.gain.linearRampToValueAtTime(targetVolume, now + 0.1);
+      });
+    }
+  }, [volume, isActive, musicEnabled]);
 
   // Breathing cycle (4 seconds in, 4 seconds out)
   useEffect(() => {
@@ -230,6 +247,23 @@ export const BreathingReset = () => {
 
       {/* Controls */}
       <div className="space-y-5">
+        {/* Volume Control */}
+        {musicEnabled && (
+          <div className="space-y-3 animate-fade-in">
+            <div className="flex items-center justify-between px-1">
+              <label className="text-sm font-medium text-muted-foreground">Volume</label>
+              <span className="text-sm font-medium text-foreground">{Math.round(volume * 100)}%</span>
+            </div>
+            <Slider
+              value={[volume]}
+              onValueChange={(values) => setVolume(values[0])}
+              max={1}
+              step={0.01}
+              className="w-full"
+            />
+          </div>
+        )}
+        
         <div className="flex gap-3">
           {!isActive ? (
             <Button
