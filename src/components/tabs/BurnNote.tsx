@@ -141,31 +141,65 @@ export const BurnNote = () => {
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
-                    {/* Larger flame effect below character */}
+                    {/* Multi-layered realistic flame effect */}
                     <span
-                      className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-5 h-6 pointer-events-none animate-flame-flicker opacity-0"
+                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-8 h-10 pointer-events-none opacity-0"
                       style={{
                         animationDelay: `${charDelay - 100}ms`,
-                        animationDuration: '0.2s',
-                        animationIterationCount: '5',
+                        animation: 'flame-appear 1.2s ease-out forwards',
                       }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-t from-orange-600 via-orange-400 to-yellow-300 rounded-t-full blur-[2px]"
+                      {/* Inner bright core */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-6 bg-gradient-to-t from-white via-yellow-200 to-transparent rounded-t-full blur-[1px]"
                         style={{ 
-                          boxShadow: '0 0 20px rgba(255, 140, 0, 0.8), 0 0 35px rgba(255, 100, 0, 0.5)' 
+                          boxShadow: '0 0 15px rgba(255, 255, 255, 0.9), 0 0 25px rgba(255, 230, 0, 0.7)',
+                          animation: 'flame-flicker-core 0.15s ease-in-out infinite alternate'
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-red-500 via-orange-500 to-yellow-400 rounded-t-full blur-sm opacity-70" />
+                      {/* Middle orange layer */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-8 bg-gradient-to-t from-orange-500 via-orange-400 to-transparent rounded-t-full blur-[2px] opacity-90"
+                        style={{ 
+                          boxShadow: '0 0 20px rgba(255, 140, 0, 0.8)',
+                          animation: 'flame-flicker-mid 0.2s ease-in-out infinite alternate-reverse'
+                        }}
+                      />
+                      {/* Outer red layer */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-9 bg-gradient-to-t from-red-600 via-orange-600 to-transparent rounded-t-full blur-[3px] opacity-70"
+                        style={{ 
+                          animation: 'flame-flicker-outer 0.25s ease-in-out infinite'
+                        }}
+                      />
                     </span>
                     
-                    {/* Ember particles */}
-                    <span
-                      className="absolute -bottom-4 left-1/2 w-1 h-1 rounded-full bg-orange-500 pointer-events-none opacity-0"
-                      style={{
-                        animationDelay: `${charDelay + 200}ms`,
-                        animation: 'ember-rise 0.8s ease-out forwards',
-                      }}
-                    />
+                    {/* Multiple ember particles */}
+                    {[0, 1, 2].map((i) => (
+                      <span
+                        key={i}
+                        className="absolute -bottom-4 left-1/2 w-1 h-1 rounded-full pointer-events-none opacity-0"
+                        style={{
+                          animationDelay: `${charDelay + 150 + (i * 100)}ms`,
+                          animation: 'ember-rise 1.2s ease-out forwards',
+                          left: `${50 + (i - 1) * 20}%`,
+                          background: i === 1 ? 'rgba(255, 200, 0, 1)' : 'rgba(255, 100, 0, 1)',
+                          boxShadow: '0 0 8px rgba(255, 140, 0, 0.8)'
+                        }}
+                      />
+                    ))}
+                    
+                    {/* Smoke particles */}
+                    {[0, 1].map((i) => (
+                      <span
+                        key={`smoke-${i}`}
+                        className="absolute -top-2 left-1/2 w-4 h-4 rounded-full pointer-events-none opacity-0"
+                        style={{
+                          animationDelay: `${charDelay + 400 + (i * 200)}ms`,
+                          animation: 'smoke-rise 2s ease-out forwards',
+                          left: `${50 + (i - 0.5) * 30}%`,
+                          background: 'rgba(100, 100, 100, 0.5)',
+                          filter: 'blur(4px)'
+                        }}
+                      />
+                    ))}
                     
                     {/* Character that burns */}
                     <span
