@@ -124,11 +124,11 @@ export const VentBox = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Type your frustrations here... Let it all out!"
-            className="min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl"
+            className="min-h-[200px] bg-black border-border text-white placeholder:text-gray-400 resize-none transition-all text-2xl"
             disabled={isShedding}
           />
         ) : (
-          <div className="min-h-[200px] bg-card border border-border rounded-md p-3 relative overflow-visible">
+          <div className="min-h-[200px] bg-black border border-border rounded-md p-3 relative overflow-visible text-white">
             <div className="relative flex flex-wrap gap-0 text-2xl leading-relaxed">
               {text.split('').map((char, index) => {
                 const totalChars = text.length;
