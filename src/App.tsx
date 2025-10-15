@@ -1,4 +1,4 @@
-import { Toaster } from "@/components/ui/toaster";
+
 import { Toaster as Sonner } from "@/components/ui/sonner";
 // TooltipProvider removed to avoid runtime issue; Radix tooltips work without global provider
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,7 +10,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <Toaster />
+    
     <Sonner />
     <BrowserRouter>
       <Routes>
