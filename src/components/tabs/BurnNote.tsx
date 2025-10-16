@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
-import fireVideo from '@/assets/fire_1.mp4';
 
 // Function to create burning/crackling sound effect
 const playBurningSound = (duration: number) => {
@@ -142,21 +141,33 @@ export const BurnNote = () => {
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
-                    {/* Video fire effect */}
+                    {/* Multi-layered realistic flame effect */}
                     <span
-                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-12 h-14 pointer-events-none opacity-0 overflow-hidden"
+                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-8 h-10 pointer-events-none opacity-0"
                       style={{
                         animationDelay: `${charDelay - 100}ms`,
                         animation: 'flame-appear 1.2s ease-out forwards',
                       }}
                     >
-                      <video
-                        src={fireVideo}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover mix-blend-screen"
+                      {/* Inner bright core */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-6 bg-gradient-to-t from-white via-yellow-200 to-transparent rounded-t-full blur-[1px]"
+                        style={{ 
+                          boxShadow: '0 0 15px rgba(255, 255, 255, 0.9), 0 0 25px rgba(255, 230, 0, 0.7)',
+                          animation: 'flame-flicker-core 0.15s ease-in-out infinite alternate'
+                        }}
+                      />
+                      {/* Middle orange layer */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-8 bg-gradient-to-t from-orange-500 via-orange-400 to-transparent rounded-t-full blur-[2px] opacity-90"
+                        style={{ 
+                          boxShadow: '0 0 20px rgba(255, 140, 0, 0.8)',
+                          animation: 'flame-flicker-mid 0.2s ease-in-out infinite alternate-reverse'
+                        }}
+                      />
+                      {/* Outer red layer */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-9 bg-gradient-to-t from-red-600 via-orange-600 to-transparent rounded-t-full blur-[3px] opacity-70"
+                        style={{ 
+                          animation: 'flame-flicker-outer 0.25s ease-in-out infinite'
+                        }}
                       />
                     </span>
                     
@@ -211,7 +222,7 @@ export const BurnNote = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Pour out your anger and frustration here..."
-            className="min-h-[200px] bg-black text-white placeholder:text-gray-400 border-gray-700 resize-none transition-all text-2xl"
+            className="min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl"
             disabled={isBurning}
           />
         )}

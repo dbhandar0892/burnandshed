@@ -1,4 +1,4 @@
-const CACHE_NAME = 'forget-about-it-v2';
+const CACHE_NAME = 'forget-about-it-v1';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -18,17 +18,37 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Fetch event - only cache pre-defined static assets; network-first for others
+// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-
-  // Only handle same-origin requests for the pre-cached URLs
-  if (url.origin === self.location.origin && urlsToCache.includes(url.pathname)) {
-    event.respondWith(
-      caches.match(request).then((cached) => cached || fetch(request))
-    );
-  }
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+        
+        // Clone the request
+        const fetchRequest = event.request.clone();
+        
+        return fetch(fetchRequest).then((response) => {
+          // Check if valid response
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
+          
+          // Clone the response
+          const responseToCache = response.clone();
+          
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          
+          return response;
+        });
+      })
+  );
 });
 
 // Activate event - clean up old caches
