@@ -1,69 +1,54 @@
-const CACHE_NAME = 'forget-about-it-v1';
-const urlsToCache = [
+// Minimal, safe service worker that avoids caching Vite chunks to prevent React duplication
+const CACHE_NAME = 'forget-about-it-v3';
+const PRECACHE = [
   '/',
   '/index.html',
   '/manifest.json',
   '/favicon.ico'
 ];
 
-// Install event - cache essential resources
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE))
   );
   self.skipWaiting();
 });
 
-// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  const url = new URL(req.url);
+
+  // Only handle same-origin GET requests
+  if (req.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  const pathname = url.pathname;
+  const isPrecached = PRECACHE.includes(pathname);
+
+  // Detect Vite dev/build assets and JS/CSS chunks - never cache them
+  const isViteAsset =
+    pathname.startsWith('/node_modules/.vite/') ||
+    pathname.includes('/@react-refresh') ||
+    pathname.includes('/assets/') ||
+    pathname.endsWith('.js') ||
+    pathname.endsWith('.css') ||
+    url.searchParams.has('v');
+
+  if (!isPrecached || isViteAsset) {
+    // Network-only for runtime/content and all module chunks
+    return; // Let the default browser fetch proceed (no caching)
+  }
+
+  // Cache-first for a tiny set of safe, static app-shell files
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        
-        // Clone the request
-        const fetchRequest = event.request.clone();
-        
-        return fetch(fetchRequest).then((response) => {
-          // Check if valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-          
-          // Clone the response
-          const responseToCache = response.clone();
-          
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-          
-          return response;
-        });
-      })
+    caches.match(req).then((cached) => cached || fetch(req))
   );
 });
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k === CACHE_NAME ? undefined : caches.delete(k))))
+    )
   );
   self.clients.claim();
 });
