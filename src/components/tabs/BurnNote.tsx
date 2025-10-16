@@ -222,7 +222,7 @@ export const BurnNote = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Pour out your anger and frustration here..."
-            className="min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl"
+            className="min-h-[200px] bg-black border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl"
             disabled={isBurning}
           />
         )}
