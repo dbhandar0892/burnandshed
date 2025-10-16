@@ -43,7 +43,7 @@ const createAmbientMusic = (audioContextRef: React.MutableRefObject<AudioContext
     filter.Q.setValueAtTime(1, now);
     
     // Fade in with volume control
-    const targetVolume = (0.15 / frequencies.length) * volume;
+    const targetVolume = (0.5 / frequencies.length) * volume;
     gain.gain.setValueAtTime(0, now);
     gain.gain.linearRampToValueAtTime(targetVolume, now + 3);
     
@@ -136,7 +136,7 @@ export const BreathingReset = () => {
       const ctx = audioContextRef.current;
       const now = ctx.currentTime;
       const frequencies = [65.41, 82.41, 98.00, 146.83, 164.81];
-      const targetVolume = (0.15 / frequencies.length) * volume;
+      const targetVolume = (0.5 / frequencies.length) * volume;
       
       gainNodesRef.current.forEach(gain => {
         gain.gain.linearRampToValueAtTime(targetVolume, now + 0.1);
