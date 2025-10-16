@@ -247,24 +247,22 @@ export const BreathingReset = () => {
 
       {/* Controls */}
       <div className="space-y-5">
-        {/* Volume Control - Always visible */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between px-1">
-            <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Volume2 className="h-4 w-4" />
-              Music Volume
-            </label>
-            <span className="text-sm font-medium text-foreground">{Math.round(volume * 100)}%</span>
+        {/* Volume Control */}
+        {musicEnabled && (
+          <div className="space-y-3 animate-fade-in">
+            <div className="flex items-center justify-between px-1">
+              <label className="text-sm font-medium text-muted-foreground">Volume</label>
+              <span className="text-sm font-medium text-foreground">{Math.round(volume * 100)}%</span>
+            </div>
+            <Slider
+              value={[volume]}
+              onValueChange={(values) => setVolume(values[0])}
+              max={1}
+              step={0.01}
+              className="w-full"
+            />
           </div>
-          <Slider
-            value={[volume]}
-            onValueChange={(values) => setVolume(values[0])}
-            max={1}
-            step={0.01}
-            className="w-full"
-            disabled={!musicEnabled}
-          />
-        </div>
+        )}
         
         <div className="flex gap-3">
           {!isActive ? (
