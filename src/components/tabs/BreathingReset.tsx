@@ -17,8 +17,8 @@ const createAmbientMusic = (audioContextRef: React.MutableRefObject<AudioContext
   const oscillators: OscillatorNode[] = [];
   const gainNodes: GainNode[] = [];
   
-  // Frequencies for a deeply calming chord (A minor 9th - meditative and peaceful)
-  const frequencies = [110.00, 130.81, 164.81, 196.00, 246.94]; // A2, C3, E3, G3, B3
+  // Frequencies for a deeply calming chord (C major 9th - uplifting and serene)
+  const frequencies = [65.41, 82.41, 98.00, 146.83, 164.81]; // C2, E2, G2, D3, E3
   
   frequencies.forEach((freq, i) => {
     const osc = ctx.createOscillator();
