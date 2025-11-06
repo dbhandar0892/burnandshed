@@ -141,47 +141,48 @@ export const BurnNote = () => {
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
-                    {/* Multi-layered realistic flame effect */}
+                    {/* Multi-layered realistic flame effect - ENHANCED */}
                     <span
-                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-8 h-10 pointer-events-none opacity-0"
+                      className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-16 h-20 pointer-events-none opacity-0"
                       style={{
                         animationDelay: `${charDelay - 100}ms`,
                         animation: 'flame-appear 1.2s ease-out forwards',
                       }}
                     >
-                      {/* Inner bright core */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-6 bg-gradient-to-t from-white via-yellow-200 to-transparent rounded-t-full blur-[1px]"
+                      {/* Inner bright core - BRIGHTER AND LARGER */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-12 bg-gradient-to-t from-white via-yellow-100 to-transparent rounded-t-full blur-[1px]"
                         style={{ 
-                          boxShadow: '0 0 15px rgba(255, 255, 255, 0.9), 0 0 25px rgba(255, 230, 0, 0.7)',
+                          boxShadow: '0 0 30px rgba(255, 255, 255, 1), 0 0 50px rgba(255, 230, 0, 0.9), 0 0 80px rgba(255, 200, 0, 0.6)',
                           animation: 'flame-flicker-core 0.15s ease-in-out infinite alternate'
                         }}
                       />
-                      {/* Middle orange layer */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-8 bg-gradient-to-t from-orange-500 via-orange-400 to-transparent rounded-t-full blur-[2px] opacity-90"
+                      {/* Middle orange layer - LARGER AND BRIGHTER */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-16 bg-gradient-to-t from-orange-400 via-orange-300 to-transparent rounded-t-full blur-[2px]"
                         style={{ 
-                          boxShadow: '0 0 20px rgba(255, 140, 0, 0.8)',
+                          boxShadow: '0 0 40px rgba(255, 140, 0, 1), 0 0 60px rgba(255, 100, 0, 0.8)',
                           animation: 'flame-flicker-mid 0.2s ease-in-out infinite alternate-reverse'
                         }}
                       />
-                      {/* Outer red layer */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-9 bg-gradient-to-t from-red-600 via-orange-600 to-transparent rounded-t-full blur-[3px] opacity-70"
+                      {/* Outer red layer - LARGER */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-18 bg-gradient-to-t from-red-500 via-orange-500 to-transparent rounded-t-full blur-[3px] opacity-90"
                         style={{ 
+                          boxShadow: '0 0 50px rgba(255, 69, 0, 0.8)',
                           animation: 'flame-flicker-outer 0.25s ease-in-out infinite'
                         }}
                       />
                     </span>
                     
-                    {/* Multiple ember particles */}
-                    {[0, 1, 2].map((i) => (
+                    {/* Multiple ember particles - ENHANCED */}
+                    {[0, 1, 2, 3, 4].map((i) => (
                       <span
                         key={i}
-                        className="absolute -bottom-4 left-1/2 w-1 h-1 rounded-full pointer-events-none opacity-0"
+                        className="absolute -bottom-4 left-1/2 w-2 h-2 rounded-full pointer-events-none opacity-0"
                         style={{
-                          animationDelay: `${charDelay + 150 + (i * 100)}ms`,
-                          animation: 'ember-rise 1.2s ease-out forwards',
-                          left: `${50 + (i - 1) * 20}%`,
-                          background: i === 1 ? 'rgba(255, 200, 0, 1)' : 'rgba(255, 100, 0, 1)',
-                          boxShadow: '0 0 8px rgba(255, 140, 0, 0.8)'
+                          animationDelay: `${charDelay + 150 + (i * 80)}ms`,
+                          animation: 'ember-rise 1.5s ease-out forwards',
+                          left: `${50 + (i - 2) * 15}%`,
+                          background: i % 2 === 0 ? 'rgba(255, 230, 0, 1)' : 'rgba(255, 80, 0, 1)',
+                          boxShadow: '0 0 20px rgba(255, 140, 0, 1), 0 0 35px rgba(255, 100, 0, 0.8)'
                         }}
                       />
                     ))}
@@ -201,13 +202,14 @@ export const BurnNote = () => {
                       />
                     ))}
                     
-                    {/* Character that burns */}
+                    {/* Character that burns - ENHANCED WITH GLOW */}
                     <span
                       className="inline-block animate-burn-letter"
                       style={{
                         animationDelay: `${charDelay}ms`,
                         animationDuration: '1.2s',
                         animationFillMode: 'forwards',
+                        filter: `drop-shadow(0 0 8px rgba(255, 140, 0, 0.8))`,
                       }}
                     >
                       {char}
