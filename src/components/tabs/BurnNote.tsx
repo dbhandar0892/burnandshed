@@ -62,7 +62,7 @@ export const BurnNote = () => {
     
     // Calculate animation duration based on character count
     const chars = text.length;
-    const matchstickDuration = 2000; // 2s for matchstick animation
+    const matchstickDuration = 300; // Quick matchstick animation
     const charBurnDuration = 80; // 80ms per character
     const burningDuration = (chars * charBurnDuration) + 1200;
     const totalDuration = matchstickDuration + burningDuration;
@@ -134,39 +134,39 @@ export const BurnNote = () => {
             {/* Burning Text */}
             <div className="text-2xl leading-relaxed whitespace-pre-wrap">
               {text.split('').map((char, charIndex) => {
-                const matchstickDelay = 2000; // matchstick animation time
+                const matchstickDelay = 300; // Quick matchstick animation
                 // Burn from end (last character) to beginning (first character)
                 const reverseIndex = text.length - 1 - charIndex;
                 const charDelay = matchstickDelay + (reverseIndex * 80);
                 
                 return (
                   <span key={charIndex} className="relative inline-block">
-                    {/* Multi-layered realistic flame effect - ENHANCED */}
+                    {/* Multi-layered realistic flame effect - MUCH BIGGER */}
                     <span
-                      className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-16 h-20 pointer-events-none opacity-0"
+                      className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-32 h-40 pointer-events-none opacity-0"
                       style={{
                         animationDelay: `${charDelay - 100}ms`,
                         animation: 'flame-appear 1.2s ease-out forwards',
                       }}
                     >
-                      {/* Inner bright core - BRIGHTER AND LARGER */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-12 bg-gradient-to-t from-white via-yellow-100 to-transparent rounded-t-full blur-[1px]"
+                      {/* Inner bright core - MUCH BIGGER */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-24 bg-gradient-to-t from-white via-yellow-100 to-transparent rounded-t-full blur-[2px]"
                         style={{ 
-                          boxShadow: '0 0 30px rgba(255, 255, 255, 1), 0 0 50px rgba(255, 230, 0, 0.9), 0 0 80px rgba(255, 200, 0, 0.6)',
+                          boxShadow: '0 0 40px rgba(255, 255, 255, 1), 0 0 60px rgba(255, 230, 0, 1), 0 0 100px rgba(255, 200, 0, 0.8)',
                           animation: 'flame-flicker-core 0.15s ease-in-out infinite alternate'
                         }}
                       />
-                      {/* Middle orange layer - LARGER AND BRIGHTER */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-16 bg-gradient-to-t from-orange-400 via-orange-300 to-transparent rounded-t-full blur-[2px]"
+                      {/* Middle orange layer - MUCH BIGGER */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-32 bg-gradient-to-t from-orange-400 via-orange-300 to-transparent rounded-t-full blur-[3px]"
                         style={{ 
-                          boxShadow: '0 0 40px rgba(255, 140, 0, 1), 0 0 60px rgba(255, 100, 0, 0.8)',
+                          boxShadow: '0 0 50px rgba(255, 140, 0, 1), 0 0 80px rgba(255, 100, 0, 0.9)',
                           animation: 'flame-flicker-mid 0.2s ease-in-out infinite alternate-reverse'
                         }}
                       />
-                      {/* Outer red layer - LARGER */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-18 bg-gradient-to-t from-red-500 via-orange-500 to-transparent rounded-t-full blur-[3px] opacity-90"
+                      {/* Outer red layer - MUCH BIGGER */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-28 h-36 bg-gradient-to-t from-red-500 via-orange-500 to-transparent rounded-t-full blur-[4px] opacity-90"
                         style={{ 
-                          boxShadow: '0 0 50px rgba(255, 69, 0, 0.8)',
+                          boxShadow: '0 0 60px rgba(255, 69, 0, 0.9)',
                           animation: 'flame-flicker-outer 0.25s ease-in-out infinite'
                         }}
                       />
