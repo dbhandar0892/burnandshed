@@ -4,6 +4,71 @@ import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Emotion detection based on keywords
+const detectEmotion = (word: string): 'anger' | 'sadness' | 'fear' | 'neutral' => {
+  const lowerWord = word.toLowerCase();
+  
+  const angerWords = ['hate', 'angry', 'mad', 'furious', 'rage', 'pissed', 'annoyed', 'frustrated', 'irritated', 'damn', 'hell', 'stupid', 'idiot', 'terrible', 'worst', 'awful'];
+  const sadnessWords = ['sad', 'depressed', 'lonely', 'hurt', 'pain', 'crying', 'tears', 'miserable', 'hopeless', 'empty', 'lost', 'alone', 'heartbroken'];
+  const fearWords = ['scared', 'afraid', 'anxious', 'worried', 'panic', 'terrified', 'nervous', 'stress', 'fear', 'overwhelming'];
+  
+  if (angerWords.some(w => lowerWord.includes(w))) return 'anger';
+  if (sadnessWords.some(w => lowerWord.includes(w))) return 'sadness';
+  if (fearWords.some(w => lowerWord.includes(w))) return 'fear';
+  
+  return 'neutral';
+};
+
+// Flame color schemes based on emotion
+const getFlameColors = (emotion: 'anger' | 'sadness' | 'fear' | 'neutral') => {
+  switch (emotion) {
+    case 'anger':
+      return {
+        core: 'from-red-100 via-orange-200',
+        coreGlow: '0 0 40px rgba(255, 50, 50, 1), 0 0 60px rgba(255, 100, 0, 1), 0 0 100px rgba(255, 0, 0, 0.8)',
+        middle: 'from-red-500 via-orange-400',
+        middleGlow: '0 0 50px rgba(255, 0, 0, 1), 0 0 80px rgba(255, 69, 0, 0.9)',
+        outer: 'from-red-700 via-red-600',
+        outerGlow: '0 0 60px rgba(139, 0, 0, 0.9)',
+        ember: 'rgba(255, 0, 0, 1)',
+        emberGlow: '0 0 20px rgba(255, 0, 0, 1), 0 0 35px rgba(200, 0, 0, 0.8)'
+      };
+    case 'sadness':
+      return {
+        core: 'from-blue-100 via-cyan-200',
+        coreGlow: '0 0 40px rgba(100, 150, 255, 1), 0 0 60px rgba(50, 100, 255, 1), 0 0 100px rgba(0, 100, 255, 0.8)',
+        middle: 'from-blue-400 via-cyan-300',
+        middleGlow: '0 0 50px rgba(0, 100, 255, 1), 0 0 80px rgba(0, 150, 255, 0.9)',
+        outer: 'from-blue-600 via-blue-500',
+        outerGlow: '0 0 60px rgba(0, 50, 150, 0.9)',
+        ember: 'rgba(50, 150, 255, 1)',
+        emberGlow: '0 0 20px rgba(50, 150, 255, 1), 0 0 35px rgba(0, 100, 200, 0.8)'
+      };
+    case 'fear':
+      return {
+        core: 'from-purple-100 via-violet-200',
+        coreGlow: '0 0 40px rgba(200, 100, 255, 1), 0 0 60px rgba(150, 50, 255, 1), 0 0 100px rgba(128, 0, 255, 0.8)',
+        middle: 'from-purple-400 via-violet-300',
+        middleGlow: '0 0 50px rgba(128, 0, 255, 1), 0 0 80px rgba(150, 0, 255, 0.9)',
+        outer: 'from-purple-600 via-purple-500',
+        outerGlow: '0 0 60px rgba(75, 0, 130, 0.9)',
+        ember: 'rgba(150, 50, 255, 1)',
+        emberGlow: '0 0 20px rgba(150, 50, 255, 1), 0 0 35px rgba(100, 0, 200, 0.8)'
+      };
+    default: // neutral - original orange/yellow
+      return {
+        core: 'from-white via-yellow-100',
+        coreGlow: '0 0 40px rgba(255, 255, 255, 1), 0 0 60px rgba(255, 230, 0, 1), 0 0 100px rgba(255, 200, 0, 0.8)',
+        middle: 'from-orange-400 via-orange-300',
+        middleGlow: '0 0 50px rgba(255, 140, 0, 1), 0 0 80px rgba(255, 100, 0, 0.9)',
+        outer: 'from-red-500 via-orange-500',
+        outerGlow: '0 0 60px rgba(255, 69, 0, 0.9)',
+        ember: 'rgba(255, 140, 0, 1)',
+        emberGlow: '0 0 20px rgba(255, 140, 0, 1), 0 0 35px rgba(255, 100, 0, 0.8)'
+      };
+  }
+};
+
 // Function to create burning/crackling sound effect
 const playBurningSound = (duration: number) => {
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -133,87 +198,98 @@ export const BurnNote = () => {
             
             {/* Burning Text */}
             <div className="text-2xl leading-relaxed whitespace-pre-wrap">
-              {text.split('').map((char, charIndex) => {
-                const matchstickDelay = 300; // Quick matchstick animation
-                // Burn from end (last character) to beginning (first character)
-                const reverseIndex = text.length - 1 - charIndex;
-                const charDelay = matchstickDelay + (reverseIndex * 80);
+              {text.split(' ').map((word, wordIndex) => {
+                const emotion = detectEmotion(word);
+                const colors = getFlameColors(emotion);
                 
                 return (
-                  <span key={charIndex} className="relative inline-block">
-                    {/* Multi-layered realistic flame effect - MUCH BIGGER */}
-                    <span
-                      className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-32 h-40 pointer-events-none opacity-0"
-                      style={{
-                        animationDelay: `${charDelay - 100}ms`,
-                        animation: 'flame-appear 1.2s ease-out forwards',
-                      }}
-                    >
-                      {/* Inner bright core - MUCH BIGGER */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-24 bg-gradient-to-t from-white via-yellow-100 to-transparent rounded-t-full blur-[2px]"
-                        style={{ 
-                          boxShadow: '0 0 40px rgba(255, 255, 255, 1), 0 0 60px rgba(255, 230, 0, 1), 0 0 100px rgba(255, 200, 0, 0.8)',
-                          animation: 'flame-flicker-core 0.15s ease-in-out infinite alternate'
-                        }}
-                      />
-                      {/* Middle orange layer - MUCH BIGGER */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-32 bg-gradient-to-t from-orange-400 via-orange-300 to-transparent rounded-t-full blur-[3px]"
-                        style={{ 
-                          boxShadow: '0 0 50px rgba(255, 140, 0, 1), 0 0 80px rgba(255, 100, 0, 0.9)',
-                          animation: 'flame-flicker-mid 0.2s ease-in-out infinite alternate-reverse'
-                        }}
-                      />
-                      {/* Outer red layer - MUCH BIGGER */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-28 h-36 bg-gradient-to-t from-red-500 via-orange-500 to-transparent rounded-t-full blur-[4px] opacity-90"
-                        style={{ 
-                          boxShadow: '0 0 60px rgba(255, 69, 0, 0.9)',
-                          animation: 'flame-flicker-outer 0.25s ease-in-out infinite'
-                        }}
-                      />
-                    </span>
-                    
-                    {/* Multiple ember particles - ENHANCED */}
-                    {[0, 1, 2, 3, 4].map((i) => (
-                      <span
-                        key={i}
-                        className="absolute -bottom-4 left-1/2 w-2 h-2 rounded-full pointer-events-none opacity-0"
-                        style={{
-                          animationDelay: `${charDelay + 150 + (i * 80)}ms`,
-                          animation: 'ember-rise 1.5s ease-out forwards',
-                          left: `${50 + (i - 2) * 15}%`,
-                          background: i % 2 === 0 ? 'rgba(255, 230, 0, 1)' : 'rgba(255, 80, 0, 1)',
-                          boxShadow: '0 0 20px rgba(255, 140, 0, 1), 0 0 35px rgba(255, 100, 0, 0.8)'
-                        }}
-                      />
-                    ))}
-                    
-                    {/* Smoke particles */}
-                    {[0, 1].map((i) => (
-                      <span
-                        key={`smoke-${i}`}
-                        className="absolute -top-2 left-1/2 w-4 h-4 rounded-full pointer-events-none opacity-0"
-                        style={{
-                          animationDelay: `${charDelay + 400 + (i * 200)}ms`,
-                          animation: 'smoke-rise 2s ease-out forwards',
-                          left: `${50 + (i - 0.5) * 30}%`,
-                          background: 'rgba(100, 100, 100, 0.5)',
-                          filter: 'blur(4px)'
-                        }}
-                      />
-                    ))}
-                    
-                    {/* Character that burns - ENHANCED WITH GLOW */}
-                    <span
-                      className="inline-block animate-burn-letter"
-                      style={{
-                        animationDelay: `${charDelay}ms`,
-                        animationDuration: '1.2s',
-                        animationFillMode: 'forwards',
-                        filter: `drop-shadow(0 0 8px rgba(255, 140, 0, 0.8))`,
-                      }}
-                    >
-                      {char}
-                    </span>
+                  <span key={wordIndex}>
+                    {word.split('').map((char, charIndex) => {
+                      const matchstickDelay = 300;
+                      const totalCharsBefore = text.split(' ').slice(0, wordIndex).join(' ').length + wordIndex;
+                      const absoluteCharIndex = totalCharsBefore + charIndex;
+                      const reverseIndex = text.length - 1 - absoluteCharIndex;
+                      const charDelay = matchstickDelay + (reverseIndex * 80);
+                      
+                      return (
+                        <span key={charIndex} className="relative inline-block">
+                          {/* Multi-layered realistic flame effect with emotion colors */}
+                          <span
+                            className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-32 h-40 pointer-events-none opacity-0"
+                            style={{
+                              animationDelay: `${charDelay - 100}ms`,
+                              animation: 'flame-appear 1.2s ease-out forwards',
+                            }}
+                          >
+                            {/* Inner bright core */}
+                            <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-24 bg-gradient-to-t ${colors.core} to-transparent rounded-t-full blur-[2px]`}
+                              style={{ 
+                                boxShadow: colors.coreGlow,
+                                animation: 'flame-flicker-core 0.15s ease-in-out infinite alternate'
+                              }}
+                            />
+                            {/* Middle layer */}
+                            <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-32 bg-gradient-to-t ${colors.middle} to-transparent rounded-t-full blur-[3px]`}
+                              style={{ 
+                                boxShadow: colors.middleGlow,
+                                animation: 'flame-flicker-mid 0.2s ease-in-out infinite alternate-reverse'
+                              }}
+                            />
+                            {/* Outer layer */}
+                            <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-28 h-36 bg-gradient-to-t ${colors.outer} to-transparent rounded-t-full blur-[4px] opacity-90`}
+                              style={{ 
+                                boxShadow: colors.outerGlow,
+                                animation: 'flame-flicker-outer 0.25s ease-in-out infinite'
+                              }}
+                            />
+                          </span>
+                          
+                          {/* Ember particles with emotion colors */}
+                          {[0, 1, 2, 3, 4].map((i) => (
+                            <span
+                              key={i}
+                              className="absolute -bottom-4 left-1/2 w-2 h-2 rounded-full pointer-events-none opacity-0"
+                              style={{
+                                animationDelay: `${charDelay + 150 + (i * 80)}ms`,
+                                animation: 'ember-rise 1.5s ease-out forwards',
+                                left: `${50 + (i - 2) * 15}%`,
+                                background: colors.ember,
+                                boxShadow: colors.emberGlow
+                              }}
+                            />
+                          ))}
+                          
+                          {/* Smoke particles */}
+                          {[0, 1].map((i) => (
+                            <span
+                              key={`smoke-${i}`}
+                              className="absolute -top-2 left-1/2 w-4 h-4 rounded-full pointer-events-none opacity-0"
+                              style={{
+                                animationDelay: `${charDelay + 400 + (i * 200)}ms`,
+                                animation: 'smoke-rise 2s ease-out forwards',
+                                left: `${50 + (i - 0.5) * 30}%`,
+                                background: 'rgba(100, 100, 100, 0.5)',
+                                filter: 'blur(4px)'
+                              }}
+                            />
+                          ))}
+                          
+                          {/* Character that burns */}
+                          <span
+                            className="inline-block animate-burn-letter"
+                            style={{
+                              animationDelay: `${charDelay}ms`,
+                              animationDuration: '1.2s',
+                              animationFillMode: 'forwards',
+                              filter: `drop-shadow(0 0 8px ${colors.ember.replace('1)', '0.8)')})`,
+                            }}
+                          >
+                            {char}
+                          </span>
+                        </span>
+                      );
+                    })}
+                    {wordIndex < text.split(' ').length - 1 && ' '}
                   </span>
                 );
               })}
