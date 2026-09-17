@@ -4,13 +4,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
 
+const IGNITER_MS = 1500;
+const IGNITER_LETTER_INTERVAL = 55;
+const IGNITER_PHRASE = "Let's burn this";
 const MATCH_SEQUENCE_MS = 1050;
 const LETTER_INTERVAL_MS = 115;
 const LETTER_BURN_MS = 1250;
 
 type MatchPosition = { left: number; top: number };
 
-const playMatchAndFire = (fireDuration: number) => {
+const playMatchAndFire = (fireDuration: number, startDelaySeconds = 0) => {
   const AudioContextClass = window.AudioContext || (window as typeof window & {
     webkitAudioContext?: typeof AudioContext;
   }).webkitAudioContext;
@@ -48,7 +51,7 @@ const playMatchAndFire = (fireDuration: number) => {
     source.start(start);
   };
 
-  const now = context.currentTime;
+  const now = context.currentTime + startDelaySeconds;
   makeNoise(now, 0.16, 0.75, 2800);
   makeNoise(now + 0.18, 0.28, 0.5, 1100);
 
@@ -63,6 +66,7 @@ const playMatchAndFire = (fireDuration: number) => {
 
 export const BurnNote = () => {
   const [text, setText] = useState('');
+  const [igniterActive, setIgniterActive] = useState(false);
   const [isBurning, setIsBurning] = useState(false);
   const [animationReady, setAnimationReady] = useState(false);
   const [matchPosition, setMatchPosition] = useState<MatchPosition>({ left: 0, top: 0 });
@@ -120,19 +124,24 @@ export const BurnNote = () => {
     }
 
     setAnimationReady(false);
-    setIsBurning(true);
+    setIgniterActive(true);
 
     const characterCount = burnOrder.size;
     const fireDuration = characterCount * LETTER_INTERVAL_MS + LETTER_BURN_MS;
-    const totalDuration = MATCH_SEQUENCE_MS + fireDuration;
-    audioContextRef.current = playMatchAndFire(fireDuration);
+    const totalDuration = IGNITER_MS + MATCH_SEQUENCE_MS + fireDuration;
+    audioContextRef.current = playMatchAndFire(fireDuration, IGNITER_MS / 1000);
 
     const currentCount = Number.parseInt(localStorage.getItem('burnCount') || '0', 10);
     localStorage.setItem('burnCount', (currentCount + 1).toString());
 
     timerRefs.current.push(window.setTimeout(() => {
+      setIgniterActive(false);
+      setIsBurning(true);
+    }, IGNITER_MS));
+
+    timerRefs.current.push(window.setTimeout(() => {
       toast.success('Burned to ashes and released.');
-    }, MATCH_SEQUENCE_MS));
+    }, IGNITER_MS + MATCH_SEQUENCE_MS));
 
     timerRefs.current.push(window.setTimeout(() => {
       setText('');
@@ -157,7 +166,42 @@ export const BurnNote = () => {
       </div>
 
       <div className="flex-1 space-y-4">
-        {isBurning ? (
+        {igniterActive ? (
+          <div
+            className="burn-stage igniter-stage is-ready min-h-[200px] border border-border rounded-md p-3 overflow-hidden relative"
+            aria-live="polite"
+          >
+            <div className="burn-message igniter-phrase text-3xl font-bold tracking-tight text-center w-full">
+              {(() => {
+                let rank = -1;
+                return Array.from(IGNITER_PHRASE).map((character, index) => {
+                  if (/\s/.test(character)) {
+                    return <span key={index}> </span>;
+                  }
+                  rank += 1;
+                  const delay = rank * IGNITER_LETTER_INTERVAL;
+                  return (
+                    <span
+                      key={index}
+                      className="burn-character"
+                      style={{ '--burn-delay': `${delay}ms` } as React.CSSProperties}
+                    >
+                      <span className="burn-character-flame" aria-hidden="true">
+                        <span className="burn-character-flame-outer" />
+                        <span className="burn-character-flame-middle" />
+                        <span className="burn-character-flame-core" />
+                      </span>
+                      <span className="burn-ember burn-ember-one" aria-hidden="true" />
+                      <span className="burn-ember burn-ember-two" aria-hidden="true" />
+                      <span className="burn-smoke" aria-hidden="true" />
+                      <span className="burn-glyph">{character}</span>
+                    </span>
+                  );
+                });
+              })()}
+            </div>
+          </div>
+        ) : isBurning ? (
           <div
             ref={burnAreaRef}
             className={`burn-stage min-h-[200px] border border-border rounded-md p-3 overflow-hidden relative ${animationReady ? 'is-ready' : ''}`}
