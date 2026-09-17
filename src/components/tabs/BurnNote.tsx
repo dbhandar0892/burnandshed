@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
+import { setVentText, useVentText } from '@/lib/ventText';
 
 const IGNITER_MS = 1500;
 const IGNITER_LETTER_INTERVAL = 55;
