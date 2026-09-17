@@ -1,56 +1,117 @@
-import { useState, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Function to create burning/crackling sound effect
-const playBurningSound = (duration: number) => {
-  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-  
-  // Create noise buffer for crackling effect
-  const bufferSize = audioContext.sampleRate * duration / 1000;
-  const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-  const output = noiseBuffer.getChannelData(0);
-  
-  // Generate crackling noise pattern
-  for (let i = 0; i < bufferSize; i++) {
-    const intensity = Math.sin(i / 500) * 0.5 + 0.5; // Varying intensity
-    output[i] = (Math.random() * 2 - 1) * intensity * 0.3;
+const MATCH_SEQUENCE_MS = 1050;
+const LETTER_INTERVAL_MS = 115;
+const LETTER_BURN_MS = 1250;
+
+type MatchPosition = { left: number; top: number };
+
+const playMatchAndFire = (fireDuration: number) => {
+  const AudioContextClass = window.AudioContext || (window as typeof window & {
+    webkitAudioContext?: typeof AudioContext;
+  }).webkitAudioContext;
+
+  if (!AudioContextClass) return null;
+
+  const context = new AudioContextClass();
+  const master = context.createGain();
+  master.gain.value = 0.18;
+  master.connect(context.destination);
+
+  const makeNoise = (start: number, duration: number, volume: number, frequency: number) => {
+    const sampleCount = Math.max(1, Math.floor(context.sampleRate * duration));
+    const buffer = context.createBuffer(1, sampleCount, context.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    for (let index = 0; index < sampleCount; index += 1) {
+      const fade = 1 - index / sampleCount;
+      data[index] = (Math.random() * 2 - 1) * fade;
+    }
+
+    const source = context.createBufferSource();
+    const filter = context.createBiquadFilter();
+    const gain = context.createGain();
+    source.buffer = buffer;
+    filter.type = 'bandpass';
+    filter.frequency.value = frequency;
+    filter.Q.value = 0.7;
+    gain.gain.setValueAtTime(0, start);
+    gain.gain.linearRampToValueAtTime(volume, start + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(master);
+    source.start(start);
+  };
+
+  const now = context.currentTime;
+  makeNoise(now, 0.16, 0.75, 2800);
+  makeNoise(now + 0.18, 0.28, 0.5, 1100);
+
+  const crackleStart = now + MATCH_SEQUENCE_MS / 1000;
+  const crackles = Math.max(8, Math.floor(fireDuration / 240));
+  for (let index = 0; index < crackles; index += 1) {
+    makeNoise(crackleStart + index * 0.22, 0.045, 0.12 + Math.random() * 0.1, 900 + Math.random() * 1700);
   }
-  
-  // Create source
-  const noiseSource = audioContext.createBufferSource();
-  noiseSource.buffer = noiseBuffer;
-  
-  // Create filter for more realistic fire sound
-  const filter = audioContext.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 2000;
-  
-  // Create gain for volume control
-  const gainNode = audioContext.createGain();
-  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-  gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.2);
-  gainNode.gain.setValueAtTime(0.15, audioContext.currentTime + duration / 1000 - 0.5);
-  gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration / 1000);
-  
-  // Connect nodes
-  noiseSource.connect(filter);
-  filter.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  
-  // Play
-  noiseSource.start(audioContext.currentTime);
-  noiseSource.stop(audioContext.currentTime + duration / 1000);
-  
-  return { audioContext, source: noiseSource };
+
+  return context;
 };
 
 export const BurnNote = () => {
   const [text, setText] = useState('');
   const [isBurning, setIsBurning] = useState(false);
-  const audioContextRef = useRef<{ audioContext: AudioContext; source: AudioBufferSourceNode } | null>(null);
+  const [animationReady, setAnimationReady] = useState(false);
+  const [matchPosition, setMatchPosition] = useState<MatchPosition>({ left: 0, top: 0 });
+  const burnAreaRef = useRef<HTMLDivElement>(null);
+  const lastCharacterRef = useRef<HTMLSpanElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const timerRefs = useRef<number[]>([]);
+
+  const burnOrder = useMemo(() => {
+    const order = new Map<number, number>();
+    let rank = 0;
+    for (let index = text.length - 1; index >= 0; index -= 1) {
+      if (!/\s/.test(text[index])) {
+        order.set(index, rank);
+        rank += 1;
+      }
+    }
+    return order;
+  }, [text]);
+
+  const finalCharacterIndex = useMemo(() => {
+    for (let index = text.length - 1; index >= 0; index -= 1) {
+      if (!/\s/.test(text[index])) return index;
+    }
+    return -1;
+  }, [text]);
+
+  useEffect(() => {
+    if (!isBurning || !burnAreaRef.current || !lastCharacterRef.current) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const area = burnAreaRef.current?.getBoundingClientRect();
+      const lastCharacter = lastCharacterRef.current?.getBoundingClientRect();
+      if (!area || !lastCharacter) return;
+
+      setMatchPosition({
+        left: lastCharacter.right - area.left + 3,
+        top: lastCharacter.top - area.top + lastCharacter.height * 0.56,
+      });
+      setAnimationReady(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [isBurning]);
+
+  useEffect(() => () => {
+    timerRefs.current.forEach(window.clearTimeout);
+    audioContextRef.current?.close().catch(() => undefined);
+  }, []);
 
   const handleBurn = () => {
     if (!text.trim()) {
@@ -58,43 +119,36 @@ export const BurnNote = () => {
       return;
     }
 
+    setAnimationReady(false);
     setIsBurning(true);
-    
-    // Calculate animation duration based on character count
-    const chars = text.length;
-    const matchstickDuration = 2000; // 2s for matchstick animation
-    const charBurnDuration = 80; // 80ms per character
-    const burningDuration = (chars * charBurnDuration) + 1200;
-    const totalDuration = matchstickDuration + burningDuration;
-    
-    // Start burning sound only when matchstick touches the words
-    setTimeout(() => {
-      audioContextRef.current = playBurningSound(burningDuration);
-      toast.success('🔥 Burned to ashes and released!');
-    }, matchstickDuration);
-    
-    // Increment tracker count in localStorage
-    const currentCount = parseInt(localStorage.getItem('burnCount') || '0');
+
+    const characterCount = burnOrder.size;
+    const fireDuration = characterCount * LETTER_INTERVAL_MS + LETTER_BURN_MS;
+    const totalDuration = MATCH_SEQUENCE_MS + fireDuration;
+    audioContextRef.current = playMatchAndFire(fireDuration);
+
+    const currentCount = Number.parseInt(localStorage.getItem('burnCount') || '0', 10);
     localStorage.setItem('burnCount', (currentCount + 1).toString());
-    
-    // Clear after animation
-    setTimeout(() => {
+
+    timerRefs.current.push(window.setTimeout(() => {
+      toast.success('Burned to ashes and released.');
+    }, MATCH_SEQUENCE_MS));
+
+    timerRefs.current.push(window.setTimeout(() => {
       setText('');
       setIsBurning(false);
-      // Clean up audio context
-      if (audioContextRef.current) {
-        audioContextRef.current.audioContext.close();
-        audioContextRef.current = null;
-      }
-    }, totalDuration);
+      setAnimationReady(false);
+      audioContextRef.current?.close().catch(() => undefined);
+      audioContextRef.current = null;
+      timerRefs.current = [];
+    }, totalDuration));
   };
 
   return (
     <div className="h-full flex flex-col p-6 space-y-8">
-      {/* Header with enhanced styling */}
       <div className="text-center space-y-3 animate-fade-in">
         <div className="w-20 h-20 bg-gradient-fire rounded-2xl flex items-center justify-center mx-auto animate-float shadow-fire">
-          <Flame className="h-10 w-10 text-white drop-shadow-md" />
+          <Flame className="h-10 w-10 text-primary-foreground drop-shadow-md" />
         </div>
         <h2 className="text-3xl font-bold text-foreground tracking-tight">Burn It Note</h2>
         <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
@@ -102,124 +156,54 @@ export const BurnNote = () => {
         </p>
       </div>
 
-      {/* Text Input */}
       <div className="flex-1 space-y-4">
         {isBurning ? (
-          <div className="min-h-[200px] bg-card border border-border rounded-md p-3 overflow-hidden relative">
-            {/* Matchstick Animation */}
-            <div 
-              className="absolute bottom-2 right-2 z-10 animate-matchstick-light"
-              style={{ transformOrigin: 'top left' }}
-            >
-              <div className="relative w-2 h-16 bg-gradient-to-b from-amber-800 to-amber-900 rounded-sm">
-                {/* Matchstick head */}
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-600 rounded-full" />
-                {/* Flame on matchstick */}
-                <div 
-                  className="absolute -top-6 left-1/2 -translate-x-1/2 w-5 h-7 animate-flame-flicker"
-                  style={{ 
-                    animationDelay: '0.4s',
-                    transformOrigin: 'bottom center'
-                  }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-orange-500 via-yellow-400 to-yellow-200 rounded-t-full blur-[1px]" 
-                    style={{ 
-                      boxShadow: '0 0 20px rgba(255, 165, 0, 0.8), 0 0 40px rgba(255, 100, 0, 0.6)' 
-                    }}
-                  />
-                </div>
+          <div
+            ref={burnAreaRef}
+            className={`burn-stage min-h-[200px] border border-border rounded-md p-3 overflow-hidden relative ${animationReady ? 'is-ready' : ''}`}
+          >
+            {animationReady && (
+              <div
+                className="burn-match"
+                style={{ left: matchPosition.left, top: matchPosition.top }}
+                aria-hidden="true"
+              >
+                <span className="burn-match-flame">
+                  <span className="burn-match-flame-outer" />
+                  <span className="burn-match-flame-inner" />
+                </span>
+                <span className="burn-match-head" />
+                <span className="burn-match-stick" />
+                <span className="burn-match-smoke" />
               </div>
-            </div>
-            
-            {/* Burning Text */}
-            <div className="text-2xl leading-relaxed whitespace-pre-wrap">
-              {text.split('').map((char, charIndex) => {
-                const matchstickDelay = 2000; // matchstick animation time
-                // Burn from end (last character) to beginning (first character)
-                const reverseIndex = text.length - 1 - charIndex;
-                const charDelay = matchstickDelay + (reverseIndex * 80);
-                
+            )}
+
+            <div className="burn-message text-2xl leading-relaxed whitespace-pre-wrap" aria-live="polite">
+              {Array.from(text).map((character, index) => {
+                const rank = burnOrder.get(index);
+                const isWhitespace = /\s/.test(character);
+                const delay = rank === undefined ? 0 : MATCH_SEQUENCE_MS + rank * LETTER_INTERVAL_MS;
+
+                if (isWhitespace) {
+                  return character === '\n' ? <br key={index} /> : <span key={index}> </span>;
+                }
+
                 return (
-                  <span key={charIndex} className="relative inline-block">
-                    {/* Multi-layered realistic flame effect - MAXIMUM VISIBILITY */}
-                    <span
-                      className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-24 h-32 pointer-events-none opacity-0"
-                      style={{
-                        animationDelay: `${charDelay - 150}ms`,
-                        animation: 'flame-appear 1.5s ease-out forwards',
-                      }}
-                    >
-                      {/* Inner bright core - MASSIVE AND SUPER BRIGHT */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-20 bg-gradient-to-t from-white via-yellow-50 to-transparent rounded-t-full blur-[2px]"
-                        style={{ 
-                          boxShadow: '0 0 60px rgba(255, 255, 255, 1), 0 0 100px rgba(255, 230, 0, 1), 0 0 150px rgba(255, 200, 0, 0.8), 0 0 200px rgba(255, 150, 0, 0.6)',
-                          animation: 'flame-flicker-core 0.12s ease-in-out infinite alternate'
-                        }}
-                      />
-                      {/* Middle orange layer - HUGE AND ULTRA BRIGHT */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-26 bg-gradient-to-t from-orange-300 via-orange-200 to-transparent rounded-t-full blur-[3px]"
-                        style={{ 
-                          boxShadow: '0 0 80px rgba(255, 140, 0, 1), 0 0 120px rgba(255, 100, 0, 1), 0 0 160px rgba(255, 80, 0, 0.8)',
-                          animation: 'flame-flicker-mid 0.18s ease-in-out infinite alternate-reverse'
-                        }}
-                      />
-                      {/* Outer red layer - MASSIVE */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-28 bg-gradient-to-t from-red-400 via-orange-400 to-transparent rounded-t-full blur-[4px]"
-                        style={{ 
-                          boxShadow: '0 0 100px rgba(255, 69, 0, 1), 0 0 150px rgba(255, 50, 0, 0.9)',
-                          animation: 'flame-flicker-outer 0.22s ease-in-out infinite'
-                        }}
-                      />
-                      {/* Additional glow layer for maximum visibility */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-32 bg-gradient-to-t from-yellow-500/30 to-transparent rounded-t-full blur-[8px]"
-                        style={{ 
-                          boxShadow: '0 0 150px rgba(255, 200, 0, 0.8), 0 0 250px rgba(255, 150, 0, 0.6)',
-                        }}
-                      />
+                  <span
+                    key={index}
+                    ref={index === finalCharacterIndex ? lastCharacterRef : undefined}
+                    className="burn-character"
+                    style={{ '--burn-delay': `${delay}ms` } as React.CSSProperties}
+                  >
+                    <span className="burn-character-flame" aria-hidden="true">
+                      <span className="burn-character-flame-outer" />
+                      <span className="burn-character-flame-middle" />
+                      <span className="burn-character-flame-core" />
                     </span>
-                    
-                    {/* Multiple ember particles - MANY MORE AND BIGGER */}
-                    {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                      <span
-                        key={i}
-                        className="absolute -bottom-6 left-1/2 w-3 h-3 rounded-full pointer-events-none opacity-0"
-                        style={{
-                          animationDelay: `${charDelay + 100 + (i * 60)}ms`,
-                          animation: 'ember-rise 2s ease-out forwards',
-                          left: `${50 + (i - 3.5) * 12}%`,
-                          background: i % 2 === 0 ? 'rgba(255, 230, 0, 1)' : 'rgba(255, 80, 0, 1)',
-                          boxShadow: '0 0 30px rgba(255, 140, 0, 1), 0 0 50px rgba(255, 100, 0, 1), 0 0 70px rgba(255, 80, 0, 0.8)'
-                        }}
-                      />
-                    ))}
-                    
-                    {/* Smoke particles - MORE AND LARGER */}
-                    {[0, 1, 2].map((i) => (
-                      <span
-                        key={`smoke-${i}`}
-                        className="absolute -top-4 left-1/2 w-6 h-6 rounded-full pointer-events-none opacity-0"
-                        style={{
-                          animationDelay: `${charDelay + 500 + (i * 150)}ms`,
-                          animation: 'smoke-rise 2.5s ease-out forwards',
-                          left: `${50 + (i - 1) * 25}%`,
-                          background: 'rgba(100, 100, 100, 0.7)',
-                          filter: 'blur(6px)'
-                        }}
-                      />
-                    ))}
-                    
-                    {/* Character that burns - INTENSE GLOW */}
-                    <span
-                      className="inline-block animate-burn-letter"
-                      style={{
-                        animationDelay: `${charDelay}ms`,
-                        animationDuration: '1.5s',
-                        animationFillMode: 'forwards',
-                        filter: `drop-shadow(0 0 15px rgba(255, 140, 0, 1)) drop-shadow(0 0 25px rgba(255, 100, 0, 0.8)) drop-shadow(0 0 35px rgba(255, 80, 0, 0.6))`,
-                      }}
-                    >
-                      {char}
-                    </span>
+                    <span className="burn-ember burn-ember-one" aria-hidden="true" />
+                    <span className="burn-ember burn-ember-two" aria-hidden="true" />
+                    <span className="burn-smoke" aria-hidden="true" />
+                    <span className="burn-glyph">{character}</span>
                   </span>
                 );
               })}
@@ -228,33 +212,22 @@ export const BurnNote = () => {
         ) : (
           <Textarea
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(event) => setText(event.target.value)}
             placeholder="Pour out your anger and frustration here..."
             className="min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl"
-            disabled={isBurning}
           />
         )}
-        
+
         <Button
           onClick={handleBurn}
           disabled={isBurning || !text.trim()}
-          className="w-full bg-gradient-fire text-white hover:opacity-90 h-16 text-lg font-bold rounded-2xl shadow-fire transition-all duration-300 hover:shadow-large hover:scale-[1.02]"
+          className="w-full bg-gradient-fire text-primary-foreground hover:opacity-90 h-16 text-lg font-bold rounded-2xl shadow-fire transition-all duration-300 hover:shadow-large hover:scale-[1.02]"
         >
-          {isBurning ? (
-            <>
-              <Flame className="mr-2 h-6 w-6 animate-pulse" />
-              Burning...
-            </>
-          ) : (
-            <>
-              <Flame className="mr-2 h-6 w-6" />
-              Burn It Away
-            </>
-          )}
+          <Flame className={`mr-2 h-6 w-6 ${isBurning ? 'animate-pulse' : ''}`} />
+          {isBurning ? 'Burning...' : 'Burn It Away'}
         </Button>
       </div>
 
-      {/* Privacy Note */}
       <div className="text-center mt-auto pt-4">
         <p className="text-sm text-muted-foreground font-medium">
           🔒 Your words turn to smoke. Nothing is saved or stored.
