@@ -8,7 +8,7 @@ import { setVentText, useVentText } from '@/lib/ventText';
 const IGNITER_MS = 1500;
 const IGNITER_LETTER_INTERVAL = 55;
 const IGNITER_PHRASE = "Let's burn this";
-const MATCH_SEQUENCE_MS = 1050;
+const MATCH_SEQUENCE_MS = 450;
 const LETTER_INTERVAL_MS = 115;
 const LETTER_BURN_MS = 1250;
 
