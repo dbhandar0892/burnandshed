@@ -66,6 +66,7 @@ const playMatchAndFire = (fireDuration: number, startDelaySeconds = 0) => {
 
 export const BurnNote = () => {
   const [text, setText] = useState('');
+  const [igniterActive, setIgniterActive] = useState(false);
   const [isBurning, setIsBurning] = useState(false);
   const [animationReady, setAnimationReady] = useState(false);
   const [matchPosition, setMatchPosition] = useState<MatchPosition>({ left: 0, top: 0 });
@@ -123,19 +124,24 @@ export const BurnNote = () => {
     }
 
     setAnimationReady(false);
-    setIsBurning(true);
+    setIgniterActive(true);
 
     const characterCount = burnOrder.size;
     const fireDuration = characterCount * LETTER_INTERVAL_MS + LETTER_BURN_MS;
-    const totalDuration = MATCH_SEQUENCE_MS + fireDuration;
-    audioContextRef.current = playMatchAndFire(fireDuration);
+    const totalDuration = IGNITER_MS + MATCH_SEQUENCE_MS + fireDuration;
+    audioContextRef.current = playMatchAndFire(fireDuration, IGNITER_MS / 1000);
 
     const currentCount = Number.parseInt(localStorage.getItem('burnCount') || '0', 10);
     localStorage.setItem('burnCount', (currentCount + 1).toString());
 
     timerRefs.current.push(window.setTimeout(() => {
+      setIgniterActive(false);
+      setIsBurning(true);
+    }, IGNITER_MS));
+
+    timerRefs.current.push(window.setTimeout(() => {
       toast.success('Burned to ashes and released.');
-    }, MATCH_SEQUENCE_MS));
+    }, IGNITER_MS + MATCH_SEQUENCE_MS));
 
     timerRefs.current.push(window.setTimeout(() => {
       setText('');
