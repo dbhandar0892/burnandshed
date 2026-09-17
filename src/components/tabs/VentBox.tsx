@@ -143,38 +143,67 @@ export const VentBox = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Type your frustrations here... Let it all out!"
-            className="min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl"
-            disabled={isShedding}
-          />
-        ) : (
-          <div className="min-h-[200px] bg-card border border-border rounded-md p-3 relative overflow-visible">
-            <div className="relative flex flex-wrap gap-0 text-2xl leading-relaxed">
-              {text.split('').map((char, index) => {
-                const totalChars = text.length;
-                const stripWidth = 3;
-                const stripIndex = Math.floor(index / stripWidth);
-                const randomX = (Math.random() - 0.5) * 40;
-                const randomRotate = (Math.random() - 0.5) * 180;
-                const delay = stripIndex * 50;
-                const isSpace = char === ' ';
-                
+          <div className="shredder min-h-[300px] bg-card border border-border rounded-md">
+            {/* Paper feeding into the machine */}
+            <div className="shredder-feed">
+              <div
+                className="shredder-sheet"
+                style={{ ['--shred-duration' as any]: `${SHRED_DURATION_MS}ms` }}
+              >
+                {text}
+              </div>
+            </div>
+
+            {/* The shredder machine */}
+            <div className="shredder-body">
+              <div className="shredder-slot">
+                <div className="shredder-teeth" />
+              </div>
+              <div className="shredder-glow" />
+            </div>
+
+            {/* Shredded strips falling out */}
+            <div className="shredder-output">
+              {Array.from({ length: STRIP_COUNT }).map((_, i) => {
+                const width = 100 / STRIP_COUNT;
+                const drift = (i - STRIP_COUNT / 2) * 2.2 + (Math.random() - 0.5) * 14;
+                const rot = (Math.random() - 0.5) * 26;
                 return (
-                  <span
-                    key={index}
-                    className="inline-block animate-shred-strip"
+                  <div
+                    key={i}
+                    className="shredder-strip"
                     style={{
-                      animationDelay: `${delay}ms`,
-                      animationDuration: '1.5s',
-                      animationFillMode: 'forwards',
-                      // @ts-ignore - CSS custom properties
-                      '--shred-x': `${randomX}px`,
-                      '--shred-rotate': `${randomRotate}deg`,
+                      left: `${i * width}%`,
+                      width: `${width}%`,
+                      ['--shred-duration' as any]: `${SHRED_DURATION_MS}ms`,
+                      ['--strip-delay' as any]: `${Math.random() * 90}ms`,
+                      ['--strip-x' as any]: `${drift}px`,
+                      ['--strip-rot' as any]: `${rot}deg`,
                     }}
                   >
-                    {isSpace ? '\u00A0' : char}
-                  </span>
+                    <div
+                      className="shredder-strip-inner"
+                      style={{ width: `${STRIP_COUNT * 100}%`, left: `-${i * 100}%` }}
+                    >
+                      {text}
+                    </div>
+                  </div>
                 );
               })}
+              {Array.from({ length: 10 }).map((_, i) => (
+                <span
+                  key={`dust-${i}`}
+                  className="shredder-dust"
+                  style={{
+                    left: `${5 + i * 9 + Math.random() * 5}%`,
+                    animationDelay: `${Math.random() * 800}ms`,
+                    ['--dust-x' as any]: `${(Math.random() - 0.5) * 30}px`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
             </div>
           </div>
         )}
