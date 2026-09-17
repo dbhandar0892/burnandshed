@@ -213,7 +213,7 @@ export const VentBox = () => {
           </div>
         )}
 
-        )}
+
         
         <Button
           onClick={handleShed}
