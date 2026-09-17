@@ -143,7 +143,12 @@ export const VentBox = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Type your frustrations here... Let it all out!"
+            className="min-h-[200px] bg-black border-border text-white placeholder:text-white/50 resize-none transition-all text-2xl"
+            disabled={isShedding}
+          />
+        ) : (
           <div className="shredder min-h-[300px] bg-card border border-border rounded-md">
+
             {/* Paper feeding into the machine */}
             <div className="shredder-feed">
               <div
