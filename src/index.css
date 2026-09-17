@@ -336,7 +336,7 @@ All colors MUST be HSL.
     height: 1rem;
     opacity: 0;
     transform-origin: left center;
-    animation: match-approach 1.35s cubic-bezier(0.2, 0.75, 0.3, 1) both;
+    animation: match-approach 0.45s cubic-bezier(0.2, 0.75, 0.3, 1) both;
     pointer-events: none;
   }
 
