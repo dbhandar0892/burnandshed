@@ -1,8 +1,6 @@
 // Minimal, safe service worker that avoids caching Vite chunks to prevent React duplication
-const CACHE_NAME = 'forget-about-it-v3';
+const CACHE_NAME = 'forget-about-it-v4';
 const PRECACHE = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/favicon.ico'
 ];
@@ -23,6 +21,7 @@ self.addEventListener('fetch', (event) => {
 
   const pathname = url.pathname;
   const isPrecached = PRECACHE.includes(pathname);
+  const isNavigation = req.mode === 'navigate' || pathname === '/' || pathname === '/index.html';
 
   // Detect Vite dev/build assets and JS/CSS chunks - never cache them
   const isViteAsset =
@@ -33,7 +32,7 @@ self.addEventListener('fetch', (event) => {
     pathname.endsWith('.css') ||
     url.searchParams.has('v');
 
-  if (!isPrecached || isViteAsset) {
+  if (isNavigation || !isPrecached || isViteAsset) {
     // Network-only for runtime/content and all module chunks
     return; // Let the default browser fetch proceed (no caching)
   }
