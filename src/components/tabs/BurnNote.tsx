@@ -4,13 +4,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
 
+const IGNITER_MS = 1500;
+const IGNITER_LETTER_INTERVAL = 55;
+const IGNITER_PHRASE = "Let's burn this";
 const MATCH_SEQUENCE_MS = 1050;
 const LETTER_INTERVAL_MS = 115;
 const LETTER_BURN_MS = 1250;
 
 type MatchPosition = { left: number; top: number };
 
-const playMatchAndFire = (fireDuration: number) => {
+const playMatchAndFire = (fireDuration: number, startDelaySeconds = 0) => {
   const AudioContextClass = window.AudioContext || (window as typeof window & {
     webkitAudioContext?: typeof AudioContext;
   }).webkitAudioContext;
@@ -48,7 +51,7 @@ const playMatchAndFire = (fireDuration: number) => {
     source.start(start);
   };
 
-  const now = context.currentTime;
+  const now = context.currentTime + startDelaySeconds;
   makeNoise(now, 0.16, 0.75, 2800);
   makeNoise(now + 0.18, 0.28, 0.5, 1100);
 
