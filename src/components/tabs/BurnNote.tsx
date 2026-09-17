@@ -69,7 +69,6 @@ export const BurnNote = () => {
   const text = useVentText();
   const setText = setVentText;
   const [igniterActive, setIgniterActive] = useState(false);
-  const [igniterActive, setIgniterActive] = useState(false);
   const [isBurning, setIsBurning] = useState(false);
   const [animationReady, setAnimationReady] = useState(false);
   const [matchPosition, setMatchPosition] = useState<MatchPosition>({ left: 0, top: 0 });

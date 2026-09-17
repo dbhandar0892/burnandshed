@@ -70,7 +70,6 @@ export const VentBox = () => {
   const text = useVentText();
   const setText = setVentText;
   const [isShedding, setIsShedding] = useState(false);
-  const [isShedding, setIsShedding] = useState(false);
   const audioContextRef = useRef<{ audioContext: AudioContext; sources: AudioBufferSourceNode[] } | null>(null);
 
   const handleShed = () => {
