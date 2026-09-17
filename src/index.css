@@ -200,54 +200,273 @@ All colors MUST be HSL.
     transition: background-color 0.2s;
   }
 
-  /* Realistic Fire Animation Keyframes */
-  @keyframes flame-appear {
-    0% { opacity: 0; transform: scale(0.5); }
-    20% { opacity: 1; transform: scale(1.2); }
-    100% { opacity: 0; transform: scale(0.8) translateY(-20px); }
+}
+
+@layer components {
+  .burn-stage {
+    background: hsl(var(--foreground));
+    color: hsl(var(--primary-foreground));
   }
 
-  @keyframes flame-flicker-core {
-    0% { transform: translate(-50%, 0) scaleY(1) scaleX(1); }
-    100% { transform: translate(-50%, 0) scaleY(1.15) scaleX(0.95); }
+  .burn-message {
+    position: relative;
+    z-index: 2;
   }
 
-  @keyframes flame-flicker-mid {
-    0% { transform: translate(-50%, 0) scaleY(1) scaleX(1); }
-    100% { transform: translate(-50%, 0) scaleY(1.1) scaleX(0.92); }
+  .burn-character {
+    position: relative;
+    display: inline-block;
   }
 
-  @keyframes flame-flicker-outer {
-    0% { transform: translate(-50%, 0) scaleY(1) scaleX(1); opacity: 0.7; }
-    50% { transform: translate(-50%, 0) scaleY(1.05) scaleX(0.95); opacity: 0.6; }
-    100% { transform: translate(-50%, 0) scaleY(1) scaleX(1); opacity: 0.7; }
+  .burn-glyph {
+    display: inline-block;
   }
 
-  @keyframes ember-rise {
-    0% { 
-      opacity: 0; 
-      transform: translateY(0) scale(1); 
-    }
-    20% { 
-      opacity: 1; 
-    }
-    100% { 
-      opacity: 0; 
-      transform: translateY(-60px) translateX(calc((random() - 0.5) * 40px)) scale(0.3); 
-    }
+  .is-ready .burn-glyph {
+    animation: burn-glyph 1.25s cubic-bezier(0.4, 0, 0.7, 1) var(--burn-delay) both;
   }
 
-  @keyframes smoke-rise {
-    0% { 
-      opacity: 0; 
-      transform: translateY(0) scale(0.5); 
-    }
-    20% { 
-      opacity: 0.6; 
-    }
-    100% { 
-      opacity: 0; 
-      transform: translateY(-80px) translateX(calc((random() - 0.5) * 60px)) scale(2); 
-    }
+  .burn-character-flame {
+    position: absolute;
+    bottom: 0.05em;
+    left: 50%;
+    z-index: 3;
+    width: 1.15em;
+    height: 1.9em;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%);
   }
+
+  .is-ready .burn-character-flame {
+    animation: letter-flame-life 1.05s ease-out var(--burn-delay) both;
+  }
+
+  .burn-character-flame > span,
+  .burn-match-flame > span {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    border-radius: 55% 45% 50% 50% / 72% 72% 28% 28%;
+    transform: translateX(-50%) rotate(45deg);
+    transform-origin: 50% 85%;
+  }
+
+  .burn-character-flame-outer {
+    width: 1em;
+    height: 1.55em;
+    background: hsl(var(--fire) / 0.76);
+    filter: blur(1.5px);
+    box-shadow: 0 0 0.55em hsl(var(--fire) / 0.58);
+    animation: natural-flame-a 0.18s ease-in-out infinite alternate;
+  }
+
+  .burn-character-flame-middle {
+    width: 0.68em;
+    height: 1.15em;
+    background: hsl(var(--fire-glow) / 0.92);
+    animation: natural-flame-b 0.14s ease-in-out infinite alternate-reverse;
+  }
+
+  .burn-character-flame-core {
+    width: 0.32em;
+    height: 0.65em;
+    background: hsl(var(--primary-foreground));
+    filter: blur(0.4px);
+  }
+
+  .burn-ember {
+    position: absolute;
+    z-index: 4;
+    bottom: 0.35em;
+    left: 50%;
+    width: 0.13em;
+    height: 0.13em;
+    border-radius: 9999px;
+    background: hsl(var(--fire-glow));
+    box-shadow: 0 0 0.25em hsl(var(--fire));
+    opacity: 0;
+  }
+
+  .is-ready .burn-ember-one {
+    animation: ember-left 0.9s ease-out calc(var(--burn-delay) + 160ms) both;
+  }
+
+  .is-ready .burn-ember-two {
+    animation: ember-right 0.75s ease-out calc(var(--burn-delay) + 310ms) both;
+  }
+
+  .burn-smoke {
+    position: absolute;
+    z-index: 1;
+    top: -0.25em;
+    left: 50%;
+    width: 0.65em;
+    height: 0.65em;
+    border-radius: 9999px;
+    background: hsl(var(--muted-foreground) / 0.45);
+    filter: blur(5px);
+    opacity: 0;
+  }
+
+  .is-ready .burn-smoke {
+    animation: natural-smoke 1.4s ease-out calc(var(--burn-delay) + 520ms) both;
+  }
+
+  .burn-match {
+    position: absolute;
+    z-index: 8;
+    width: 8.5rem;
+    height: 1rem;
+    opacity: 0;
+    transform-origin: left center;
+    animation: match-approach 1.35s cubic-bezier(0.2, 0.75, 0.3, 1) both;
+    pointer-events: none;
+  }
+
+  .burn-match-stick {
+    position: absolute;
+    left: 0.65rem;
+    top: 0.3rem;
+    width: 7.75rem;
+    height: 0.34rem;
+    border-radius: 9999px;
+    background: linear-gradient(to bottom, hsl(35 58% 70%), hsl(30 46% 42%) 70%, hsl(24 35% 27%));
+    box-shadow: inset 0 1px hsl(40 75% 88% / 0.65), 0 1px 2px hsl(var(--foreground) / 0.4);
+  }
+
+  .burn-match-stick::after {
+    content: '';
+    position: absolute;
+    inset: 0 5% 0 4%;
+    background: repeating-linear-gradient(90deg, transparent 0 0.85rem, hsl(25 40% 28% / 0.22) 0.9rem 0.96rem);
+  }
+
+  .burn-match-head {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    top: 0.13rem;
+    width: 0.9rem;
+    height: 0.72rem;
+    border-radius: 48% 42% 45% 52%;
+    background: radial-gradient(circle at 35% 30%, hsl(8 45% 38%), hsl(4 48% 21%) 68%, hsl(0 0% 8%));
+    box-shadow: inset -2px -2px 2px hsl(0 0% 4% / 0.55);
+  }
+
+  .burn-match-flame {
+    position: absolute;
+    z-index: 4;
+    left: 0.38rem;
+    bottom: 0.62rem;
+    width: 1.5rem;
+    height: 2.25rem;
+    opacity: 0;
+    filter: drop-shadow(0 0 0.55rem hsl(var(--fire) / 0.85));
+    animation: match-flame-life 1.35s ease-out both;
+    transform-origin: 50% 100%;
+  }
+
+  .burn-match-flame-outer {
+    width: 1.3rem;
+    height: 2rem;
+    background: hsl(var(--fire) / 0.9);
+    animation: natural-flame-a 0.16s ease-in-out infinite alternate;
+  }
+
+  .burn-match-flame-inner {
+    width: 0.72rem;
+    height: 1.25rem;
+    background: hsl(var(--fire-glow));
+    box-shadow: inset 0 -0.42rem hsl(var(--primary-foreground) / 0.88);
+    animation: natural-flame-b 0.12s ease-in-out infinite alternate-reverse;
+  }
+
+  .burn-match-smoke {
+    position: absolute;
+    left: 0.2rem;
+    top: -1.4rem;
+    width: 0.75rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: hsl(var(--muted-foreground) / 0.38);
+    filter: blur(6px);
+    opacity: 0;
+    animation: match-smoke 1.35s ease-out both;
+  }
+}
+
+@keyframes match-approach {
+  0% { opacity: 0; transform: translate(9rem, 1.2rem) rotate(7deg); }
+  12% { opacity: 1; }
+  35% { transform: translate(5.5rem, 0.55rem) rotate(3deg); }
+  72% { transform: translate(0.25rem, 0) rotate(-1deg); }
+  82% { transform: translate(0, 0) rotate(-2deg); }
+  92% { opacity: 1; transform: translate(0.1rem, 0.05rem) rotate(1deg); }
+  100% { opacity: 0; transform: translate(1.8rem, 0.8rem) rotate(8deg); }
+}
+
+@keyframes match-flame-life {
+  0%, 12% { opacity: 0; transform: scale(0.15); }
+  23% { opacity: 1; transform: scale(1.15); }
+  72%, 86% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.35); }
+}
+
+@keyframes match-smoke {
+  0%, 80% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  88% { opacity: 0.5; }
+  100% { opacity: 0; transform: translate(-0.45rem, -1.6rem) scale(1.7); }
+}
+
+@keyframes letter-flame-life {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.18); }
+  12% { opacity: 1; transform: translateX(-50%) scale(0.9); }
+  54% { opacity: 0.96; transform: translateX(-50%) scale(1.05); }
+  100% { opacity: 0; transform: translate(-42%, -1.25em) scale(0.45); }
+}
+
+@keyframes natural-flame-a {
+  from { transform: translateX(-50%) rotate(41deg) skewX(-3deg) scale(0.96, 1.05); }
+  to { transform: translateX(-50%) rotate(49deg) skewX(4deg) scale(1.03, 0.94); }
+}
+
+@keyframes natural-flame-b {
+  from { transform: translateX(-50%) rotate(42deg) scale(0.92, 1.08); }
+  to { transform: translateX(-50%) rotate(48deg) scale(1.08, 0.9); }
+}
+
+@keyframes burn-glyph {
+  0%, 8% { opacity: 1; color: inherit; transform: translateY(0) scale(1); filter: none; }
+  20% { color: hsl(var(--fire-glow)); text-shadow: 0 0 0.3em hsl(var(--fire)); }
+  48% { opacity: 0.88; color: hsl(var(--fire)); transform: translateY(0.04em) scale(0.97); filter: contrast(1.3); }
+  72% { opacity: 0.48; color: hsl(25 18% 18%); transform: translateY(0.18em) scale(0.82) rotate(2deg); filter: blur(0.4px); }
+  100% { opacity: 0; color: hsl(0 0% 5%); transform: translateY(0.65em) scale(0.45) rotate(-5deg); filter: blur(2px); }
+}
+
+@keyframes ember-left {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  18% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-0.65em, -2.8em) scale(0.15); }
+}
+
+@keyframes ember-right {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  18% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(0.8em, -2.2em) scale(0.1); }
+}
+
+@keyframes natural-smoke {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.45); }
+  20% { opacity: 0.42; }
+  55% { opacity: 0.24; transform: translate(-75%, -1.8em) scale(1.2); }
+  100% { opacity: 0; transform: translate(-15%, -4em) scale(2.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .burn-match { animation-duration: 0.35s; }
+  .is-ready .burn-glyph,
+  .is-ready .burn-character-flame,
+  .is-ready .burn-ember,
+  .is-ready .burn-smoke { animation-duration: 0.45s; }
 }

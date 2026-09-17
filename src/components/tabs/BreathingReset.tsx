@@ -94,7 +94,7 @@ export const BreathingReset = () => {
   const gainNodesRef = useRef<GainNode[]>([]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval> | undefined;
 
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
@@ -104,7 +104,9 @@ export const BreathingReset = () => {
       setIsActive(false);
     }
 
-    return () => clearInterval(interval);
+    return () => {
+      if (interval !== undefined) clearInterval(interval);
+    };
   }, [isActive, timeLeft]);
 
   // Ambient music control
@@ -146,7 +148,7 @@ export const BreathingReset = () => {
 
   // Breathing cycle (4 seconds in, 4 seconds out)
   useEffect(() => {
-    let phaseInterval: NodeJS.Timeout;
+    let phaseInterval: ReturnType<typeof setInterval> | undefined;
 
     if (isActive) {
       phaseInterval = setInterval(() => {
@@ -162,7 +164,9 @@ export const BreathingReset = () => {
       }, 4000);
     }
 
-    return () => clearInterval(phaseInterval);
+    return () => {
+      if (phaseInterval !== undefined) clearInterval(phaseInterval);
+    };
   }, [isActive]);
 
   const handleStart = () => {
