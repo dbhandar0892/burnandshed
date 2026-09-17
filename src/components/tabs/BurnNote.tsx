@@ -66,7 +66,9 @@ const playMatchAndFire = (fireDuration: number, startDelaySeconds = 0) => {
 };
 
 export const BurnNote = () => {
-  const [text, setText] = useState('');
+  const text = useVentText();
+  const setText = setVentText;
+  const [igniterActive, setIgniterActive] = useState(false);
   const [igniterActive, setIgniterActive] = useState(false);
   const [isBurning, setIsBurning] = useState(false);
   const [animationReady, setAnimationReady] = useState(false);
