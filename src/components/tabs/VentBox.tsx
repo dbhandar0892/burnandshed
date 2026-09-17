@@ -5,6 +5,9 @@ import { Scissors } from 'lucide-react';
 import { toast } from 'sonner';
 import { setVentText, useVentText } from '@/lib/ventText';
 
+const SHRED_DURATION_MS = 2800;
+const STRIP_COUNT = 14;
+
 // Motor + grinding paper shredder sound
 const playShredSound = (duration: number) => {
   const sources: AudioBufferSourceNode[] = [];
