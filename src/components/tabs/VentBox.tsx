@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Scissors } from 'lucide-react';
 import { toast } from 'sonner';
+import { setVentText, useVentText } from '@/lib/ventText';
 
 // Function to create paper shredding sound effect
 const playShredSound = (duration: number) => {
@@ -66,7 +67,8 @@ const playShredSound = (duration: number) => {
 };
 
 export const VentBox = () => {
-  const [text, setText] = useState('');
+  const text = useVentText();
+  const setText = setVentText;
   const [isShedding, setIsShedding] = useState(false);
   const audioContextRef = useRef<{ audioContext: AudioContext; sources: AudioBufferSourceNode[] } | null>(null);
 
