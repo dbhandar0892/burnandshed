@@ -208,9 +208,8 @@ export const VentBox = () => {
               ))}
             </div>
           </div>
+        )}
 
-            </div>
-          </div>
         )}
         
         <Button
