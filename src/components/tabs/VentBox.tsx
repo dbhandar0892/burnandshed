@@ -99,11 +99,9 @@ export const VentBox = () => {
 
     setIsShedding(true);
     
-    // Calculate shredding duration based on text length
-    const chars = text.length;
-    const stripWidth = 3;
-    const numStrips = Math.ceil(chars / stripWidth);
-    const shreddingDuration = numStrips * 50 + 1500; // Strip delay + animation
+    // Shredding takes a fixed, machine-like time
+    const shreddingDuration = SHRED_DURATION_MS + 250;
+
     
     // Play realistic shredding sound
     audioContextRef.current = playShredSound(shreddingDuration);
