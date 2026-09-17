@@ -313,6 +313,22 @@ All colors MUST be HSL.
     animation: natural-smoke 1.4s ease-out calc(var(--burn-delay) + 520ms) both;
   }
 
+  .igniter-stage {
+    display: flex;
+    align-items: center;
+  }
+
+  .is-ready .igniter-phrase .burn-glyph,
+  .is-ready .igniter-phrase .burn-character-flame {
+    animation-duration: 0.85s;
+  }
+
+  .is-ready .igniter-phrase .burn-ember,
+  .is-ready .igniter-phrase .burn-smoke {
+    animation-duration: 0.55s;
+  }
+
+
   .burn-match {
     position: absolute;
     z-index: 8;
