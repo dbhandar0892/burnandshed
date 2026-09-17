@@ -486,3 +486,157 @@ All colors MUST be HSL.
   .is-ready .burn-ember,
   .is-ready .burn-smoke { animation-duration: 0.45s; }
 }
+
+/* ---------- Realistic paper shredder ---------- */
+.shredder {
+  position: relative;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.shredder-feed {
+  position: relative;
+  width: 86%;
+  height: 120px;
+  overflow: hidden;
+}
+
+.shredder-sheet {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #fdfdfa 0%, #f2f0e8 100%);
+  border-radius: 3px 3px 0 0;
+  box-shadow: 0 6px 18px hsl(0 0% 0% / 0.45), inset 0 1px 0 #fff;
+  padding: 10px 12px;
+  color: #1c1c1c;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  text-align: left;
+  overflow: hidden;
+  word-break: break-word;
+  animation: shredder-feed-in var(--shred-duration, 2600ms) linear forwards;
+}
+
+@keyframes shredder-feed-in {
+  0% { transform: translateY(-4%); }
+  100% { transform: translateY(102%); }
+}
+
+.shredder-body {
+  position: relative;
+  width: 100%;
+  height: 46px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #4a4f57 0%, #2a2d33 48%, #1a1c20 100%);
+  box-shadow: 0 10px 22px hsl(0 0% 0% / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.shredder-slot {
+  position: relative;
+  width: 86%;
+  height: 12px;
+  border-radius: 3px;
+  background: #07080a;
+  box-shadow: inset 0 3px 7px hsl(0 0% 0% / 0.95);
+  overflow: hidden;
+}
+
+.shredder-teeth {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(90deg, hsl(0 0% 62% / 0.85) 0 2px, transparent 2px 9px);
+  animation: shredder-teeth-roll 220ms linear infinite;
+}
+
+@keyframes shredder-teeth-roll {
+  from { background-position-x: 0; }
+  to { background-position-x: 9px; }
+}
+
+.shredder-glow {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -2px;
+  height: 10px;
+  background: radial-gradient(ellipse at center, hsl(35 90% 60% / 0.28), transparent 70%);
+  filter: blur(3px);
+  animation: shredder-pulse 400ms ease-in-out infinite alternate;
+}
+
+@keyframes shredder-pulse {
+  from { opacity: 0.35; }
+  to { opacity: 0.8; }
+}
+
+.shredder-output {
+  position: relative;
+  width: 86%;
+  flex: 1;
+  min-height: 130px;
+  overflow: hidden;
+}
+
+.shredder-strip {
+  position: absolute;
+  top: 0;
+  height: 120px;
+  overflow: hidden;
+  transform-origin: top center;
+  will-change: transform;
+  animation: shredder-strip-fall var(--shred-duration, 2600ms) cubic-bezier(0.32, 0, 0.5, 1) forwards;
+  animation-delay: var(--strip-delay, 0ms);
+}
+
+.shredder-strip-inner {
+  position: absolute;
+  top: 0;
+  height: 120px;
+  background: linear-gradient(180deg, #fdfdfa 0%, #f2f0e8 100%);
+  padding: 10px 12px;
+  color: #1c1c1c;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  text-align: left;
+  word-break: break-word;
+  box-shadow: 1px 0 0 hsl(0 0% 0% / 0.25);
+  -webkit-mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
+}
+
+@keyframes shredder-strip-fall {
+  0% { transform: translateY(-120px) rotate(0deg); opacity: 1; }
+  45% { transform: translateY(-10px) translateX(calc(var(--strip-x) * 0.2)) rotate(calc(var(--strip-rot) * 0.2)); opacity: 1; }
+  75% { transform: translateY(60px) translateX(calc(var(--strip-x) * 0.6)) rotate(calc(var(--strip-rot) * 0.6)); opacity: 0.9; }
+  100% { transform: translateY(170px) translateX(var(--strip-x)) rotate(var(--strip-rot)); opacity: 0; }
+}
+
+.shredder-dust {
+  position: absolute;
+  top: 2px;
+  width: 3px;
+  height: 3px;
+  border-radius: 1px;
+  background: #e9e6da;
+  opacity: 0;
+  animation: shredder-dust 900ms ease-out infinite;
+}
+
+@keyframes shredder-dust {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  20% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(var(--dust-x), 46px) rotate(220deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shredder-strip, .shredder-sheet { animation-duration: 900ms; }
+  .shredder-dust, .shredder-teeth { animation: none; }
+}

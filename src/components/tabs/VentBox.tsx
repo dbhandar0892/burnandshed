@@ -5,64 +5,86 @@ import { Scissors } from 'lucide-react';
 import { toast } from 'sonner';
 import { setVentText, useVentText } from '@/lib/ventText';
 
-// Function to create paper shredding sound effect
+const SHRED_DURATION_MS = 2800;
+const STRIP_COUNT = 14;
+
+// Motor + grinding paper shredder sound
 const playShredSound = (duration: number) => {
+  const sources: AudioBufferSourceNode[] = [];
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-  
-  // Create multiple noise bursts to simulate strips being shredded
-  const createShredBurst = (startTime: number, burstDuration: number) => {
-    const bufferSize = audioContext.sampleRate * burstDuration / 1000;
-    const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
-    
-    // Generate sharp, high-frequency noise for paper ripping
-    for (let i = 0; i < bufferSize; i++) {
-      const intensity = Math.sin(i / 200) * 0.5 + 0.5;
-      output[i] = (Math.random() * 2 - 1) * intensity * 0.4;
-    }
-    
-    const noiseSource = audioContext.createBufferSource();
-    noiseSource.buffer = noiseBuffer;
-    
-    // High-pass filter for sharp, crisp paper sound
-    const filter = audioContext.createBiquadFilter();
-    filter.type = 'highpass';
-    filter.frequency.value = 3000;
-    
-    // Additional band-pass filter for more realistic paper tearing
-    const bandpass = audioContext.createBiquadFilter();
-    bandpass.type = 'bandpass';
-    bandpass.frequency.value = 5000;
-    bandpass.Q.value = 2;
-    
-    // Gain envelope for burst effect
-    const gainNode = audioContext.createGain();
-    gainNode.gain.setValueAtTime(0, startTime);
-    gainNode.gain.linearRampToValueAtTime(0.2, startTime + 0.02);
-    gainNode.gain.linearRampToValueAtTime(0, startTime + burstDuration / 1000);
-    
-    // Connect nodes
-    noiseSource.connect(filter);
-    filter.connect(bandpass);
-    bandpass.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    noiseSource.start(startTime);
-    noiseSource.stop(startTime + burstDuration / 1000);
-    
-    return noiseSource;
-  };
-  
-  // Create multiple bursts throughout the shredding duration
-  const sources = [];
-  const numBursts = Math.floor(duration / 80); // One burst every 80ms
-  
-  for (let i = 0; i < numBursts; i++) {
-    const startTime = audioContext.currentTime + (i * 0.08);
-    const burstDuration = 60 + Math.random() * 40; // Vary burst duration
-    sources.push(createShredBurst(startTime, burstDuration));
+  const master = audioContext.createGain();
+  master.gain.value = 0.9;
+  master.connect(audioContext.destination);
+
+  const now = audioContext.currentTime;
+  const seconds = duration / 1000;
+
+  // Motor hum (low oscillators with slight detune)
+  const motorGain = audioContext.createGain();
+  motorGain.gain.setValueAtTime(0, now);
+  motorGain.gain.linearRampToValueAtTime(0.22, now + 0.18);
+  motorGain.gain.setValueAtTime(0.22, now + seconds - 0.35);
+  motorGain.gain.linearRampToValueAtTime(0, now + seconds);
+  const motorFilter = audioContext.createBiquadFilter();
+  motorFilter.type = 'lowpass';
+  motorFilter.frequency.value = 420;
+  motorGain.connect(motorFilter);
+  motorFilter.connect(master);
+
+  [58, 87, 116].forEach((freq, i) => {
+    const osc = audioContext.createOscillator();
+    osc.type = i === 0 ? 'sawtooth' : 'square';
+    osc.frequency.setValueAtTime(freq * 0.7, now);
+    osc.frequency.linearRampToValueAtTime(freq, now + 0.35);
+    osc.frequency.setValueAtTime(freq, now + seconds - 0.3);
+    osc.frequency.linearRampToValueAtTime(freq * 0.6, now + seconds);
+    const g = audioContext.createGain();
+    g.gain.value = i === 0 ? 0.6 : 0.2;
+    osc.connect(g);
+    g.connect(motorGain);
+    osc.start(now);
+    osc.stop(now + seconds);
+    sources.push(osc as unknown as AudioBufferSourceNode);
+  });
+
+  // Continuous grinding / paper tearing noise
+  const bufferSize = Math.max(1, Math.floor(audioContext.sampleRate * seconds));
+  const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+  const output = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    const t = i / audioContext.sampleRate;
+    // grinding wobble from the blades biting the paper
+    const bite = 0.55 + 0.45 * Math.abs(Math.sin(t * Math.PI * 26));
+    const tear = 0.7 + 0.3 * Math.sin(t * Math.PI * 7.3);
+    output[i] = (Math.random() * 2 - 1) * bite * tear;
   }
-  
+  const noiseSource = audioContext.createBufferSource();
+  noiseSource.buffer = noiseBuffer;
+
+  const bandpass = audioContext.createBiquadFilter();
+  bandpass.type = 'bandpass';
+  bandpass.frequency.value = 2600;
+  bandpass.Q.value = 0.8;
+
+  const highShelf = audioContext.createBiquadFilter();
+  highShelf.type = 'highshelf';
+  highShelf.frequency.value = 5200;
+  highShelf.gain.value = 5;
+
+  const noiseGain = audioContext.createGain();
+  noiseGain.gain.setValueAtTime(0, now);
+  noiseGain.gain.linearRampToValueAtTime(0.28, now + 0.3);
+  noiseGain.gain.setValueAtTime(0.28, now + seconds - 0.4);
+  noiseGain.gain.linearRampToValueAtTime(0, now + seconds);
+
+  noiseSource.connect(bandpass);
+  bandpass.connect(highShelf);
+  highShelf.connect(noiseGain);
+  noiseGain.connect(master);
+  noiseSource.start(now);
+  noiseSource.stop(now + seconds);
+  sources.push(noiseSource);
+
   return { audioContext, sources };
 };
 
@@ -80,11 +102,9 @@ export const VentBox = () => {
 
     setIsShedding(true);
     
-    // Calculate shredding duration based on text length
-    const chars = text.length;
-    const stripWidth = 3;
-    const numStrips = Math.ceil(chars / stripWidth);
-    const shreddingDuration = numStrips * 50 + 1500; // Strip delay + animation
+    // Shredding takes a fixed, machine-like time
+    const shreddingDuration = SHRED_DURATION_MS + 250;
+
     
     // Play realistic shredding sound
     audioContextRef.current = playShredSound(shreddingDuration);
@@ -126,41 +146,74 @@ export const VentBox = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Type your frustrations here... Let it all out!"
-            className="min-h-[200px] bg-card border-border text-foreground placeholder:text-muted-foreground resize-none transition-all text-2xl"
+            className="min-h-[200px] bg-black border-border text-white placeholder:text-white/50 resize-none transition-all text-2xl"
             disabled={isShedding}
           />
         ) : (
-          <div className="min-h-[200px] bg-card border border-border rounded-md p-3 relative overflow-visible">
-            <div className="relative flex flex-wrap gap-0 text-2xl leading-relaxed">
-              {text.split('').map((char, index) => {
-                const totalChars = text.length;
-                const stripWidth = 3;
-                const stripIndex = Math.floor(index / stripWidth);
-                const randomX = (Math.random() - 0.5) * 40;
-                const randomRotate = (Math.random() - 0.5) * 180;
-                const delay = stripIndex * 50;
-                const isSpace = char === ' ';
-                
+          <div className="shredder min-h-[300px] bg-card border border-border rounded-md">
+
+            {/* Paper feeding into the machine */}
+            <div className="shredder-feed">
+              <div
+                className="shredder-sheet"
+                style={{ ['--shred-duration' as any]: `${SHRED_DURATION_MS}ms` }}
+              >
+                {text}
+              </div>
+            </div>
+
+            {/* The shredder machine */}
+            <div className="shredder-body">
+              <div className="shredder-slot">
+                <div className="shredder-teeth" />
+              </div>
+              <div className="shredder-glow" />
+            </div>
+
+            {/* Shredded strips falling out */}
+            <div className="shredder-output">
+              {Array.from({ length: STRIP_COUNT }).map((_, i) => {
+                const width = 100 / STRIP_COUNT;
+                const drift = (i - STRIP_COUNT / 2) * 2.2 + (Math.random() - 0.5) * 14;
+                const rot = (Math.random() - 0.5) * 26;
                 return (
-                  <span
-                    key={index}
-                    className="inline-block animate-shred-strip"
+                  <div
+                    key={i}
+                    className="shredder-strip"
                     style={{
-                      animationDelay: `${delay}ms`,
-                      animationDuration: '1.5s',
-                      animationFillMode: 'forwards',
-                      // @ts-ignore - CSS custom properties
-                      '--shred-x': `${randomX}px`,
-                      '--shred-rotate': `${randomRotate}deg`,
+                      left: `${i * width}%`,
+                      width: `${width}%`,
+                      ['--shred-duration' as any]: `${SHRED_DURATION_MS}ms`,
+                      ['--strip-delay' as any]: `${Math.random() * 90}ms`,
+                      ['--strip-x' as any]: `${drift}px`,
+                      ['--strip-rot' as any]: `${rot}deg`,
                     }}
                   >
-                    {isSpace ? '\u00A0' : char}
-                  </span>
+                    <div
+                      className="shredder-strip-inner"
+                      style={{ width: `${STRIP_COUNT * 100}%`, left: `-${i * 100}%` }}
+                    >
+                      {text}
+                    </div>
+                  </div>
                 );
               })}
+              {Array.from({ length: 10 }).map((_, i) => (
+                <span
+                  key={`dust-${i}`}
+                  className="shredder-dust"
+                  style={{
+                    left: `${5 + i * 9 + Math.random() * 5}%`,
+                    animationDelay: `${Math.random() * 800}ms`,
+                    ['--dust-x' as any]: `${(Math.random() - 0.5) * 30}px`,
+                  }}
+                />
+              ))}
             </div>
           </div>
         )}
+
+
         
         <Button
           onClick={handleShed}
