@@ -166,7 +166,42 @@ export const BurnNote = () => {
       </div>
 
       <div className="flex-1 space-y-4">
-        {isBurning ? (
+        {igniterActive ? (
+          <div
+            className="burn-stage igniter-stage is-ready min-h-[200px] border border-border rounded-md p-3 overflow-hidden relative"
+            aria-live="polite"
+          >
+            <div className="burn-message igniter-phrase text-3xl font-bold tracking-tight text-center w-full">
+              {(() => {
+                let rank = -1;
+                return Array.from(IGNITER_PHRASE).map((character, index) => {
+                  if (/\s/.test(character)) {
+                    return <span key={index}> </span>;
+                  }
+                  rank += 1;
+                  const delay = rank * IGNITER_LETTER_INTERVAL;
+                  return (
+                    <span
+                      key={index}
+                      className="burn-character"
+                      style={{ '--burn-delay': `${delay}ms` } as React.CSSProperties}
+                    >
+                      <span className="burn-character-flame" aria-hidden="true">
+                        <span className="burn-character-flame-outer" />
+                        <span className="burn-character-flame-middle" />
+                        <span className="burn-character-flame-core" />
+                      </span>
+                      <span className="burn-ember burn-ember-one" aria-hidden="true" />
+                      <span className="burn-ember burn-ember-two" aria-hidden="true" />
+                      <span className="burn-smoke" aria-hidden="true" />
+                      <span className="burn-glyph">{character}</span>
+                    </span>
+                  );
+                });
+              })()}
+            </div>
+          </div>
+        ) : isBurning ? (
           <div
             ref={burnAreaRef}
             className={`burn-stage min-h-[200px] border border-border rounded-md p-3 overflow-hidden relative ${animationReady ? 'is-ready' : ''}`}
