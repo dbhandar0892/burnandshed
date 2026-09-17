@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { setVentText, useVentText } from '@/lib/ventText';
 
 const IGNITER_MS = 1500;
-const MATCH_START_MS = 1320;
 const IGNITER_LETTER_INTERVAL = 55;
 const IGNITER_PHRASE = "Let's burn this";
 const MATCH_SEQUENCE_MS = 1050;
@@ -131,23 +130,20 @@ export const BurnNote = () => {
 
     const characterCount = burnOrder.size;
     const fireDuration = characterCount * LETTER_INTERVAL_MS + LETTER_BURN_MS;
-    const totalDuration = MATCH_START_MS + MATCH_SEQUENCE_MS + fireDuration;
-    audioContextRef.current = playMatchAndFire(fireDuration, MATCH_START_MS / 1000);
+    const totalDuration = IGNITER_MS + MATCH_SEQUENCE_MS + fireDuration;
+    audioContextRef.current = playMatchAndFire(fireDuration, IGNITER_MS / 1000);
 
     const currentCount = Number.parseInt(localStorage.getItem('burnCount') || '0', 10);
     localStorage.setItem('burnCount', (currentCount + 1).toString());
 
     timerRefs.current.push(window.setTimeout(() => {
-      setIsBurning(true);
-    }, MATCH_START_MS));
-
-    timerRefs.current.push(window.setTimeout(() => {
       setIgniterActive(false);
+      setIsBurning(true);
     }, IGNITER_MS));
 
     timerRefs.current.push(window.setTimeout(() => {
       toast.success('Burned to ashes and released.');
-    }, MATCH_START_MS + MATCH_SEQUENCE_MS));
+    }, IGNITER_MS + MATCH_SEQUENCE_MS));
 
     timerRefs.current.push(window.setTimeout(() => {
       setText('');
@@ -172,11 +168,9 @@ export const BurnNote = () => {
       </div>
 
       <div className="flex-1 space-y-4">
-        {(igniterActive || isBurning) ? (
-          <div className="relative min-h-[200px]">
-          {igniterActive && (
+        {igniterActive ? (
           <div
-            className="burn-stage igniter-stage is-ready absolute inset-0 z-10 border border-border rounded-md p-3 overflow-hidden"
+            className="burn-stage igniter-stage is-ready min-h-[200px] border border-border rounded-md p-3 overflow-hidden relative"
             aria-live="polite"
           >
             <div className="burn-message igniter-phrase text-3xl font-bold tracking-tight text-center w-full">
@@ -209,11 +203,10 @@ export const BurnNote = () => {
               })()}
             </div>
           </div>
-          )}
-          {isBurning && (
+        ) : isBurning ? (
           <div
             ref={burnAreaRef}
-            className={`burn-stage absolute inset-0 border border-border rounded-md p-3 overflow-hidden ${animationReady ? 'is-ready' : ''}`}
+            className={`burn-stage min-h-[200px] border border-border rounded-md p-3 overflow-hidden relative ${animationReady ? 'is-ready' : ''}`}
           >
             {animationReady && (
               <div
@@ -262,8 +255,6 @@ export const BurnNote = () => {
               })}
             </div>
           </div>
-          )}
-          </div>
         ) : (
           <Textarea
             value={text}
@@ -275,11 +266,11 @@ export const BurnNote = () => {
 
         <Button
           onClick={handleBurn}
-          disabled={igniterActive || isBurning || !text.trim()}
+          disabled={isBurning || !text.trim()}
           className="w-full bg-gradient-fire text-primary-foreground hover:opacity-90 h-16 text-lg font-bold rounded-2xl shadow-fire transition-all duration-300 hover:shadow-large hover:scale-[1.02]"
         >
           <Flame className={`mr-2 h-6 w-6 ${isBurning ? 'animate-pulse' : ''}`} />
-          {igniterActive || isBurning ? 'Burning...' : 'Burn It Away'}
+          {isBurning ? 'Burning...' : 'Burn It Away'}
         </Button>
       </div>
 

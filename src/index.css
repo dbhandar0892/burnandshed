@@ -316,7 +316,6 @@ All colors MUST be HSL.
   .igniter-stage {
     display: flex;
     align-items: center;
-    animation: igniter-stage-handoff 1.5s linear both;
   }
 
   .is-ready .igniter-phrase .burn-glyph,
@@ -421,11 +420,6 @@ All colors MUST be HSL.
   82% { transform: translate(0, 0) rotate(-2deg); }
   92% { opacity: 1; transform: translate(0.1rem, 0.05rem) rotate(1deg); }
   100% { opacity: 0; transform: translate(1.8rem, 0.8rem) rotate(8deg); }
-}
-
-@keyframes igniter-stage-handoff {
-  0%, 88% { opacity: 1; }
-  100% { opacity: 0; }
 }
 
 @keyframes match-flame-life {
