@@ -27,7 +27,7 @@ export const MobileLayout = () => {
         <div className="absolute inset-0 bg-gradient-mesh-calm opacity-40" />
         
         <div className="relative z-10">
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Forget About It</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Burn & Shed</h1>
           <p className="text-white/90 text-base font-medium">Let go and feel better</p>
         </div>
       </header>
