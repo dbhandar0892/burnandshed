@@ -118,6 +118,7 @@ export const LaughBreak = () => {
     } while (newJoke === currentJoke && jokes.length > 1);
     
     setCurrentJoke(newJoke);
+    logActivity('laugh');
   };
 
   return (
