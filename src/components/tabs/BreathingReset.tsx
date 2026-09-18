@@ -2,83 +2,193 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX, Music, Waves, CloudRain } from 'lucide-react';
 
-// Soothing ambient music generator using Web Audio API
-const createAmbientMusic = (audioContextRef: React.MutableRefObject<AudioContext | null>, volume: number) => {
+type SoundId = 'pad' | 'ocean' | 'rain';
+
+const SOUNDS: { id: SoundId; label: string; icon: typeof Music }[] = [
+  { id: 'pad', label: 'Ambient', icon: Music },
+  { id: 'ocean', label: 'Ocean', icon: Waves },
+  { id: 'rain', label: 'Rain', icon: CloudRain },
+];
+
+// Base per-sound output level, before the user volume slider
+const BASE_GAIN: Record<SoundId, number> = { pad: 0.5, ocean: 0.45, rain: 0.4 };
+
+interface SoundHandle {
+  stops: (OscillatorNode | AudioBufferSourceNode)[];
+  master: GainNode;
+  intervals: ReturnType<typeof setInterval>[];
+}
+
+const makeNoiseBuffer = (ctx: AudioContext) => {
+  const seconds = 2;
+  const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let last = 0;
+  for (let i = 0; i < data.length; i++) {
+    // Pink-ish noise for a softer, more natural sound
+    const white = Math.random() * 2 - 1;
+    last = 0.97 * last + 0.03 * white;
+    data[i] = last * 3.5;
+  }
+  return buffer;
+};
+
+const createSoundscape = (
+  audioContextRef: React.MutableRefObject<AudioContext | null>,
+  sound: SoundId,
+  volume: number
+): SoundHandle => {
   if (!audioContextRef.current) {
     audioContextRef.current = new AudioContext();
   }
-  
   const ctx = audioContextRef.current;
   const now = ctx.currentTime;
-  
-  // Create multiple oscillators for ambient pad sound
-  const oscillators: OscillatorNode[] = [];
-  const gainNodes: GainNode[] = [];
-  
-  // Frequencies for a deeply calming chord (C major 9th - uplifting and serene)
-  const frequencies = [65.41, 82.41, 98.00, 146.83, 164.81]; // C2, E2, G2, D3, E3
-  
-  frequencies.forEach((freq, i) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0, now);
+  master.gain.linearRampToValueAtTime(BASE_GAIN[sound] * volume, now + 3);
+  master.connect(ctx.destination);
+
+  const stops: (OscillatorNode | AudioBufferSourceNode)[] = [];
+  const intervals: ReturnType<typeof setInterval>[] = [];
+
+  if (sound === 'pad') {
+    // Warm C major 9th pad with gentle vibrato
+    const frequencies = [65.41, 82.41, 98.0, 146.83, 164.81]; // C2, E2, G2, D3, E3
+    frequencies.forEach((freq) => {
+      const osc = ctx.createOscillator();
+      const voice = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+
+      const lfo = ctx.createOscillator();
+      const lfoGain = ctx.createGain();
+      lfo.frequency.setValueAtTime(0.2, now);
+      lfoGain.gain.setValueAtTime(2, now);
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      lfo.start(now);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(800, now);
+      filter.Q.setValueAtTime(1, now);
+
+      voice.gain.setValueAtTime(1 / frequencies.length, now);
+
+      osc.connect(filter);
+      filter.connect(voice);
+      voice.connect(master);
+
+      osc.start(now);
+      stops.push(osc, lfo);
+    });
+  } else if (sound === 'ocean') {
+    // Slow rolling waves: pink noise through a low-pass whose cutoff and
+    // level swell on long LFO cycles
+    const noise = ctx.createBufferSource();
+    noise.buffer = makeNoiseBuffer(ctx);
+    noise.loop = true;
+
     const filter = ctx.createBiquadFilter();
-    
-    osc.type = 'triangle'; // Warmer, softer tone
-    osc.frequency.setValueAtTime(freq, now);
-    
-    // Add subtle vibrato for organic feel
-    const lfo = ctx.createOscillator();
-    const lfoGain = ctx.createGain();
-    lfo.frequency.setValueAtTime(0.2, now);
-    lfoGain.gain.setValueAtTime(2, now);
-    lfo.connect(lfoGain);
-    lfoGain.connect(osc.frequency);
-    lfo.start(now);
-    
-    // Low-pass filter for warmth
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(800, now);
-    filter.Q.setValueAtTime(1, now);
-    
-    // Fade in with volume control
-    const targetVolume = (0.5 / frequencies.length) * volume;
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(targetVolume, now + 3);
-    
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-    
-    osc.start(now);
-    
-    oscillators.push(osc);
-    oscillators.push(lfo);
-    gainNodes.push(gain);
-  });
-  
-  return { oscillators, gainNodes };
+    filter.frequency.setValueAtTime(400, now);
+    filter.Q.setValueAtTime(0.8, now);
+
+    const waveGain = ctx.createGain();
+    waveGain.gain.setValueAtTime(0.6, now);
+
+    // Swell the wave level (~8 second cycle)
+    const levelLfo = ctx.createOscillator();
+    const levelDepth = ctx.createGain();
+    levelLfo.frequency.setValueAtTime(0.12, now);
+    levelDepth.gain.setValueAtTime(0.35, now);
+    levelLfo.connect(levelDepth);
+    levelDepth.connect(waveGain.gain);
+    levelLfo.start(now);
+
+    // Sweep the filter cutoff so each wave sounds different
+    const filterLfo = ctx.createOscillator();
+    const filterDepth = ctx.createGain();
+    filterLfo.frequency.setValueAtTime(0.07, now);
+    filterDepth.gain.setValueAtTime(250, now);
+    filterLfo.connect(filterDepth);
+    filterDepth.connect(filter.frequency);
+    filterLfo.start(now);
+
+    noise.connect(filter);
+    filter.connect(waveGain);
+    waveGain.connect(master);
+    noise.start(now);
+
+    stops.push(noise, levelLfo, filterLfo);
+  } else {
+    // Rain: steady filtered hiss plus random soft droplet ticks
+    const noise = ctx.createBufferSource();
+    noise.buffer = makeNoiseBuffer(ctx);
+    noise.loop = true;
+
+    const band = ctx.createBiquadFilter();
+    band.type = 'bandpass';
+    band.frequency.setValueAtTime(1800, now);
+    band.Q.setValueAtTime(0.5, now);
+
+    const rainGain = ctx.createGain();
+    rainGain.gain.setValueAtTime(0.55, now);
+
+    noise.connect(band);
+    band.connect(rainGain);
+    rainGain.connect(master);
+    noise.start(now);
+    stops.push(noise);
+
+    // Droplet ticks
+    intervals.push(
+      setInterval(() => {
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const tickGain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(900 + Math.random() * 900, t);
+        tickGain.gain.setValueAtTime(0.08 + Math.random() * 0.06, t);
+        tickGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
+        osc.connect(tickGain);
+        tickGain.connect(master);
+        osc.start(t);
+        osc.stop(t + 0.1);
+      }, 120)
+    );
+  }
+
+  return { stops, master, intervals };
 };
 
-const stopAmbientMusic = (
+const stopSoundscape = (
   audioContextRef: React.MutableRefObject<AudioContext | null>,
-  oscillators: OscillatorNode[],
-  gainNodes: GainNode[]
+  handle: SoundHandle | null
 ) => {
-  if (!audioContextRef.current) return;
-  
+  if (!audioContextRef.current || !handle) return;
+
   const ctx = audioContextRef.current;
   const now = ctx.currentTime;
-  
-  // Fade out
-  gainNodes.forEach(gain => {
-    gain.gain.linearRampToValueAtTime(0, now + 1);
-  });
-  
-  // Stop oscillators after fade out
+
+  handle.intervals.forEach(clearInterval);
+  handle.master.gain.cancelScheduledValues(now);
+  handle.master.gain.setValueAtTime(handle.master.gain.value, now);
+  handle.master.gain.linearRampToValueAtTime(0, now + 1);
+
   setTimeout(() => {
-    oscillators.forEach(osc => osc.stop());
+    handle.stops.forEach((s) => {
+      try {
+        s.stop();
+      } catch {
+        // already stopped
+      }
+    });
+    handle.master.disconnect();
   }, 1000);
 };
 
@@ -88,10 +198,10 @@ export const BreathingReset = () => {
   const [breathePhase, setBreathePhase] = useState<'in' | 'out'>('in');
   const [cycleCount, setCycleCount] = useState(0);
   const [musicEnabled, setMusicEnabled] = useState(true);
+  const [sound, setSound] = useState<SoundId>('pad');
   const [volume, setVolume] = useState(0.7);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const oscillatorsRef = useRef<OscillatorNode[]>([]);
-  const gainNodesRef = useRef<GainNode[]>([]);
+  const soundHandleRef = useRef<SoundHandle | null>(null);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
@@ -109,42 +219,29 @@ export const BreathingReset = () => {
     };
   }, [isActive, timeLeft]);
 
-  // Ambient music control
+  // Soundscape control — restarts when sound choice changes
   useEffect(() => {
     if (isActive && musicEnabled) {
-      const { oscillators, gainNodes } = createAmbientMusic(audioContextRef, volume);
-      oscillatorsRef.current = oscillators;
-      gainNodesRef.current = gainNodes;
-    } else if (!isActive || !musicEnabled) {
-      if (oscillatorsRef.current.length > 0) {
-        stopAmbientMusic(audioContextRef, oscillatorsRef.current, gainNodesRef.current);
-        oscillatorsRef.current = [];
-        gainNodesRef.current = [];
-      }
+      soundHandleRef.current = createSoundscape(audioContextRef, sound, volume);
     }
 
     return () => {
-      if (oscillatorsRef.current.length > 0) {
-        stopAmbientMusic(audioContextRef, oscillatorsRef.current, gainNodesRef.current);
-        oscillatorsRef.current = [];
-        gainNodesRef.current = [];
-      }
+      stopSoundscape(audioContextRef, soundHandleRef.current);
+      soundHandleRef.current = null;
     };
-  }, [isActive, musicEnabled, volume]);
+  }, [isActive, musicEnabled, sound]);
 
   // Update volume in real-time
   useEffect(() => {
-    if (isActive && musicEnabled && gainNodesRef.current.length > 0 && audioContextRef.current) {
+    if (isActive && musicEnabled && soundHandleRef.current && audioContextRef.current) {
       const ctx = audioContextRef.current;
       const now = ctx.currentTime;
-      const frequencies = [65.41, 82.41, 98.00, 146.83, 164.81];
-      const targetVolume = (0.5 / frequencies.length) * volume;
-      
-      gainNodesRef.current.forEach(gain => {
-        gain.gain.linearRampToValueAtTime(targetVolume, now + 0.1);
-      });
+      const master = soundHandleRef.current.master;
+      master.gain.cancelScheduledValues(now);
+      master.gain.setValueAtTime(master.gain.value, now);
+      master.gain.linearRampToValueAtTime(BASE_GAIN[sound] * volume, now + 0.1);
     }
-  }, [volume, isActive, musicEnabled]);
+  }, [volume, isActive, musicEnabled, sound]);
 
   // Breathing cycle (4 seconds in, 4 seconds out)
   useEffect(() => {
@@ -154,11 +251,11 @@ export const BreathingReset = () => {
       phaseInterval = setInterval(() => {
         setBreathePhase(prev => {
           const nextPhase = prev === 'in' ? 'out' : 'in';
-          
+
           if (prev === 'out') {
             setCycleCount(count => count + 1);
           }
-          
+
           return nextPhase;
         });
       }, 4000);
@@ -182,11 +279,6 @@ export const BreathingReset = () => {
     setTimeLeft(60);
     setBreathePhase('in');
     setCycleCount(0);
-    if (oscillatorsRef.current.length > 0) {
-      stopAmbientMusic(audioContextRef, oscillatorsRef.current, gainNodesRef.current);
-      oscillatorsRef.current = [];
-      gainNodesRef.current = [];
-    }
   };
 
   const toggleMusic = () => {
@@ -251,23 +343,46 @@ export const BreathingReset = () => {
 
       {/* Controls */}
       <div className="space-y-5">
-        {/* Volume Control */}
         {musicEnabled && (
-          <div className="space-y-3 animate-fade-in">
-            <div className="flex items-center justify-between px-1">
-              <label className="text-sm font-medium text-muted-foreground">Volume</label>
-              <span className="text-sm font-medium text-foreground">{Math.round(volume * 100)}%</span>
+          <div className="space-y-4 animate-fade-in">
+            {/* Sound picker */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-muted-foreground px-1">Sound</label>
+              <div className="grid grid-cols-3 gap-2">
+                {SOUNDS.map(({ id, label, icon: Icon }) => (
+                  <button
+                    key={id}
+                    onClick={() => setSound(id)}
+                    className={`flex flex-col items-center gap-1.5 py-3 rounded-2xl border transition-all duration-300 ${
+                      sound === id
+                        ? 'bg-primary/15 border-primary text-primary shadow-soft'
+                        : 'bg-card/50 border-border text-muted-foreground hover:bg-card hover:text-foreground'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="text-xs font-semibold">{label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <Slider
-              value={[volume]}
-              onValueChange={(values) => setVolume(values[0])}
-              max={1}
-              step={0.01}
-              className="w-full"
-            />
+
+            {/* Volume Control */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between px-1">
+                <label className="text-sm font-medium text-muted-foreground">Volume</label>
+                <span className="text-sm font-medium text-foreground">{Math.round(volume * 100)}%</span>
+              </div>
+              <Slider
+                value={[volume]}
+                onValueChange={(values) => setVolume(values[0])}
+                max={1}
+                step={0.01}
+                className="w-full"
+              />
+            </div>
           </div>
         )}
-        
+
         <div className="flex gap-3">
           {!isActive ? (
             <Button
@@ -287,7 +402,7 @@ export const BreathingReset = () => {
               Pause
             </Button>
           )}
-          
+
           <Button
             onClick={toggleMusic}
             variant="outline"
@@ -296,7 +411,7 @@ export const BreathingReset = () => {
           >
             {musicEnabled ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
           </Button>
-          
+
           <Button
             onClick={handleReset}
             variant="outline"
@@ -305,7 +420,7 @@ export const BreathingReset = () => {
             <RotateCcw className="h-6 w-6" />
           </Button>
         </div>
-        
+
         <div className="text-center pt-2">
           <p className="text-sm text-muted-foreground font-medium">
             🧘‍♀️ Focus on the rhythm. Let each breath calm your mind.
