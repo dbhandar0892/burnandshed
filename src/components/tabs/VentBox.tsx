@@ -111,9 +111,8 @@ export const VentBox = () => {
     audioContextRef.current = playShredSound(shreddingDuration);
     toast.success('🗑️ Shredded and released!');
     
-    // Increment tracker count in localStorage
-    const currentCount = parseInt(localStorage.getItem('shedCount') || '0');
-    localStorage.setItem('shedCount', (currentCount + 1).toString());
+    // Increment tracker count
+    logActivity('shed');
     
     // Clear after animation completes
     setTimeout(() => {
