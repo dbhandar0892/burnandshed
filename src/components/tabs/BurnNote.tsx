@@ -134,8 +134,7 @@ export const BurnNote = () => {
     const totalDuration = IGNITER_MS + MATCH_SEQUENCE_MS + fireDuration;
     audioContextRef.current = playMatchAndFire(fireDuration, IGNITER_MS / 1000);
 
-    const currentCount = Number.parseInt(localStorage.getItem('burnCount') || '0', 10);
-    localStorage.setItem('burnCount', (currentCount + 1).toString());
+    logActivity('burn');
 
     timerRefs.current.push(window.setTimeout(() => {
       setIgniterActive(false);
