@@ -212,6 +212,7 @@ export const BreathingReset = () => {
         setTimeLeft(timeLeft - 1);
       }, 1000);
     } else if (timeLeft === 0) {
+      if (isActive) logActivity('breathe');
       setIsActive(false);
     }
 
