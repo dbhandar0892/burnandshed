@@ -1,5 +1,5 @@
 // Minimal, safe service worker that avoids caching Vite chunks to prevent React duplication
-const CACHE_NAME = 'forget-about-it-v4';
+const CACHE_NAME = 'burn-and-shed-v5';
 const PRECACHE = [
   '/manifest.json',
   '/favicon.ico'
