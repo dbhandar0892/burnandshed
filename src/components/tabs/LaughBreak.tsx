@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logActivity } from '@/lib/activity';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Laugh, RefreshCw } from 'lucide-react';
