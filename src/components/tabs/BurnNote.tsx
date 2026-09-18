@@ -4,6 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
 import { setVentText, useVentText } from '@/lib/ventText';
+import { logActivity } from '@/lib/activity';
 
 const IGNITER_MS = 1500;
 const IGNITER_LETTER_INTERVAL = 55;
@@ -133,8 +134,7 @@ export const BurnNote = () => {
     const totalDuration = IGNITER_MS + MATCH_SEQUENCE_MS + fireDuration;
     audioContextRef.current = playMatchAndFire(fireDuration, IGNITER_MS / 1000);
 
-    const currentCount = Number.parseInt(localStorage.getItem('burnCount') || '0', 10);
-    localStorage.setItem('burnCount', (currentCount + 1).toString());
+    logActivity('burn');
 
     timerRefs.current.push(window.setTimeout(() => {
       setIgniterActive(false);

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logActivity } from '@/lib/activity';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Laugh, RefreshCw } from 'lucide-react';
@@ -118,6 +119,7 @@ export const LaughBreak = () => {
     } while (newJoke === currentJoke && jokes.length > 1);
     
     setCurrentJoke(newJoke);
+    logActivity('laugh');
   };
 
   return (

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX, Music, Waves, CloudRain } from 'lucide-react';
+import { logActivity } from '@/lib/activity';
 
 type SoundId = 'pad' | 'ocean' | 'rain';
 
@@ -211,6 +212,7 @@ export const BreathingReset = () => {
         setTimeLeft(timeLeft - 1);
       }, 1000);
     } else if (timeLeft === 0) {
+      if (isActive) logActivity('breathe');
       setIsActive(false);
     }
 
