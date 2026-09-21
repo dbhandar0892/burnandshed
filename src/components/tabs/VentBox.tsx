@@ -112,7 +112,7 @@ export const VentBox = () => {
     toast.success('🗑️ Shredded and released!');
     
     // Increment tracker count
-    logActivity('shed');
+    logActivity('shred');
     
     // Clear after animation completes
     setTimeout(() => {
