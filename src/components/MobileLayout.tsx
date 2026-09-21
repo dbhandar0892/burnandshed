@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Scissors, Flame, Laugh, Wind, Trophy } from 'lucide-react';
+import { Droplets, Scissors, Flame, Laugh, Wind, Trophy } from 'lucide-react';
+import { ShedIt } from './tabs/ShedIt';
 import { VentBox } from './tabs/VentBox';
 import { BurnNote } from './tabs/BurnNote';
 import { LaughBreak } from './tabs/LaughBreak';
@@ -8,7 +9,8 @@ import { LetGoTracker } from './tabs/LetGoTracker';
 import logo from '../assets/burn-and-shed-logo.webp';
 
 const tabs = [
-  { id: 'vent', icon: Scissors, label: 'Shed It', component: VentBox },
+  { id: 'shed', icon: Droplets, label: 'Shed It', component: ShedIt },
+  { id: 'shred', icon: Scissors, label: 'Shred It', component: VentBox },
   { id: 'burn', icon: Flame, label: 'Burn It', component: BurnNote },
   { id: 'laugh', icon: Laugh, label: 'Laugh', component: LaughBreak },
   { id: 'breathe', icon: Wind, label: 'Breathe', component: BreathingReset },
@@ -16,9 +18,9 @@ const tabs = [
 ];
 
 export const MobileLayout = () => {
-  const [activeTab, setActiveTab] = useState('vent');
-  
-  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || VentBox;
+  const [activeTab, setActiveTab] = useState('shed');
+
+  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || ShedIt;
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto shadow-large">

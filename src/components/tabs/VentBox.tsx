@@ -97,7 +97,7 @@ export const VentBox = () => {
 
   const handleShed = () => {
     if (!text.trim()) {
-      toast.error('Write something to shed first!');
+      toast.error('Write something to shred first!');
       return;
     }
 
@@ -133,9 +133,9 @@ export const VentBox = () => {
         <div className="w-20 h-20 bg-gradient-calm rounded-2xl flex items-center justify-center mx-auto animate-float shadow-primary">
           <Scissors className="h-10 w-10 text-white drop-shadow-md" />
         </div>
-        <h2 className="text-3xl font-bold text-foreground tracking-tight">Vent Box</h2>
+        <h2 className="text-3xl font-bold text-foreground tracking-tight">Shred It</h2>
         <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
-          Write what's bothering you, then shed it away like old skin
+          Write what's bothering you, then shred it to pieces
         </p>
       </div>
 
@@ -223,12 +223,12 @@ export const VentBox = () => {
           {isShedding ? (
             <>
               <Scissors className="mr-2 h-6 w-6 animate-pulse" />
-              Shedding...
+              Shredding...
             </>
           ) : (
             <>
               <Scissors className="mr-2 h-6 w-6" />
-              Shed It Away
+              Shred It Away
             </>
           )}
         </Button>
@@ -237,7 +237,7 @@ export const VentBox = () => {
       {/* Privacy Note */}
       <div className="text-center mt-auto pt-4">
         <p className="text-sm text-muted-foreground font-medium">
-          🔒 Your words shed away like old skin. Complete privacy guaranteed.
+          🔒 Your words shredded to pieces. Complete privacy guaranteed.
         </p>
       </div>
     </div>
