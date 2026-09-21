@@ -5,6 +5,7 @@ import { BurnNote } from './tabs/BurnNote';
 import { LaughBreak } from './tabs/LaughBreak';
 import { BreathingReset } from './tabs/BreathingReset';
 import { LetGoTracker } from './tabs/LetGoTracker';
+import logo from '../assets/burn-and-shed-logo.webp';
 
 const tabs = [
   { id: 'vent', icon: Scissors, label: 'Shed It', component: VentBox },
@@ -22,13 +23,16 @@ export const MobileLayout = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto shadow-large">
       {/* Header with enhanced gradient and depth */}
-      <header className="bg-gradient-calm p-8 text-center shadow-medium relative overflow-hidden">
-        {/* Decorative gradient overlay */}
+      <header className="bg-gradient-calm px-6 py-5 text-center shadow-medium relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-mesh-calm opacity-40" />
         
-        <div className="relative z-10">
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Burn & Shed</h1>
-          <p className="text-white/90 text-base font-medium">Let go and feel better</p>
+        <div className="relative z-10 flex flex-col items-center">
+          <img
+            src={logo}
+            alt="Burn & Shed"
+            className="h-[7.5rem] w-auto max-w-full object-contain drop-shadow-sm"
+          />
+          <p className="-mt-1 text-primary-foreground/90 text-sm font-medium">Let go and feel better</p>
         </div>
       </header>
 
