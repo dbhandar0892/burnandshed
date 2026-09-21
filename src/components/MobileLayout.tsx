@@ -9,18 +9,18 @@ import { LetGoTracker } from './tabs/LetGoTracker';
 import logo from '../assets/burn-and-shed-logo.webp';
 
 const tabs = [
+  { id: 'burn', icon: Flame, label: 'Burn It', component: BurnNote },
   { id: 'shed', icon: Droplets, label: 'Shed It', component: ShedIt },
   { id: 'shred', icon: Scissors, label: 'Shred It', component: VentBox },
-  { id: 'burn', icon: Flame, label: 'Burn It', component: BurnNote },
   { id: 'laugh', icon: Laugh, label: 'Laugh', component: LaughBreak },
   { id: 'breathe', icon: Wind, label: 'Breathe', component: BreathingReset },
   { id: 'tracker', icon: Trophy, label: 'Tracker', component: LetGoTracker },
 ];
 
 export const MobileLayout = () => {
-  const [activeTab, setActiveTab] = useState('shed');
+  const [activeTab, setActiveTab] = useState('burn');
 
-  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || ShedIt;
+  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || BurnNote;
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto shadow-large">
