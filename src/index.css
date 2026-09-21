@@ -31,6 +31,10 @@ All colors MUST be HSL.
     --accent: 270 65% 75%;
     --accent-foreground: 230 25% 20%;
 
+    /* Brand colors sampled from the Burn & Shed logo wordmark */
+    --brand-ember: 13 85% 42%;
+    --brand-leaf: 176 54% 22%;
+
     /* Enhanced fire/burn colors with more vibrancy */
     --fire: 20 100% 58%;
     --fire-foreground: 0 0% 100%;
