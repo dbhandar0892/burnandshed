@@ -292,7 +292,7 @@ export const LetGoTracker = () => {
             </div>
           </Card>
 
-          <Card className="p-5 bg-gradient-to-br from-muted/40 to-muted/10 border-border/50 shadow-medium rounded-2xl transition-all duration-300 hover:scale-105">
+          <Card className="col-span-2 p-5 bg-gradient-to-br from-muted/40 to-muted/10 border-border/50 shadow-medium rounded-2xl transition-all duration-300 hover:scale-105">
             <div className="text-center space-y-2">
               <div className="text-3xl font-bold text-foreground">{stats.laugh}</div>
               <div className="text-sm font-bold text-foreground">Laughs</div>
