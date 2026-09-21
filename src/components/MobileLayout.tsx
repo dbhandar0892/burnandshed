@@ -34,7 +34,7 @@ export const MobileLayout = () => {
             alt="Burn & Shed"
             className="h-[7.5rem] w-auto max-w-full object-contain drop-shadow-sm"
           />
-          <p className="logo-tagline -mt-1 text-sm font-medium">Let go and feel better</p>
+          <p className="logo-tagline -mt-1 text-[11px] font-bold">Let go and feel better</p>
         </div>
       </header>
 
