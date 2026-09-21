@@ -208,20 +208,11 @@ All colors MUST be HSL.
 
 @layer components {
   .logo-tagline {
-    background-image: linear-gradient(
-      90deg,
-      hsl(var(--brand-ember)) 0%,
-      hsl(var(--brand-ember)) 42%,
-      hsl(var(--brand-leaf)) 62%,
-      hsl(var(--brand-leaf)) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    /* keeps the letters legible if background-clip is unsupported */
-    @supports not (background-clip: text) {
-      color: hsl(var(--brand-ember));
-    }
+    /* unified luminous tone — one soft light-lavender color, no per-word tinting */
+    color: hsl(226 100% 94% / 0.85);
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    text-shadow: 0 1px 12px hsl(258 60% 30% / 0.35);
   }
 
   .burn-stage {
