@@ -1,8 +1,10 @@
 // Minimal, safe service worker that avoids caching Vite chunks to prevent React duplication
-const CACHE_NAME = 'burn-and-shed-v5';
+const CACHE_NAME = 'burn-and-shed-v6';
 const PRECACHE = [
   '/manifest.json',
-  '/favicon.ico'
+  '/favicon.png',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
