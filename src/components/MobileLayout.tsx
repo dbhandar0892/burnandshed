@@ -5,7 +5,7 @@ import { BurnNote } from './tabs/BurnNote';
 import { LaughBreak } from './tabs/LaughBreak';
 import { BreathingReset } from './tabs/BreathingReset';
 import { LetGoTracker } from './tabs/LetGoTracker';
-import logoAsset from '../assets/burn-and-shed-logo.png.asset.json';
+import logo from '../assets/burn-and-shed-logo.webp';
 
 const tabs = [
   { id: 'vent', icon: Scissors, label: 'Shed It', component: VentBox },
@@ -28,7 +28,7 @@ export const MobileLayout = () => {
         
         <div className="relative z-10 flex flex-col items-center">
           <img
-            src={logoAsset.url}
+            src={logo}
             alt="Burn & Shed"
             className="h-[7.5rem] w-auto max-w-full object-contain drop-shadow-sm"
           />
