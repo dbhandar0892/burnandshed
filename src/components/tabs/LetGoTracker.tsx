@@ -9,6 +9,7 @@ import {
   Award,
   Flame,
   Scissors,
+  Waves,
   Wind,
   Smile,
   Sparkles,
@@ -79,9 +80,17 @@ const featureBadges: BadgeDef[] = [
   {
     id: 'clean-slate',
     name: 'Clean Slate',
+    description: 'Wash 20 notes away',
+    icon: Waves,
+    progress: s => s.shed,
+    requirement: 20,
+  },
+  {
+    id: 'into-pieces',
+    name: 'Into Pieces',
     description: 'Shred 20 notes',
     icon: Scissors,
-    progress: s => s.shed,
+    progress: s => s.shred,
     requirement: 20,
   },
   {
@@ -103,11 +112,11 @@ const featureBadges: BadgeDef[] = [
   {
     id: 'full-toolkit',
     name: 'Full Toolkit',
-    description: 'Try all four ways to let go',
+    description: 'Try all five ways to let go',
     icon: Sparkles,
     progress: s =>
-      [s.burn, s.shed, s.breathe, s.laugh].filter(count => count > 0).length,
-    requirement: 4,
+      [s.burn, s.shed, s.shred, s.breathe, s.laugh].filter(count => count > 0).length,
+    requirement: 5,
   },
 ];
 
@@ -121,9 +130,9 @@ interface Challenge {
 const weeklyChallenges: Challenge[] = [
   {
     title: 'Three Releases',
-    description: 'Burn or shred 3 notes this week',
+    description: 'Burn, shed, or shred 3 notes this week',
     target: 3,
-    types: ['burn', 'shed'],
+    types: ['burn', 'shed', 'shred'],
   },
   {
     title: 'Breathing Room',
@@ -147,11 +156,17 @@ const weeklyChallenges: Challenge[] = [
     title: 'Mix It Up',
     description: 'Use 4 tools or sessions this week, any kind',
     target: 4,
-    types: ['burn', 'shed', 'breathe', 'laugh'],
+    types: ['burn', 'shed', 'shred', 'breathe', 'laugh'],
   },
   {
     title: 'Shred Day',
     description: 'Shred 3 notes this week',
+    target: 3,
+    types: ['shred'],
+  },
+  {
+    title: 'Wash It Away',
+    description: 'Shed 3 notes this week',
     target: 3,
     types: ['shed'],
   },
@@ -259,6 +274,13 @@ export const LetGoTracker = () => {
           <Card className="p-5 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-medium rounded-2xl transition-all duration-300 hover:shadow-primary hover:scale-105">
             <div className="text-center space-y-2">
               <div className="text-3xl font-bold text-primary">{stats.shed}</div>
+              <div className="text-sm font-bold text-foreground">Shed Away</div>
+            </div>
+          </Card>
+
+          <Card className="p-5 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-medium rounded-2xl transition-all duration-300 hover:shadow-primary hover:scale-105">
+            <div className="text-center space-y-2">
+              <div className="text-3xl font-bold text-primary">{stats.shred}</div>
               <div className="text-sm font-bold text-foreground">Shredded</div>
             </div>
           </Card>
@@ -270,7 +292,7 @@ export const LetGoTracker = () => {
             </div>
           </Card>
 
-          <Card className="p-5 bg-gradient-to-br from-muted/40 to-muted/10 border-border/50 shadow-medium rounded-2xl transition-all duration-300 hover:scale-105">
+          <Card className="col-span-2 p-5 bg-gradient-to-br from-muted/40 to-muted/10 border-border/50 shadow-medium rounded-2xl transition-all duration-300 hover:scale-105">
             <div className="text-center space-y-2">
               <div className="text-3xl font-bold text-foreground">{stats.laugh}</div>
               <div className="text-sm font-bold text-foreground">Laughs</div>

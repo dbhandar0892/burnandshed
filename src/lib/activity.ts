@@ -1,4 +1,4 @@
-export type ActivityType = 'burn' | 'shed' | 'breathe' | 'laugh';
+export type ActivityType = 'burn' | 'shed' | 'shred' | 'breathe' | 'laugh';
 
 interface ActivityEvent {
   type: ActivityType;
@@ -9,6 +9,7 @@ const LOG_KEY = 'activityLog';
 const COUNT_KEYS: Record<ActivityType, string> = {
   burn: 'burnCount',
   shed: 'shedCount',
+  shred: 'shredCount',
   breathe: 'breatheCount',
   laugh: 'laughCount',
 };
@@ -16,6 +17,7 @@ const COUNT_KEYS: Record<ActivityType, string> = {
 export interface ActivitySnapshot {
   burn: number;
   shed: number;
+  shred: number;
   breathe: number;
   laugh: number;
   total: number;
@@ -31,6 +33,18 @@ const readNumber = (key: string) => {
   return Number.isFinite(value) ? value : 0;
 };
 
+// One-time migration: before the wash-away "Shed It" tab existed, shedCount
+// tracked the shredder. Move that history to shredCount so the new tab starts clean.
+const migrateCounts = () => {
+  if (localStorage.getItem('shredMigrationDone')) return;
+  const oldShed = readNumber(COUNT_KEYS.shed);
+  if (oldShed > 0 && readNumber(COUNT_KEYS.shred) === 0) {
+    localStorage.setItem(COUNT_KEYS.shred, oldShed.toString());
+    localStorage.setItem(COUNT_KEYS.shed, '0');
+  }
+  localStorage.setItem('shredMigrationDone', '1');
+};
+
 const readLog = (): ActivityEvent[] => {
   try {
     const raw = localStorage.getItem(LOG_KEY);
@@ -42,18 +56,21 @@ const readLog = (): ActivityEvent[] => {
 };
 
 const build = (): ActivitySnapshot => {
+  migrateCounts();
   const burn = readNumber(COUNT_KEYS.burn);
   const shed = readNumber(COUNT_KEYS.shed);
+  const shred = readNumber(COUNT_KEYS.shred);
   const breathe = readNumber(COUNT_KEYS.breathe);
   const laugh = readNumber(COUNT_KEYS.laugh);
 
   return {
     burn,
     shed,
+    shred,
     breathe,
     laugh,
-    releases: burn + shed,
-    total: burn + shed + breathe + laugh,
+    releases: burn + shed + shred,
+    total: burn + shed + shred + breathe + laugh,
     log: readLog(),
   };
 };
