@@ -31,6 +31,10 @@ All colors MUST be HSL.
     --accent: 270 65% 75%;
     --accent-foreground: 230 25% 20%;
 
+    /* Brand colors sampled from the Burn & Shed logo wordmark */
+    --brand-ember: 13 85% 42%;
+    --brand-leaf: 176 54% 22%;
+
     /* Enhanced fire/burn colors with more vibrancy */
     --fire: 20 100% 58%;
     --fire-foreground: 0 0% 100%;
@@ -203,6 +207,23 @@ All colors MUST be HSL.
 }
 
 @layer components {
+  .logo-tagline {
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--brand-ember)) 0%,
+      hsl(var(--brand-ember)) 42%,
+      hsl(var(--brand-leaf)) 62%,
+      hsl(var(--brand-leaf)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* keeps the letters legible if background-clip is unsupported */
+    @supports not (background-clip: text) {
+      color: hsl(var(--brand-ember));
+    }
+  }
+
   .burn-stage {
     background: hsl(var(--foreground));
     color: hsl(var(--primary-foreground));
