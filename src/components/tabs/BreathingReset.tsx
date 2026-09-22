@@ -4,6 +4,9 @@ import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX, Music, Waves, CloudRain, Flame, Trees, Radio } from 'lucide-react';
 import { logActivity } from '@/lib/activity';
+import { usePremium } from '@/lib/premium';
+import { navigate } from '@/lib/nav';
+import { Lock } from 'lucide-react';
 
 type SoundId = 'pad' | 'ocean' | 'rain' | 'fire' | 'forest' | 'hum';
 
@@ -342,7 +345,9 @@ export const BreathingReset = () => {
   const [breathePhase, setBreathePhase] = useState<'in' | 'out'>('in');
   const [cycleCount, setCycleCount] = useState(0);
   const [musicEnabled, setMusicEnabled] = useState(true);
-  const [sound, setSound] = useState<SoundId>('pad');
+  const premium = usePremium();
+  const [soundChoice, setSoundChoice] = useState<SoundId>('pad');
+  const sound: SoundId = premium.active ? soundChoice : 'pad';
   const [volume, setVolume] = useState(0.7);
   const audioContextRef = useRef<AudioContext | null>(null);
   const soundHandleRef = useRef<SoundHandle | null>(null);
@@ -497,18 +502,26 @@ export const BreathingReset = () => {
                 {SOUNDS.map(({ id, label, icon: Icon }) => (
                   <button
                     key={id}
-                    onClick={() => setSound(id)}
-                    className={`flex flex-col items-center gap-1.5 py-3 rounded-2xl border transition-all duration-300 ${
+                    onClick={() => (id === 'pad' || premium.active ? setSoundChoice(id) : navigate('premium'))}
+                    className={`relative flex flex-col items-center gap-1.5 py-3 rounded-2xl border transition-all duration-300 ${
                       sound === id
                         ? 'bg-primary/15 border-primary text-primary shadow-soft'
                         : 'bg-card/50 border-border text-muted-foreground hover:bg-card hover:text-foreground'
-                    }`}
+                    } ${id !== 'pad' && !premium.active ? 'opacity-60' : ''}`}
                   >
+                    {id !== 'pad' && !premium.active && (
+                      <Lock className="absolute top-1.5 right-1.5 h-3 w-3" />
+                    )}
                     <Icon className="h-5 w-5" />
                     <span className="text-xs font-semibold">{label}</span>
                   </button>
                 ))}
               </div>
+              {!premium.active && (
+                <p className="text-xs text-muted-foreground font-medium px-1">
+                  Ocean, Rain, Fire, Forest and Deep Hum unlock with Premium.
+                </p>
+              )}
             </div>
 
             {/* Volume Control */}
