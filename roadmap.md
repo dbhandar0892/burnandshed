@@ -5,4 +5,4 @@
 - [x] Free/Premium split built: free = all release effects unlimited, 100 jokes, Ambient breathe sound, totals + weekly challenge. Premium = all 6 breathe sounds, full tracker history, guided rituals, dark mode + colour themes
 - [x] Guided Rituals tab — 5-step flow (name the feeling → write → 3 breaths → choose release → closing line)
 - [x] Themes — light/dark plus Violet, Ember, Ocean, Forest palettes (Premium)
-- [ ] Real billing — Premium currently unlocks via a preview toggle / 7-day trial stored on the device; needs a payment provider ($3.99/mo or $29.99/yr)
+- [ ] Real billing — DEFERRED by user (Sep 22, 2026): don't wire it yet, don't delete anything. Premium currently unlocks via a preview toggle / 7-day trial stored on the device; keep this placeholder intact until the user asks to connect a payment provider ($3.99/mo or $29.99/yr)
