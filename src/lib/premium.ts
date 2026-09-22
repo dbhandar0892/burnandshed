@@ -39,6 +39,13 @@ const subscribe = (listener: () => void) => {
   };
 };
 
+export const subscribePremium = (listener: () => void) => {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+};
+
 export const getPremium = (): PremiumState => {
   if (!cache) cache = build();
   return cache;

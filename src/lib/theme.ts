@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { getPremium } from './premium';
+import { getPremium, subscribePremium } from './premium';
 
 export type ThemeMode = 'light' | 'dark';
 export type Palette = 'violet' | 'ember' | 'ocean' | 'forest';
@@ -69,3 +69,6 @@ export const setPalette = (palette: Palette) => {
 };
 
 export const refreshTheme = emit;
+
+// Re-apply (and downgrade if needed) whenever Premium status changes.
+subscribePremium(() => emit());
