@@ -1,33 +1,52 @@
-import { useState } from 'react';
-import { Droplets, Scissors, Flame, Laugh, Wind, Trophy } from 'lucide-react';
+import { Droplets, Scissors, Flame, Laugh, Wind, Trophy, Sparkles } from 'lucide-react';
 import { ShedIt } from './tabs/ShedIt';
 import { VentBox } from './tabs/VentBox';
 import { BurnNote } from './tabs/BurnNote';
 import { LaughBreak } from './tabs/LaughBreak';
 import { BreathingReset } from './tabs/BreathingReset';
 import { LetGoTracker } from './tabs/LetGoTracker';
+import { Rituals } from './tabs/Rituals';
+import { PremiumScreen } from './tabs/PremiumScreen';
+import { navigate, useView, ViewId } from '@/lib/nav';
+import { usePremium } from '@/lib/premium';
 import logo from '../assets/burn-and-shed-logo.webp';
 
-const tabs = [
+const tabs: { id: ViewId; icon: typeof Flame; label: string; component: () => JSX.Element }[] = [
   { id: 'burn', icon: Flame, label: 'Burn It', component: BurnNote },
   { id: 'shed', icon: Droplets, label: 'Shed It', component: ShedIt },
   { id: 'shred', icon: Scissors, label: 'Shred It', component: VentBox },
+  { id: 'ritual', icon: Sparkles, label: 'Ritual', component: Rituals },
   { id: 'laugh', icon: Laugh, label: 'Laugh', component: LaughBreak },
   { id: 'breathe', icon: Wind, label: 'Breathe', component: BreathingReset },
   { id: 'tracker', icon: Trophy, label: 'Tracker', component: LetGoTracker },
 ];
 
 export const MobileLayout = () => {
-  const [activeTab, setActiveTab] = useState('burn');
+  const activeTab = useView();
+  const premium = usePremium();
 
-  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || BurnNote;
+  const ActiveComponent =
+    activeTab === 'premium'
+      ? PremiumScreen
+      : tabs.find(tab => tab.id === activeTab)?.component || BurnNote;
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto shadow-large">
       {/* Header with enhanced gradient and depth */}
       <header className="bg-gradient-calm px-6 py-5 text-center shadow-medium relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-mesh-calm opacity-40" />
-        
+
+        <button
+          onClick={() => navigate('premium')}
+          aria-label="Premium"
+          className={`absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 ${
+            premium.active ? 'bg-white/25 text-white' : 'bg-white/15 text-white/90'
+          }`}
+        >
+          <Sparkles className="h-4 w-4" />
+          <span className="text-[11px] font-bold">{premium.active ? 'Premium' : 'Upgrade'}</span>
+        </button>
+
         <div className="relative z-10 flex flex-col items-center">
           <img
             src={logo}
@@ -46,24 +65,24 @@ export const MobileLayout = () => {
       </main>
 
       {/* Bottom Navigation with modern design */}
-      <nav className="bg-card/80 backdrop-blur-lg border-t border-border/50 p-3 shadow-large">
-        <div className="flex justify-between items-center gap-1">
+      <nav className="bg-card/80 backdrop-blur-lg border-t border-border/50 p-2 shadow-large">
+        <div className="flex justify-between items-center gap-0.5">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
-            
+
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-300 flex-1 ${
-                  isActive 
-                    ? 'bg-primary text-primary-foreground shadow-primary scale-105' 
+                onClick={() => navigate(tab.id)}
+                className={`flex flex-col items-center justify-center py-2.5 px-1 rounded-xl transition-all duration-300 flex-1 ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground shadow-primary scale-105'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/60 hover:scale-105'
                 }`}
               >
-                <Icon size={22} className={isActive ? 'animate-float' : ''} />
-                <span className="text-[10px] mt-1.5 font-semibold">{tab.label}</span>
+                <Icon size={20} className={isActive ? 'animate-float' : ''} />
+                <span className="text-[9px] mt-1 font-semibold">{tab.label}</span>
               </button>
             );
           })}
