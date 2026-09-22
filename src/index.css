@@ -753,3 +753,76 @@ All colors MUST be HSL.
   .wash-wave, .wash-wave-back { animation-duration: 900ms; }
   .wash-drop { animation: none; }
 }
+
+/* ── Premium colour themes (applied via data-palette on <html>) ───────────── */
+:root[data-palette="ember"] {
+  --primary: 18 88% 52%;
+  --primary-glow: 30 95% 60%;
+  --ring: 18 88% 52%;
+  --accent: 32 90% 70%;
+  --background: 24 55% 97%;
+  --secondary: 24 40% 91%;
+  --muted: 24 35% 94%;
+  --border: 24 30% 88%;
+  --gradient-calm: linear-gradient(135deg, hsl(14 85% 48%), hsl(30 92% 58%), hsl(42 95% 60%));
+  --gradient-mesh-calm: radial-gradient(at 20% 30%, hsl(30 95% 70% / 0.32) 0px, transparent 50%),
+                        radial-gradient(at 80% 70%, hsl(14 85% 65% / 0.25) 0px, transparent 50%);
+  --shadow-primary: 0 4px 20px -4px hsl(18 88% 52% / 0.3);
+}
+:root.dark[data-palette="ember"] {
+  --background: 20 30% 8%;
+  --card: 20 28% 11%;
+  --popover: 20 28% 11%;
+  --secondary: 20 22% 18%;
+  --muted: 20 22% 16%;
+  --border: 20 18% 20%;
+  --primary: 22 90% 58%;
+}
+
+:root[data-palette="ocean"] {
+  --primary: 196 78% 45%;
+  --primary-glow: 188 75% 55%;
+  --ring: 196 78% 45%;
+  --accent: 186 70% 70%;
+  --background: 200 55% 97%;
+  --secondary: 200 40% 91%;
+  --muted: 200 35% 94%;
+  --border: 200 30% 88%;
+  --gradient-calm: linear-gradient(135deg, hsl(205 80% 42%), hsl(192 75% 50%), hsl(178 65% 55%));
+  --gradient-mesh-calm: radial-gradient(at 20% 30%, hsl(192 80% 70% / 0.32) 0px, transparent 50%),
+                        radial-gradient(at 80% 70%, hsl(205 75% 65% / 0.25) 0px, transparent 50%);
+  --shadow-primary: 0 4px 20px -4px hsl(196 78% 45% / 0.3);
+}
+:root.dark[data-palette="ocean"] {
+  --background: 205 40% 8%;
+  --card: 205 35% 11%;
+  --popover: 205 35% 11%;
+  --secondary: 205 25% 18%;
+  --muted: 205 25% 16%;
+  --border: 205 20% 20%;
+  --primary: 192 80% 55%;
+}
+
+:root[data-palette="forest"] {
+  --primary: 158 55% 34%;
+  --primary-glow: 148 50% 46%;
+  --ring: 158 55% 34%;
+  --accent: 140 45% 68%;
+  --background: 150 40% 97%;
+  --secondary: 150 30% 90%;
+  --muted: 150 28% 94%;
+  --border: 150 25% 87%;
+  --gradient-calm: linear-gradient(135deg, hsl(166 60% 28%), hsl(152 50% 40%), hsl(138 45% 50%));
+  --gradient-mesh-calm: radial-gradient(at 20% 30%, hsl(148 55% 65% / 0.3) 0px, transparent 50%),
+                        radial-gradient(at 80% 70%, hsl(166 50% 55% / 0.22) 0px, transparent 50%);
+  --shadow-primary: 0 4px 20px -4px hsl(158 55% 34% / 0.3);
+}
+:root.dark[data-palette="forest"] {
+  --background: 160 30% 7%;
+  --card: 160 26% 10%;
+  --popover: 160 26% 10%;
+  --secondary: 160 20% 17%;
+  --muted: 160 20% 15%;
+  --border: 160 16% 19%;
+  --primary: 152 55% 48%;
+}
