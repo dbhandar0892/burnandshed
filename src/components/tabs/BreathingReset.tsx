@@ -2,19 +2,29 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX, Music, Waves, CloudRain } from 'lucide-react';
+import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX, Music, Waves, CloudRain, Flame, Trees, Radio } from 'lucide-react';
 import { logActivity } from '@/lib/activity';
 
-type SoundId = 'pad' | 'ocean' | 'rain';
+type SoundId = 'pad' | 'ocean' | 'rain' | 'fire' | 'forest' | 'hum';
 
 const SOUNDS: { id: SoundId; label: string; icon: typeof Music }[] = [
   { id: 'pad', label: 'Ambient', icon: Music },
   { id: 'ocean', label: 'Ocean', icon: Waves },
   { id: 'rain', label: 'Rain', icon: CloudRain },
+  { id: 'fire', label: 'Fire', icon: Flame },
+  { id: 'forest', label: 'Forest', icon: Trees },
+  { id: 'hum', label: 'Deep Hum', icon: Radio },
 ];
 
 // Base per-sound output level, before the user volume slider
-const BASE_GAIN: Record<SoundId, number> = { pad: 0.5, ocean: 0.45, rain: 0.4 };
+const BASE_GAIN: Record<SoundId, number> = {
+  pad: 0.5,
+  ocean: 0.45,
+  rain: 0.4,
+  fire: 0.45,
+  forest: 0.4,
+  hum: 0.5,
+};
 
 interface SoundHandle {
   stops: (OscillatorNode | AudioBufferSourceNode)[];
@@ -126,7 +136,7 @@ const createSoundscape = (
     noise.start(now);
 
     stops.push(noise, levelLfo, filterLfo);
-  } else {
+  } else if (sound === 'rain') {
     // Rain: steady filtered hiss plus random soft droplet ticks
     const noise = ctx.createBufferSource();
     noise.buffer = makeNoiseBuffer(ctx);
@@ -162,6 +172,139 @@ const createSoundscape = (
         osc.stop(t + 0.1);
       }, 120)
     );
+  } else if (sound === 'fire') {
+    // Crackling fire: warm low roar plus random crackle pops
+    const noise = ctx.createBufferSource();
+    noise.buffer = makeNoiseBuffer(ctx);
+    noise.loop = true;
+
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(520, now);
+    lp.Q.setValueAtTime(0.7, now);
+
+    const roarGain = ctx.createGain();
+    roarGain.gain.setValueAtTime(0.5, now);
+
+    // Slow flicker in the roar level
+    const flickerLfo = ctx.createOscillator();
+    const flickerDepth = ctx.createGain();
+    flickerLfo.frequency.setValueAtTime(0.9, now);
+    flickerDepth.gain.setValueAtTime(0.18, now);
+    flickerLfo.connect(flickerDepth);
+    flickerDepth.connect(roarGain.gain);
+    flickerLfo.start(now);
+
+    noise.connect(lp);
+    lp.connect(roarGain);
+    roarGain.connect(master);
+    noise.start(now);
+    stops.push(noise, flickerLfo);
+
+    // Crackles: short bursts of filtered noise
+    intervals.push(
+      setInterval(() => {
+        if (Math.random() > 0.65) return;
+        const t = ctx.currentTime;
+        const pop = ctx.createBufferSource();
+        pop.buffer = makeNoiseBuffer(ctx);
+        const popFilter = ctx.createBiquadFilter();
+        popFilter.type = 'bandpass';
+        popFilter.frequency.setValueAtTime(1200 + Math.random() * 2200, t);
+        popFilter.Q.setValueAtTime(3, t);
+        const popGain = ctx.createGain();
+        popGain.gain.setValueAtTime(0.14 + Math.random() * 0.12, t);
+        popGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.06 + Math.random() * 0.05);
+        pop.connect(popFilter);
+        popFilter.connect(popGain);
+        popGain.connect(master);
+        pop.start(t);
+        pop.stop(t + 0.15);
+      }, 110)
+    );
+  } else if (sound === 'forest') {
+    // Forest night: soft air movement plus occasional cricket chirps
+    const noise = ctx.createBufferSource();
+    noise.buffer = makeNoiseBuffer(ctx);
+    noise.loop = true;
+
+    const airFilter = ctx.createBiquadFilter();
+    airFilter.type = 'lowpass';
+    airFilter.frequency.setValueAtTime(700, now);
+    airFilter.Q.setValueAtTime(0.6, now);
+
+    const airGain = ctx.createGain();
+    airGain.gain.setValueAtTime(0.28, now);
+
+    const breezeLfo = ctx.createOscillator();
+    const breezeDepth = ctx.createGain();
+    breezeLfo.frequency.setValueAtTime(0.06, now);
+    breezeDepth.gain.setValueAtTime(0.12, now);
+    breezeLfo.connect(breezeDepth);
+    breezeDepth.connect(airGain.gain);
+    breezeLfo.start(now);
+
+    noise.connect(airFilter);
+    airFilter.connect(airGain);
+    airGain.connect(master);
+    noise.start(now);
+    stops.push(noise, breezeLfo);
+
+    // Crickets: short high trills at irregular intervals
+    intervals.push(
+      setInterval(() => {
+        if (Math.random() > 0.35) return;
+        const t = ctx.currentTime;
+        const base = 3600 + Math.random() * 1200;
+        const pulses = 3 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < pulses; i++) {
+          const at = t + i * 0.055;
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(base, at);
+          g.gain.setValueAtTime(0, at);
+          g.gain.linearRampToValueAtTime(0.045, at + 0.008);
+          g.gain.exponentialRampToValueAtTime(0.0001, at + 0.035);
+          osc.connect(g);
+          g.connect(master);
+          osc.start(at);
+          osc.stop(at + 0.05);
+        }
+      }, 900)
+    );
+  } else {
+    // Deep hum: low steady drone with slow beating for focus
+    const freqs = [55, 55.4, 110, 164.81];
+    freqs.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      const lp = ctx.createBiquadFilter();
+
+      osc.type = i === 3 ? 'triangle' : 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(400, now);
+
+      g.gain.setValueAtTime(i === 3 ? 0.12 : 0.3, now);
+
+      osc.connect(lp);
+      lp.connect(g);
+      g.connect(master);
+      osc.start(now);
+      stops.push(osc);
+    });
+
+    // Very slow swell so the drone breathes
+    const swell = ctx.createOscillator();
+    const swellDepth = ctx.createGain();
+    swell.frequency.setValueAtTime(0.05, now);
+    swellDepth.gain.setValueAtTime(0.1, now);
+    swell.connect(swellDepth);
+    swellDepth.connect(master.gain);
+    swell.start(now);
+    stops.push(swell);
   }
 
   return { stops, master, intervals };
