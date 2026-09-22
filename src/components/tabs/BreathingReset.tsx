@@ -2,19 +2,29 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX, Music, Waves, CloudRain } from 'lucide-react';
+import { Wind, Play, Pause, RotateCcw, Volume2, VolumeX, Music, Waves, CloudRain, Flame, Trees, Radio } from 'lucide-react';
 import { logActivity } from '@/lib/activity';
 
-type SoundId = 'pad' | 'ocean' | 'rain';
+type SoundId = 'pad' | 'ocean' | 'rain' | 'fire' | 'forest' | 'hum';
 
 const SOUNDS: { id: SoundId; label: string; icon: typeof Music }[] = [
   { id: 'pad', label: 'Ambient', icon: Music },
   { id: 'ocean', label: 'Ocean', icon: Waves },
   { id: 'rain', label: 'Rain', icon: CloudRain },
+  { id: 'fire', label: 'Fire', icon: Flame },
+  { id: 'forest', label: 'Forest', icon: Trees },
+  { id: 'hum', label: 'Deep Hum', icon: Radio },
 ];
 
 // Base per-sound output level, before the user volume slider
-const BASE_GAIN: Record<SoundId, number> = { pad: 0.5, ocean: 0.45, rain: 0.4 };
+const BASE_GAIN: Record<SoundId, number> = {
+  pad: 0.5,
+  ocean: 0.45,
+  rain: 0.4,
+  fire: 0.45,
+  forest: 0.4,
+  hum: 0.5,
+};
 
 interface SoundHandle {
   stops: (OscillatorNode | AudioBufferSourceNode)[];
