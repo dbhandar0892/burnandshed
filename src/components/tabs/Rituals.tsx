@@ -218,7 +218,7 @@ export const Rituals = () => {
   };
 
   const answerSecondCheckIn = (answer: CheckIn) => {
-    setStep(answer === 'stressed' ? 7 : 8);
+    setStep(answer === 'stressed' ? 7 : answer === 'same' ? 11 : 8);
   };
 
   const flowIndex = step === 0 ? 0 : step === 1 ? 1 : step === 2 || step === 5 || step === 9 ? 2 : 3;
@@ -361,6 +361,15 @@ export const Rituals = () => {
           <Sparkles className="h-10 w-10 text-primary mx-auto" />
           <h3 className="font-bold text-xl text-foreground">You made space for yourself.</h3>
           <p className="text-muted-foreground">Carry that little bit of lightness with you.</p>
+          <Button onClick={reset} variant="outline" className="w-full"><RotateCcw className="h-4 w-4" /> Begin another ritual</Button>
+        </Card>
+      )}
+
+      {step === 11 && (
+        <Card className="p-8 rounded-lg shadow-medium space-y-5 text-center animate-fade-in">
+          <p className="text-4xl" aria-hidden="true">💛</p>
+          <h3 className="font-bold text-xl text-foreground leading-snug">Sometimes letting it out is enough for now.</h3>
+          <p className="text-muted-foreground leading-relaxed">You don't have to feel better all at once.</p>
           <Button onClick={reset} variant="outline" className="w-full"><RotateCcw className="h-4 w-4" /> Begin another ritual</Button>
         </Card>
       )}
