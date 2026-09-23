@@ -42,9 +42,20 @@ export const Rituals = () => {
     if (consumeRitualReturn()) {
       setPhase('in');
       setSecondsLeft(RESET_SECONDS);
-      setStep(2);
+      setStep(9);
     }
   }, []);
+
+  // Gentle transition screen after a release, before the breathing exercise starts
+  useEffect(() => {
+    if (step !== 9) return;
+    const timer = window.setTimeout(() => {
+      setPhase('in');
+      setSecondsLeft(RESET_SECONDS);
+      setStep(2);
+    }, 2600);
+    return () => window.clearTimeout(timer);
+  }, [step]);
 
   const getContext = () => {
     if (!audioRef.current) {
@@ -185,7 +196,7 @@ export const Rituals = () => {
     setStep(answer === 'stressed' ? 7 : 8);
   };
 
-  const flowIndex = step === 0 ? 0 : step === 1 ? 1 : step === 2 || step === 5 ? 2 : 3;
+  const flowIndex = step === 0 ? 0 : step === 1 ? 1 : step === 2 || step === 5 || step === 9 ? 2 : 3;
 
   return (
     <div className="h-full overflow-y-auto p-6 space-y-6">
@@ -229,6 +240,21 @@ export const Rituals = () => {
             ))}
           </div>
           <p className="text-sm text-center text-muted-foreground">Your full release effect will play, then the ritual will continue.</p>
+        </Card>
+      )}
+
+      {step === 9 && (
+        <Card className="p-8 rounded-lg shadow-medium space-y-6 text-center animate-fade-in">
+          <div>
+            <p className="text-xs font-bold text-primary">RESET</p>
+            <h3 className="font-bold text-xl text-foreground mt-2">Take one minute for yourself.</h3>
+          </div>
+          <div className="flex justify-center">
+            <div className="w-24 h-24 rounded-full bg-gradient-zen flex items-center justify-center shadow-zen animate-breathe">
+              <Wind className="h-9 w-9 text-primary-foreground drop-shadow-md" />
+            </div>
+          </div>
+          <p className="text-lg font-semibold text-foreground">Breathe in and out...</p>
         </Card>
       )}
 
