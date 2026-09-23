@@ -282,11 +282,11 @@ export const LetGoTracker = () => {
         </p>
       </div>
 
-
       <div className="space-y-4">
         <h3 className="text-xl font-bold text-foreground tracking-tight">Milestones</h3>
         <div className="grid grid-cols-1 gap-4">{milestoneBadges.map(renderBadge)}</div>
       </div>
+
 
       <div className="flex-1 space-y-4">
         <h3 className="text-xl font-bold text-foreground tracking-tight">Explorer Badges</h3>
