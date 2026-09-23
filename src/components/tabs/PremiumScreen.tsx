@@ -16,7 +16,7 @@ import { PALETTES, setPalette, setThemeMode, useTheme } from '@/lib/theme';
 const PREMIUM_FEATURES = [
   'All 6 breathing sounds — Ambient, Ocean, Rain, Fire, Forest, Deep Hum',
   'Guided Rituals — step-by-step release sessions',
-  'Full tracker history with every badge and every entry',
+  'All milestone and explorer badges in the tracker',
   'Dark mode and colour themes',
   'No ads, ever',
 ];
