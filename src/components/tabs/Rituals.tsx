@@ -218,7 +218,7 @@ export const Rituals = () => {
   };
 
   const answerSecondCheckIn = (answer: CheckIn) => {
-    setStep(answer === 'stressed' ? 7 : 8);
+    setStep(answer === 'stressed' ? 7 : answer === 'same' ? 11 : 8);
   };
 
   const flowIndex = step === 0 ? 0 : step === 1 ? 1 : step === 2 || step === 5 || step === 9 ? 2 : 3;
