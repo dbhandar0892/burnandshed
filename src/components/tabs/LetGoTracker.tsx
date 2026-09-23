@@ -23,8 +23,6 @@ import {
   subscribeActivity,
   weekIndex,
 } from '@/lib/activity';
-import { usePremium } from '@/lib/premium';
-import { PremiumLock } from '@/components/PremiumLock';
 
 interface BadgeDef {
   id: string;
@@ -174,22 +172,13 @@ const weeklyChallenges: Challenge[] = [
   },
 ];
 
-const HISTORY_LABELS: Record<ActivityType, string> = {
-  burn: '🔥 Burned a note',
-  shed: '💧 Shed a note',
-  shred: '✂️ Shredded a note',
-  breathe: '🌬️ Breathing reset',
-  laugh: '😄 Laugh break',
-};
-
 export const LetGoTracker = () => {
   const stats = useSyncExternalStore(subscribeActivity, getActivitySnapshot, getActivitySnapshot);
-  const premium = usePremium();
 
   const weekStart = startOfWeek().getTime();
   const challenge = weeklyChallenges[weekIndex() % weeklyChallenges.length];
   const challengeProgress = Math.min(
-    stats.log.filter(entry => entry.ts >= weekStart && challenge.types.includes(entry.type)).length,
+    challenge.types.reduce((sum, type) => sum + stats.week[type], 0),
     challenge.target,
   );
   const challengeDone = challengeProgress >= challenge.target;
