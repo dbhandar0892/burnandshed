@@ -3,12 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, ArrowRight, Flame, Droplets, Scissors, Wind, Volume2, VolumeX, Laugh, RotateCcw } from 'lucide-react';
+import { Sparkles, ArrowRight, Flame, Droplets, Scissors, Wind, Volume2, VolumeX, Laugh, RotateCcw, RefreshCw } from 'lucide-react';
 import { usePremium } from '@/lib/premium';
 import { PremiumLock } from '@/components/PremiumLock';
 import { setVentText } from '@/lib/ventText';
 import { navigate, ViewId } from '@/lib/nav';
 import { beginRitualRelease, consumeRitualReturn } from '@/lib/ritualFlow';
+import { nextJoke } from '@/lib/jokes';
+import { logActivity } from '@/lib/activity';
 
 const RELEASES: { id: Extract<ViewId, 'burn' | 'shred' | 'shed'>; label: string; icon: typeof Flame }[] = [
   { id: 'burn', label: 'Burn', icon: Flame },
@@ -19,12 +21,6 @@ const RELEASES: { id: Extract<ViewId, 'burn' | 'shred' | 'shed'>; label: string;
 const PHASE_MS = 4000;
 const RESET_SECONDS = 60;
 const FLOW_LABELS = ['VENT', 'RELEASE', 'RESET', 'CHECK-IN'];
-const RITUAL_JOKES = [
-  "Why don't eggs tell jokes? They'd crack each other up!",
-  'What did the ocean say to the beach? Nothing, it just waved.',
-  "What do you call a bear with no teeth? A gummy bear!",
-  'How do you make a tissue dance? Put a little boogie in it!',
-];
 
 type CheckIn = 'better' | 'same' | 'stressed';
 
@@ -205,6 +201,17 @@ export const Rituals = () => {
     setStep(5);
   };
 
+  const showJoke = () => {
+    setJoke(nextJoke());
+    logActivity('laugh');
+    setStep(10);
+  };
+
+  const showNextJoke = () => {
+    setJoke(nextJoke());
+    logActivity('laugh');
+  };
+
   const answerFirstCheckIn = (answer: CheckIn) => {
     if (answer === 'better') setStep(8);
     else setStep(4);
@@ -313,14 +320,25 @@ export const Rituals = () => {
             <p className="text-xs font-bold text-primary">LET'S TRY SOMETHING ELSE</p>
             <h3 className="font-bold text-xl text-foreground mt-2">What might help right now?</h3>
           </div>
-          {joke && <p className="p-5 bg-muted rounded-lg text-foreground font-semibold leading-relaxed">{joke}</p>}
-          <Button onClick={() => setJoke(RITUAL_JOKES[Math.floor(Math.random() * RITUAL_JOKES.length)])} variant="outline" className="w-full h-14 font-bold">
+          <Button onClick={showJoke} variant="outline" className="w-full h-14 font-bold">
             <Laugh className="h-5 w-5" /> MAKE ME LAUGH
           </Button>
           <Button onClick={beginAnotherBreath} className="w-full h-14 font-bold">
             <Wind className="h-5 w-5" /> BREATHE AGAIN
           </Button>
-          {joke && <Button onClick={() => setStep(6)} variant="ghost" className="w-full">Continue to check-in <ArrowRight className="h-4 w-4" /></Button>}
+        </Card>
+      )}
+
+      {step === 10 && (
+        <Card className="p-7 rounded-lg shadow-medium space-y-5 text-center animate-fade-in">
+          <div className="text-6xl animate-float" aria-hidden="true">😄</div>
+          <p className="p-5 bg-muted rounded-lg text-foreground font-semibold leading-relaxed text-lg">{joke}</p>
+          <Button onClick={showNextJoke} variant="outline" className="w-full h-14 font-bold">
+            <RefreshCw className="h-5 w-5" /> Next Joke
+          </Button>
+          <Button onClick={() => setStep(6)} className="w-full h-14 font-bold">
+            Continue to check-in <ArrowRight className="h-4 w-4" />
+          </Button>
         </Card>
       )}
 
