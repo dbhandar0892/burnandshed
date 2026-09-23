@@ -234,9 +234,19 @@ export const Rituals = () => {
           <p className="text-sm text-muted-foreground font-medium">
             {cycles}/{BREATH_CYCLES} breaths
           </p>
-          <Button variant="outline" className="h-11 rounded-2xl" onClick={() => setStep(3)}>
-            Skip breathing
-          </Button>
+          <div className="flex justify-center gap-3">
+            <Button
+              variant="outline"
+              className="h-11 rounded-2xl"
+              onClick={() => setMuted(m => !m)}
+              aria-label={muted ? 'Unmute breathing sound' : 'Mute breathing sound'}
+            >
+              {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+            </Button>
+            <Button variant="outline" className="h-11 rounded-2xl" onClick={() => setStep(3)}>
+              Skip breathing
+            </Button>
+          </div>
         </Card>
       )}
 
