@@ -212,13 +212,20 @@ export const Rituals = () => {
     logActivity('laugh');
   };
 
+  const finishRitual = (finalStep: number) => {
+    logActivity('ritual');
+    setStep(finalStep);
+  };
+
   const answerFirstCheckIn = (answer: CheckIn) => {
-    if (answer === 'better') setStep(8);
+    if (answer === 'better') finishRitual(8);
     else setStep(4);
   };
 
   const answerSecondCheckIn = (answer: CheckIn) => {
-    setStep(answer === 'stressed' ? 7 : answer === 'same' ? 11 : 8);
+    if (answer === 'stressed') finishRitual(7);
+    else if (answer === 'same') finishRitual(11);
+    else finishRitual(8);
   };
 
   const flowIndex = step === 0 ? 0 : step === 1 ? 1 : step === 2 || step === 5 || step === 9 ? 2 : 3;

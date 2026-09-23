@@ -13,6 +13,7 @@ import {
   Wind,
   Smile,
   Sparkles,
+  HeartHandshake,
 } from 'lucide-react';
 import { ActivitySnapshot, getActivitySnapshot, subscribeActivity } from '@/lib/activity';
 
@@ -96,10 +97,18 @@ const featureBadges: BadgeDef[] = [
   {
     id: 'good-medicine',
     name: 'Good Medicine',
-    description: 'Enjoy 25 laughs',
+    description: 'Enjoy 50 laughs',
     icon: Smile,
     progress: s => s.laugh,
-    requirement: 25,
+    requirement: 50,
+  },
+  {
+    id: 'ritual-keeper',
+    name: 'Ritual Keeper',
+    description: 'Complete 5 guided rituals',
+    icon: HeartHandshake,
+    progress: s => s.ritual,
+    requirement: 5,
   },
   {
     id: 'full-toolkit',

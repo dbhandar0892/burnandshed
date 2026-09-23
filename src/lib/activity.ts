@@ -1,4 +1,4 @@
-export type ActivityType = 'burn' | 'shed' | 'shred' | 'breathe' | 'laugh';
+export type ActivityType = 'burn' | 'shed' | 'shred' | 'breathe' | 'laugh' | 'ritual';
 
 const COUNT_KEYS: Record<ActivityType, string> = {
   burn: 'burnCount',
@@ -6,6 +6,7 @@ const COUNT_KEYS: Record<ActivityType, string> = {
   shred: 'shredCount',
   breathe: 'breatheCount',
   laugh: 'laughCount',
+  ritual: 'ritualCount',
 };
 
 export interface ActivitySnapshot {
@@ -14,6 +15,7 @@ export interface ActivitySnapshot {
   shred: number;
   breathe: number;
   laugh: number;
+  ritual: number;
   total: number;
   releases: number;
 }
@@ -49,6 +51,7 @@ const build = (): ActivitySnapshot => {
   const shred = readNumber(COUNT_KEYS.shred);
   const breathe = readNumber(COUNT_KEYS.breathe);
   const laugh = readNumber(COUNT_KEYS.laugh);
+  const ritual = readNumber(COUNT_KEYS.ritual);
 
   return {
     burn,
@@ -56,6 +59,7 @@ const build = (): ActivitySnapshot => {
     shred,
     breathe,
     laugh,
+    ritual,
     releases: burn + shed + shred,
     total: burn + shed + shred + breathe + laugh,
   };
