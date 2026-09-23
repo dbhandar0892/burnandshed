@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, ArrowRight, ArrowLeft, Flame, Droplets, Scissors, Wind } from 'lucide-react';
+import { Sparkles, ArrowRight, ArrowLeft, Flame, Droplets, Scissors, Wind, Volume2, VolumeX } from 'lucide-react';
 import { usePremium } from '@/lib/premium';
 import { PremiumLock } from '@/components/PremiumLock';
 import { setVentText } from '@/lib/ventText';
@@ -33,6 +33,8 @@ const RELEASES: { id: ViewId; label: string; icon: typeof Flame; note: string }[
 
 const BREATH_CYCLES = 3;
 
+const PHASE_MS = 4000;
+
 export const Rituals = () => {
   const premium = usePremium();
   const [step, setStep] = useState(0);
@@ -40,19 +42,87 @@ export const Rituals = () => {
   const [text, setText] = useState('');
   const [phase, setPhase] = useState<'in' | 'out'>('in');
   const [cycles, setCycles] = useState(0);
+  const [muted, setMuted] = useState(false);
   const [closing] = useState(() => CLOSING_LINES[Math.floor(Math.random() * CLOSING_LINES.length)]);
+  const audioRef = useRef<AudioContext | null>(null);
+
+  const getContext = () => {
+    if (!audioRef.current) {
+      const Ctx = window.AudioContext || (window as typeof window & {
+        webkitAudioContext?: typeof AudioContext;
+      }).webkitAudioContext;
+      if (!Ctx) return null;
+      audioRef.current = new Ctx();
+    }
+    if (audioRef.current.state === 'suspended') audioRef.current.resume().catch(() => undefined);
+    return audioRef.current;
+  };
+
+  // Soft breath cue: rising airy swell on inhale, falling on exhale
+  const playBreathCue = (dir: 'in' | 'out') => {
+    if (muted) return;
+    const ctx = getContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const seconds = PHASE_MS / 1000;
+
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, now);
+    master.gain.linearRampToValueAtTime(0.28, now + seconds * 0.35);
+    master.gain.linearRampToValueAtTime(0, now + seconds);
+    master.connect(ctx.destination);
+
+    // Breath-like filtered noise
+    const size = Math.floor(ctx.sampleRate * seconds);
+    const buffer = ctx.createBuffer(1, size, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < size; i += 1) data[i] = (Math.random() * 2 - 1) * 0.5;
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.Q.value = 1.1;
+    bp.frequency.setValueAtTime(dir === 'in' ? 420 : 900, now);
+    bp.frequency.linearRampToValueAtTime(dir === 'in' ? 1100 : 320, now + seconds);
+    noise.connect(bp);
+    bp.connect(master);
+    noise.start(now);
+    noise.stop(now + seconds);
+
+    // Warm tone gliding with the breath
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(dir === 'in' ? 196 : 262, now);
+    osc.frequency.linearRampToValueAtTime(dir === 'in' ? 262 : 196, now + seconds);
+    const toneGain = ctx.createGain();
+    toneGain.gain.setValueAtTime(0, now);
+    toneGain.gain.linearRampToValueAtTime(0.1, now + seconds * 0.4);
+    toneGain.gain.linearRampToValueAtTime(0, now + seconds);
+    osc.connect(toneGain);
+    toneGain.connect(master);
+    osc.start(now);
+    osc.stop(now + seconds);
+  };
 
   // Breathing step timer
   useEffect(() => {
     if (step !== 2) return;
+    playBreathCue('in');
     const timer = setInterval(() => {
       setPhase(prev => {
+        const next = prev === 'in' ? 'out' : 'in';
         if (prev === 'out') setCycles(c => c + 1);
-        return prev === 'in' ? 'out' : 'in';
+        playBreathCue(next);
+        return next;
       });
-    }, 4000);
+    }, PHASE_MS);
     return () => clearInterval(timer);
-  }, [step]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, muted]);
+
+  useEffect(() => () => {
+    audioRef.current?.close().catch(() => undefined);
+  }, []);
 
   useEffect(() => {
     if (step === 2 && cycles >= BREATH_CYCLES) setStep(3);
@@ -164,9 +234,19 @@ export const Rituals = () => {
           <p className="text-sm text-muted-foreground font-medium">
             {cycles}/{BREATH_CYCLES} breaths
           </p>
-          <Button variant="outline" className="h-11 rounded-2xl" onClick={() => setStep(3)}>
-            Skip breathing
-          </Button>
+          <div className="flex justify-center gap-3">
+            <Button
+              variant="outline"
+              className="h-11 rounded-2xl"
+              onClick={() => setMuted(m => !m)}
+              aria-label={muted ? 'Unmute breathing sound' : 'Mute breathing sound'}
+            >
+              {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+            </Button>
+            <Button variant="outline" className="h-11 rounded-2xl" onClick={() => setStep(3)}>
+              Skip breathing
+            </Button>
+          </div>
         </Card>
       )}
 
