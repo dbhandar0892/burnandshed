@@ -343,43 +343,6 @@ export const LetGoTracker = () => {
         <div className="grid grid-cols-1 gap-4">{milestoneBadges.map(renderBadge)}</div>
       </div>
 
-      {/* Full history — Premium */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-bold text-foreground tracking-tight">Your History</h3>
-        {premium.active ? (
-          <Card className="p-5 rounded-2xl shadow-medium">
-            {stats.log.length === 0 ? (
-              <p className="text-sm text-muted-foreground font-medium text-center py-4">
-                Nothing yet — your releases will appear here.
-              </p>
-            ) : (
-              <div className="divide-y divide-border/60">
-                {[...stats.log].reverse().map(entry => (
-                  <div key={`${entry.type}-${entry.ts}`} className="flex items-center justify-between py-3">
-                    <span className="text-sm font-semibold text-foreground">
-                      {HISTORY_LABELS[entry.type]}
-                    </span>
-                    <span className="text-xs text-muted-foreground font-medium">
-                      {new Date(entry.ts).toLocaleString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-        ) : (
-          <PremiumLock
-            title="Full history is a Premium feature"
-            description="See every burn, shed, shred, breath and laugh with the date and time it happened."
-          />
-        )}
-      </div>
-
       <div className="flex-1 space-y-4">
         <h3 className="text-xl font-bold text-foreground tracking-tight">Explorer Badges</h3>
         <div className="grid grid-cols-1 gap-4">{featureBadges.map(renderBadge)}</div>
