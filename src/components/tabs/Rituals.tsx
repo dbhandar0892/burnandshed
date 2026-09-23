@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, ArrowRight, ArrowLeft, Flame, Droplets, Scissors, Wind } from 'lucide-react';
+import { Sparkles, ArrowRight, ArrowLeft, Flame, Droplets, Scissors, Wind, Volume2, VolumeX } from 'lucide-react';
 import { usePremium } from '@/lib/premium';
 import { PremiumLock } from '@/components/PremiumLock';
 import { setVentText } from '@/lib/ventText';
