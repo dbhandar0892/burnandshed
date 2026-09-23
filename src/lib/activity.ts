@@ -120,6 +120,8 @@ const build = (): ActivitySnapshot => {
 
   const store = readMonthStore();
   const keys = lastMonths();
+  // Prune anything older than the kept window so it disappears from storage too.
+  if (Object.keys(store.months).some(k => !keys.includes(k))) writeMonthStore(store);
   const months: MonthEntry[] = keys.map(key => ({
     key,
     label: monthLabel(key),
