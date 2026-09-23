@@ -163,10 +163,10 @@ export const Rituals = () => {
 
   if (!premium.active) {
     return (
-      <div className="h-full overflow-y-auto p-6 space-y-6">
+      <div className="ritual-theme h-full overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-background to-primary/5">
         <div className="text-center space-y-3 animate-fade-in">
           <div className="w-20 h-20 bg-gradient-calm rounded-2xl flex items-center justify-center mx-auto animate-float shadow-primary">
-            <Sparkles className="h-10 w-10 text-white drop-shadow-md" />
+            <Sparkles className="h-10 w-10 text-primary-foreground drop-shadow-md" />
           </div>
           <h2 className="text-3xl font-bold text-foreground tracking-tight">Guided Rituals</h2>
           <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
@@ -224,10 +224,10 @@ export const Rituals = () => {
   const flowIndex = step === 0 ? 0 : step === 1 ? 1 : step === 2 || step === 5 || step === 9 ? 2 : 3;
 
   return (
-    <div className="h-full overflow-y-auto p-6 space-y-6">
+    <div className="ritual-theme h-full overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-background to-primary/5">
       <div className="text-center space-y-3 animate-fade-in">
         <div className="w-16 h-16 bg-gradient-calm rounded-2xl flex items-center justify-center mx-auto shadow-primary">
-          <Sparkles className="h-8 w-8 text-white drop-shadow-md" />
+          <Sparkles className="h-8 w-8 text-primary-foreground drop-shadow-md" />
         </div>
         <h2 className="text-2xl font-bold text-foreground tracking-tight">Guided Ritual</h2>
         <Progress value={((flowIndex + 1) / FLOW_LABELS.length) * 100} className="h-1.5 max-w-xs mx-auto" />
