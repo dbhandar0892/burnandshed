@@ -41,7 +41,7 @@ export const consumeRitualReturn = () => {
 
 
 export const getRitualReleaseDuration = (release: PendingRitualRelease) => {
-  if (release.type === 'shed') return 3400;
-  if (release.type === 'shred') return 3250;
-  return 1500 + 450 + release.characterCount * 115 + 1250 + 200;
+  if (release.type === 'shed') return 2400 + 800;
+  if (release.type === 'shred') return 2800 + 250;
+  return 1500 + 450 + release.characterCount * 115 + 1250;
 };
