@@ -201,6 +201,17 @@ export const Rituals = () => {
     setStep(5);
   };
 
+  const showJoke = () => {
+    setJoke(nextJoke());
+    logActivity('laugh');
+    setStep(10);
+  };
+
+  const showNextJoke = () => {
+    setJoke(nextJoke());
+    logActivity('laugh');
+  };
+
   const answerFirstCheckIn = (answer: CheckIn) => {
     if (answer === 'better') setStep(8);
     else setStep(4);
