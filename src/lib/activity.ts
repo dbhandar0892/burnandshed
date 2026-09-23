@@ -18,7 +18,22 @@ export interface ActivitySnapshot {
   ritual: number;
   total: number;
   releases: number;
+  month: { burn: number; shed: number; shred: number; breathe: number; laugh: number; ritual: number; releases: number };
 }
+
+const MONTH_KEY = 'monthlyCounts';
+const currentMonth = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}`;
+};
+type MonthStore = { month: string; counts: Partial<Record<ActivityType, number>> };
+const readMonth = (): MonthStore => {
+  try {
+    const raw = JSON.parse(localStorage.getItem(MONTH_KEY) || 'null') as MonthStore | null;
+    if (raw && raw.month === currentMonth() && raw.counts) return raw;
+  } catch { /* ignore */ }
+  return { month: currentMonth(), counts: {} };
+};
 
 const listeners = new Set<() => void>();
 let cache: ActivitySnapshot | null = null;
@@ -61,6 +76,11 @@ const build = (): ActivitySnapshot => {
     laugh,
     ritual,
     releases: burn + shed + shred,
+    month: (() => {
+      const c = readMonth().counts;
+      const m = { burn: c.burn || 0, shed: c.shed || 0, shred: c.shred || 0, breathe: c.breathe || 0, laugh: c.laugh || 0, ritual: c.ritual || 0 };
+      return { ...m, releases: m.burn + m.shed + m.shred };
+    })(),
     total: burn + shed + shred + breathe + laugh,
   };
 };
@@ -79,14 +99,18 @@ export const subscribeActivity = (listener: () => void) => {
   };
 };
 
+let cacheMonth = '';
 export const getActivitySnapshot = (): ActivitySnapshot => {
-  if (!cache) cache = build();
+  if (!cache || cacheMonth !== currentMonth()) { cache = build(); cacheMonth = currentMonth(); }
   return cache;
 };
 
 export const logActivity = (type: ActivityType) => {
   const key = COUNT_KEYS[type];
   localStorage.setItem(key, (readNumber(key) + 1).toString());
+  const m = readMonth();
+  m.counts[type] = (m.counts[type] || 0) + 1;
+  localStorage.setItem(MONTH_KEY, JSON.stringify(m));
 
   emit();
 };
