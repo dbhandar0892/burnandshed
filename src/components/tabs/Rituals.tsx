@@ -37,6 +37,7 @@ export const Rituals = () => {
   const [muted, setMuted] = useState(false);
   const [joke, setJoke] = useState('');
   const audioRef = useRef<AudioContext | null>(null);
+  const breathCueRef = useRef<{ noise: AudioBufferSourceNode; tone: OscillatorNode; master: GainNode } | null>(null);
 
   useEffect(() => {
     if (consumeRitualReturn()) {
@@ -69,9 +70,22 @@ export const Rituals = () => {
     return audioRef.current;
   };
 
+  const stopBreathCue = () => {
+    const cue = breathCueRef.current;
+    if (!cue) return;
+    const now = audioRef.current?.currentTime ?? 0;
+    cue.master.gain.cancelScheduledValues(now);
+    cue.master.gain.setValueAtTime(0, now);
+    try { cue.noise.stop(); } catch { /* cue already ended */ }
+    try { cue.tone.stop(); } catch { /* cue already ended */ }
+    cue.master.disconnect();
+    breathCueRef.current = null;
+  };
+
   // Soft breath cue: rising airy swell on inhale, falling on exhale
   const playBreathCue = (dir: 'in' | 'out') => {
     if (muted) return;
+    stopBreathCue();
     const ctx = getContext();
     if (!ctx) return;
     const now = ctx.currentTime;
@@ -113,6 +127,7 @@ export const Rituals = () => {
     toneGain.connect(master);
     osc.start(now);
     osc.stop(now + seconds);
+    breathCueRef.current = { noise, tone: osc, master };
   };
 
   useEffect(() => {
@@ -130,6 +145,7 @@ export const Rituals = () => {
         if (previous <= 1) {
           window.clearInterval(countdown);
           window.clearInterval(phaseTimer);
+          stopBreathCue();
           setStep(step === 2 ? 3 : 6);
           return 0;
         }
@@ -139,11 +155,13 @@ export const Rituals = () => {
     return () => {
       window.clearInterval(phaseTimer);
       window.clearInterval(countdown);
+      stopBreathCue();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, muted]);
 
   useEffect(() => () => {
+    stopBreathCue();
     audioRef.current?.close().catch(() => undefined);
   }, []);
 
