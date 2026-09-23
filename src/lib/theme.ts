@@ -13,6 +13,7 @@ export const PALETTES: { id: Palette; label: string; swatch: string; premium: bo
 
 const MODE_KEY = 'themeMode';
 const PALETTE_KEY = 'themePalette';
+const RITUAL_PALETTE_MIGRATION_KEY = 'ritualPaletteMigrationDone';
 
 interface ThemeState {
   mode: ThemeMode;
@@ -28,6 +29,10 @@ const read = (): ThemeState => ({
 });
 
 export const applyTheme = () => {
+  if (!localStorage.getItem(RITUAL_PALETTE_MIGRATION_KEY)) {
+    localStorage.setItem(PALETTE_KEY, 'violet');
+    localStorage.setItem(RITUAL_PALETTE_MIGRATION_KEY, '1');
+  }
   const stored = read();
   const premium = getPremium().active;
   const mode = premium ? stored.mode : 'light';
