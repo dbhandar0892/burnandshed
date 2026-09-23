@@ -11,7 +11,7 @@ import { navigate, useView, ViewId } from '@/lib/nav';
 import { usePremium } from '@/lib/premium';
 import { useEffect, useRef } from 'react';
 import { getActivitySnapshot, subscribeActivity } from '@/lib/activity';
-import { completeRitualRelease, getPendingRitualRelease, getRitualReleaseDuration } from '@/lib/ritualFlow';
+import { completeRitualRelease, getPendingRitualRelease, getRitualReleaseDuration, PAUSE_AFTER_RELEASE_MS } from '@/lib/ritualFlow';
 import logo from '../assets/burn-and-shed-logo.webp';
 
 const tabs: { id: ViewId; icon: typeof Flame; label: string; component: () => JSX.Element }[] = [
