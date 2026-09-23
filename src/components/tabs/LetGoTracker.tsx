@@ -132,6 +132,13 @@ export const LetGoTracker = () => {
     return "You're a master of letting go!";
   };
 
+  const monthlyMessage = () => {
+    const n = stats.month.releases;
+    if (n === 0) return 'A fresh month is waiting for you.';
+    if (n === 1) return 'You gave yourself 1 chance to let go.';
+    return `You gave yourself ${n} chances to let go.`;
+  };
+
   const renderBadge = (badge: BadgeDef) => {
     const Icon = badge.icon;
     const current = Math.min(badge.progress(stats), badge.requirement);
@@ -238,6 +245,16 @@ export const LetGoTracker = () => {
       </div>
 
       <div className="space-y-4">
+        <h3 className="text-xl font-bold text-foreground tracking-tight">Milestones</h3>
+        <div className="grid grid-cols-1 gap-4">{milestoneBadges.map(renderBadge)}</div>
+      </div>
+
+      <div className="flex-1 space-y-4">
+        <h3 className="text-xl font-bold text-foreground tracking-tight">Explorer Badges</h3>
+        <div className="grid grid-cols-1 gap-4">{featureBadges.map(renderBadge)}</div>
+      </div>
+
+      <div className="space-y-4">
         <h3 className="text-xl font-bold text-foreground tracking-tight">
           This Month{' '}
           <span className="text-sm font-medium text-muted-foreground">
@@ -265,17 +282,11 @@ export const LetGoTracker = () => {
           </div>
           <p className="text-xs text-muted-foreground text-center mt-4">Resets on the 1st of each month. Lifetime totals above never reset.</p>
         </Card>
+        <p className="text-center text-base text-primary font-semibold leading-relaxed px-4">
+          {monthlyMessage()}
+        </p>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-xl font-bold text-foreground tracking-tight">Milestones</h3>
-        <div className="grid grid-cols-1 gap-4">{milestoneBadges.map(renderBadge)}</div>
-      </div>
-
-      <div className="flex-1 space-y-4">
-        <h3 className="text-xl font-bold text-foreground tracking-tight">Explorer Badges</h3>
-        <div className="grid grid-cols-1 gap-4">{featureBadges.map(renderBadge)}</div>
-      </div>
 
       <div className="text-center mt-auto pt-4">
         <p className="text-sm text-muted-foreground font-medium">
