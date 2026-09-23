@@ -118,6 +118,14 @@ const build = (): ActivitySnapshot => {
   const laugh = readNumber(COUNT_KEYS.laugh);
   const ritual = readNumber(COUNT_KEYS.ritual);
 
+  const store = readMonthStore();
+  const keys = lastMonths();
+  const months: MonthEntry[] = keys.map(key => ({
+    key,
+    label: monthLabel(key),
+    counts: toMonthCounts(store.months[key]),
+  }));
+
   return {
     burn,
     shed,
@@ -126,11 +134,8 @@ const build = (): ActivitySnapshot => {
     laugh,
     ritual,
     releases: burn + shed + shred,
-    month: (() => {
-      const c = readMonth().counts;
-      const m = { burn: c.burn || 0, shed: c.shed || 0, shred: c.shred || 0, breathe: c.breathe || 0, laugh: c.laugh || 0, ritual: c.ritual || 0 };
-      return { ...m, releases: m.burn + m.shed + m.shred };
-    })(),
+    month: months[0].counts,
+    months,
     total: burn + shed + shred + breathe + laugh,
   };
 };
@@ -158,9 +163,12 @@ export const getActivitySnapshot = (): ActivitySnapshot => {
 export const logActivity = (type: ActivityType) => {
   const key = COUNT_KEYS[type];
   localStorage.setItem(key, (readNumber(key) + 1).toString());
-  const m = readMonth();
-  m.counts[type] = (m.counts[type] || 0) + 1;
-  localStorage.setItem(MONTH_KEY, JSON.stringify(m));
+  const store = readMonthStore();
+  const mk = currentMonth();
+  const counts = store.months[mk] || {};
+  counts[type] = (counts[type] || 0) + 1;
+  store.months[mk] = counts;
+  writeMonthStore(store);
 
   emit();
 };
