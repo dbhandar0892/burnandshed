@@ -9,6 +9,9 @@ import { Rituals } from './tabs/Rituals';
 import { PremiumScreen } from './tabs/PremiumScreen';
 import { navigate, useView, ViewId } from '@/lib/nav';
 import { usePremium } from '@/lib/premium';
+import { useEffect, useRef } from 'react';
+import { getActivitySnapshot, subscribeActivity } from '@/lib/activity';
+import { completeRitualRelease, getPendingRitualRelease, getRitualReleaseDuration } from '@/lib/ritualFlow';
 import logo from '../assets/burn-and-shed-logo.webp';
 
 const tabs: { id: ViewId; icon: typeof Flame; label: string; component: () => JSX.Element }[] = [
@@ -24,6 +27,27 @@ const tabs: { id: ViewId; icon: typeof Flame; label: string; component: () => JS
 export const MobileLayout = () => {
   const activeTab = useView();
   const premium = usePremium();
+  const returnTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let previous = getActivitySnapshot();
+    const unsubscribe = subscribeActivity(() => {
+      const current = getActivitySnapshot();
+      const pending = getPendingRitualRelease();
+      if (pending && current[pending.type] > previous[pending.type] && returnTimerRef.current === null) {
+        returnTimerRef.current = window.setTimeout(() => {
+          completeRitualRelease();
+          navigate('ritual');
+          returnTimerRef.current = null;
+        }, getRitualReleaseDuration(pending));
+      }
+      previous = current;
+    });
+    return () => {
+      unsubscribe();
+      if (returnTimerRef.current !== null) window.clearTimeout(returnTimerRef.current);
+    };
+  }, []);
 
   const ActiveComponent =
     activeTab === 'premium'

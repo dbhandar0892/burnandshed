@@ -3,48 +3,48 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { Sparkles, ArrowRight, ArrowLeft, Flame, Droplets, Scissors, Wind, Volume2, VolumeX } from 'lucide-react';
+import { Sparkles, ArrowRight, Flame, Droplets, Scissors, Wind, Volume2, VolumeX, Laugh, RotateCcw } from 'lucide-react';
 import { usePremium } from '@/lib/premium';
 import { PremiumLock } from '@/components/PremiumLock';
 import { setVentText } from '@/lib/ventText';
 import { navigate, ViewId } from '@/lib/nav';
+import { beginRitualRelease, consumeRitualReturn } from '@/lib/ritualFlow';
 
-const FEELINGS = [
-  { id: 'anger', label: 'Anger', prompt: 'What made you angry? Say it exactly how it feels.' },
-  { id: 'anxiety', label: 'Anxiety', prompt: 'What is the worry circling in your head right now?' },
-  { id: 'sadness', label: 'Sadness', prompt: 'What hurts? Write it down as gently or as bluntly as you like.' },
-  { id: 'resentment', label: 'Resentment', prompt: 'Who or what are you still carrying? Put it into words.' },
-  { id: 'overwhelm', label: 'Overwhelm', prompt: 'List everything pressing on you. No order needed.' },
-  { id: 'shame', label: 'Shame', prompt: 'What are you being hard on yourself about?' },
+const RELEASES: { id: Extract<ViewId, 'burn' | 'shred' | 'shed'>; label: string; icon: typeof Flame }[] = [
+  { id: 'burn', label: 'Burn', icon: Flame },
+  { id: 'shred', label: 'Shred', icon: Scissors },
+  { id: 'shed', label: 'Shed', icon: Droplets },
 ];
-
-const CLOSING_LINES = [
-  'That feeling had its moment. You do not have to carry it any further.',
-  'You named it, faced it, and let it go. That is the whole practice.',
-  'Lighter than a few minutes ago. Come back whenever you need to.',
-  'Nothing to fix right now. You made room, and that is enough.',
-];
-
-const RELEASES: { id: ViewId; label: string; icon: typeof Flame; note: string }[] = [
-  { id: 'burn', label: 'Burn it', icon: Flame, note: 'Hot and final' },
-  { id: 'shed', label: 'Shed it', icon: Droplets, note: 'Washed away' },
-  { id: 'shred', label: 'Shred it', icon: Scissors, note: 'Torn to pieces' },
-];
-
-const BREATH_CYCLES = 3;
 
 const PHASE_MS = 4000;
+const RESET_SECONDS = 60;
+const FLOW_LABELS = ['VENT', 'RELEASE', 'RESET', 'CHECK-IN'];
+const RITUAL_JOKES = [
+  "Why don't eggs tell jokes? They'd crack each other up!",
+  'What did the ocean say to the beach? Nothing, it just waved.',
+  "What do you call a bear with no teeth? A gummy bear!",
+  'How do you make a tissue dance? Put a little boogie in it!',
+];
+
+type CheckIn = 'better' | 'same' | 'stressed';
 
 export const Rituals = () => {
   const premium = usePremium();
   const [step, setStep] = useState(0);
-  const [feeling, setFeeling] = useState<typeof FEELINGS[number] | null>(null);
   const [text, setText] = useState('');
   const [phase, setPhase] = useState<'in' | 'out'>('in');
-  const [cycles, setCycles] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(RESET_SECONDS);
   const [muted, setMuted] = useState(false);
-  const [closing] = useState(() => CLOSING_LINES[Math.floor(Math.random() * CLOSING_LINES.length)]);
+  const [joke, setJoke] = useState('');
   const audioRef = useRef<AudioContext | null>(null);
+
+  useEffect(() => {
+    if (consumeRitualReturn()) {
+      setPhase('in');
+      setSecondsLeft(RESET_SECONDS);
+      setStep(2);
+    }
+  }, []);
 
   const getContext = () => {
     if (!audioRef.current) {
@@ -104,29 +104,37 @@ export const Rituals = () => {
     osc.stop(now + seconds);
   };
 
-  // Breathing step timer
   useEffect(() => {
-    if (step !== 2) return;
+    if (step !== 2 && step !== 5) return;
     playBreathCue('in');
-    const timer = setInterval(() => {
+    const phaseTimer = window.setInterval(() => {
       setPhase(prev => {
         const next = prev === 'in' ? 'out' : 'in';
-        if (prev === 'out') setCycles(c => c + 1);
         playBreathCue(next);
         return next;
       });
     }, PHASE_MS);
-    return () => clearInterval(timer);
+    const countdown = window.setInterval(() => {
+      setSecondsLeft(previous => {
+        if (previous <= 1) {
+          window.clearInterval(countdown);
+          window.clearInterval(phaseTimer);
+          setStep(step === 2 ? 3 : 6);
+          return 0;
+        }
+        return previous - 1;
+      });
+    }, 1000);
+    return () => {
+      window.clearInterval(phaseTimer);
+      window.clearInterval(countdown);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, muted]);
 
   useEffect(() => () => {
     audioRef.current?.close().catch(() => undefined);
   }, []);
-
-  useEffect(() => {
-    if (step === 2 && cycles >= BREATH_CYCLES) setStep(3);
-  }, [cycles, step]);
 
   if (!premium.active) {
     return (
@@ -137,12 +145,12 @@ export const Rituals = () => {
           </div>
           <h2 className="text-3xl font-bold text-foreground tracking-tight">Guided Rituals</h2>
           <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
-            A calm, step-by-step release: name the feeling, write it out, breathe, then let it go.
+            Vent, release what is bothering you, reset with one minute of breathing, then check in with yourself.
           </p>
         </div>
         <PremiumLock
           title="Guided Rituals is a Premium feature"
-          description="Walk through a complete release in four gentle steps, with prompts written for what you are feeling."
+          description="Move through a complete release, a one-minute reset, and gentle check-ins."
         />
       </div>
     );
@@ -150,17 +158,34 @@ export const Rituals = () => {
 
   const reset = () => {
     setStep(0);
-    setFeeling(null);
     setText('');
     setPhase('in');
-    setCycles(0);
+    setSecondsLeft(RESET_SECONDS);
+    setJoke('');
   };
 
-  const release = (target: ViewId) => {
+  const release = (target: Extract<ViewId, 'burn' | 'shred' | 'shed'>) => {
+    beginRitualRelease({ type: target, characterCount: Array.from(text).filter(character => !/\s/.test(character)).length });
     setVentText(text);
     navigate(target);
-    reset();
   };
+
+  const beginAnotherBreath = () => {
+    setPhase('in');
+    setSecondsLeft(RESET_SECONDS);
+    setStep(5);
+  };
+
+  const answerFirstCheckIn = (answer: CheckIn) => {
+    if (answer === 'better') setStep(8);
+    else setStep(4);
+  };
+
+  const answerSecondCheckIn = (answer: CheckIn) => {
+    setStep(answer === 'stressed' ? 7 : 8);
+  };
+
+  const flowIndex = step === 0 ? 0 : step === 1 ? 1 : step === 2 || step === 5 ? 2 : 3;
 
   return (
     <div className="h-full overflow-y-auto p-6 space-y-6">
@@ -169,124 +194,134 @@ export const Rituals = () => {
           <Sparkles className="h-8 w-8 text-white drop-shadow-md" />
         </div>
         <h2 className="text-2xl font-bold text-foreground tracking-tight">Guided Ritual</h2>
-        <Progress value={((step + 1) / 5) * 100} className="h-1.5 max-w-xs mx-auto" />
-        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-widest">
-          Step {step + 1} of 5
-        </p>
+        <Progress value={((flowIndex + 1) / FLOW_LABELS.length) * 100} className="h-1.5 max-w-xs mx-auto" />
+        <div className="grid grid-cols-4 gap-1 max-w-xs mx-auto" aria-label="Ritual progress">
+          {FLOW_LABELS.map((label, index) => (
+            <span key={label} className={`text-[10px] font-bold ${index === flowIndex ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
+          ))}
+        </div>
       </div>
 
       {step === 0 && (
-        <Card className="p-6 rounded-2xl shadow-medium space-y-5 animate-fade-in">
-          <h3 className="font-bold text-lg text-foreground">What are you feeling?</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {FEELINGS.map(f => (
-              <button
-                key={f.id}
-                onClick={() => {
-                  setFeeling(f);
-                  setStep(1);
-                }}
-                className="py-4 rounded-2xl border border-border bg-card/60 font-semibold text-foreground transition-all duration-300 hover:bg-primary/10 hover:border-primary hover:scale-[1.03]"
-              >
-                {f.label}
-              </button>
+        <Card className="p-6 rounded-lg shadow-medium space-y-5 animate-fade-in">
+          <div>
+            <p className="text-xs font-bold text-primary">VENT</p>
+            <h3 className="font-bold text-xl text-foreground mt-2">What's bothering you?</h3>
+          </div>
+          <Textarea value={text} onChange={event => setText(event.target.value)} placeholder="Write" className="min-h-[190px] resize-none rounded-lg bg-card text-foreground placeholder:text-muted-foreground text-lg" />
+          <Button disabled={!text.trim()} onClick={() => setStep(1)} className="w-full h-12 font-bold">
+            Continue <ArrowRight className="h-5 w-5" />
+          </Button>
+        </Card>
+      )}
+
+      {step === 1 && (
+        <Card className="p-6 rounded-lg shadow-medium space-y-5 animate-fade-in">
+          <div>
+            <p className="text-xs font-bold text-primary">RELEASE</p>
+            <h3 className="font-bold text-xl text-foreground mt-2">How do you want to let it go?</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {RELEASES.map(({ id, label, icon: Icon }) => (
+              <Button key={id} variant="outline" onClick={() => release(id)} className="h-24 flex-col gap-2 whitespace-normal font-bold">
+                <Icon className="h-6 w-6 text-primary" />{label}
+              </Button>
             ))}
           </div>
+          <p className="text-sm text-center text-muted-foreground">Your full release effect will play, then the ritual will continue.</p>
         </Card>
       )}
 
-      {step === 1 && feeling && (
-        <Card className="p-6 rounded-2xl shadow-medium space-y-5 animate-fade-in">
-          <h3 className="font-bold text-lg text-foreground">{feeling.label}</h3>
-          <p className="text-sm text-muted-foreground font-medium">{feeling.prompt}</p>
-          <Textarea
-            value={text}
-            onChange={e => setText(e.target.value)}
-            placeholder="Write freely. Nobody else will ever read this."
-            className="min-h-[160px] resize-none rounded-2xl bg-card text-foreground placeholder:text-muted-foreground"
-          />
-          <div className="flex gap-3">
-            <Button variant="outline" className="h-12 rounded-2xl px-5" onClick={() => setStep(0)}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <Button
-              disabled={!text.trim()}
-              onClick={() => setStep(2)}
-              className="flex-1 h-12 rounded-2xl bg-gradient-calm text-white font-bold shadow-primary hover:opacity-90"
-            >
-              Next
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+      {(step === 2 || step === 5) && (
+        <Card className="p-7 rounded-lg shadow-medium space-y-6 text-center animate-fade-in">
+          <div>
+            <p className="text-xs font-bold text-primary">RESET</p>
+            <h3 className="font-bold text-xl text-foreground mt-2">Take one minute for yourself.</h3>
           </div>
-        </Card>
-      )}
-
-      {step === 2 && (
-        <Card className="p-8 rounded-2xl shadow-medium space-y-6 text-center animate-fade-in">
-          <h3 className="font-bold text-lg text-foreground">Three slow breaths</h3>
           <div className="flex justify-center">
             <div className="w-36 h-36 rounded-full bg-gradient-zen flex items-center justify-center shadow-zen animate-breathe">
-              <span className="text-white font-bold text-lg drop-shadow-md">
-                {phase === 'in' ? 'Breathe In' : 'Breathe Out'}
+              <span className="text-primary-foreground font-bold text-lg drop-shadow-md">
+                {phase === 'in' ? 'Breathe in...' : 'Breathe out...'}
               </span>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground font-medium">
-            {cycles}/{BREATH_CYCLES} breaths
-          </p>
-          <div className="flex justify-center gap-3">
+          <p className="text-2xl font-bold text-foreground tabular-nums">0:{secondsLeft.toString().padStart(2, '0')}</p>
+          <div className="flex justify-center">
             <Button
               variant="outline"
-              className="h-11 rounded-2xl"
+              size="icon"
               onClick={() => setMuted(m => !m)}
               aria-label={muted ? 'Unmute breathing sound' : 'Mute breathing sound'}
             >
               {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-            </Button>
-            <Button variant="outline" className="h-11 rounded-2xl" onClick={() => setStep(3)}>
-              Skip breathing
             </Button>
           </div>
         </Card>
       )}
 
       {step === 3 && (
-        <Card className="p-6 rounded-2xl shadow-medium space-y-5 animate-fade-in">
-          <h3 className="font-bold text-lg text-foreground">How do you want to let it go?</h3>
-          <div className="space-y-3">
-            {RELEASES.map(({ id, label, icon: Icon, note }) => (
-              <button
-                key={id}
-                onClick={() => {
-                  setStep(4);
-                  setTimeout(() => release(id), 1400);
-                }}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border bg-card/60 transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:scale-[1.02]"
-              >
-                <div className="p-3 rounded-xl bg-muted">
-                  <Icon className="h-6 w-6 text-primary" />
-                </div>
-                <div className="text-left">
-                  <div className="font-bold text-foreground">{label}</div>
-                  <div className="text-sm text-muted-foreground font-medium">{note}</div>
-                </div>
-              </button>
-            ))}
-          </div>
-          <Button variant="outline" className="w-full h-11 rounded-2xl" onClick={() => setStep(1)}>
-            <ArrowLeft className="mr-2 h-5 w-5" />
-            Back to my words
-          </Button>
-        </Card>
+        <CheckInCard title="Feeling a little lighter?" labels={['😌 Yes', '😐 About the same', '😣 Still stressed']} onAnswer={answerFirstCheckIn} />
       )}
 
       {step === 4 && (
-        <Card className="p-8 rounded-2xl shadow-medium space-y-4 text-center animate-fade-in">
-          <Wind className="h-10 w-10 text-primary mx-auto animate-float" />
-          <p className="text-base font-medium text-foreground leading-relaxed">{closing}</p>
-          <p className="text-sm text-muted-foreground font-medium">Taking you to your release…</p>
+        <Card className="p-7 rounded-lg shadow-medium space-y-5 text-center animate-fade-in">
+          <div>
+            <p className="text-xs font-bold text-primary">LET'S TRY SOMETHING ELSE</p>
+            <h3 className="font-bold text-xl text-foreground mt-2">What might help right now?</h3>
+          </div>
+          {joke && <p className="p-5 bg-muted rounded-lg text-foreground font-semibold leading-relaxed">{joke}</p>}
+          <Button onClick={() => setJoke(RITUAL_JOKES[Math.floor(Math.random() * RITUAL_JOKES.length)])} variant="outline" className="w-full h-14 font-bold">
+            <Laugh className="h-5 w-5" /> MAKE ME LAUGH
+          </Button>
+          <Button onClick={beginAnotherBreath} className="w-full h-14 font-bold">
+            <Wind className="h-5 w-5" /> BREATHE AGAIN
+          </Button>
+          {joke && <Button onClick={() => setStep(6)} variant="ghost" className="w-full">Continue to check-in <ArrowRight className="h-4 w-4" /></Button>}
+        </Card>
+      )}
+
+      {step === 6 && (
+        <CheckInCard title="How are you feeling now?" labels={['😌 Better', '😐 Same', '😣 Still stressed']} onAnswer={answerSecondCheckIn} />
+      )}
+
+      {step === 7 && (
+        <Card className="p-8 rounded-lg shadow-medium space-y-5 text-center animate-fade-in">
+          <p className="text-4xl" aria-hidden="true">💛</p>
+          <h3 className="font-bold text-xl text-foreground">You've had a rough day.</h3>
+          <p className="text-base text-muted-foreground leading-relaxed">If you can, step away, get some water, stretch, or take a short walk.</p>
+          <p className="font-semibold text-foreground">Come back when you're ready.</p>
+          <Button onClick={reset} variant="outline" className="w-full"><RotateCcw className="h-4 w-4" /> Start over</Button>
+        </Card>
+      )}
+
+      {step === 8 && (
+        <Card className="p-8 rounded-lg shadow-medium space-y-5 text-center animate-fade-in">
+          <Sparkles className="h-10 w-10 text-primary mx-auto" />
+          <h3 className="font-bold text-xl text-foreground">You made space for yourself.</h3>
+          <p className="text-muted-foreground">Carry that little bit of lightness with you.</p>
+          <Button onClick={reset} variant="outline" className="w-full"><RotateCcw className="h-4 w-4" /> Begin another ritual</Button>
         </Card>
       )}
     </div>
   );
 };
+
+interface CheckInCardProps {
+  title: string;
+  labels: [string, string, string];
+  onAnswer: (answer: CheckIn) => void;
+}
+
+const CheckInCard = ({ title, labels, onAnswer }: CheckInCardProps) => (
+  <Card className="p-7 rounded-lg shadow-medium space-y-5 animate-fade-in">
+    <div className="text-center">
+      <p className="text-xs font-bold text-primary">CHECK-IN</p>
+      <h3 className="font-bold text-xl text-foreground mt-2">{title}</h3>
+    </div>
+    <div className="space-y-3">
+      <Button onClick={() => onAnswer('better')} variant="outline" className="w-full h-14 justify-start text-base">{labels[0]}</Button>
+      <Button onClick={() => onAnswer('same')} variant="outline" className="w-full h-14 justify-start text-base">{labels[1]}</Button>
+      <Button onClick={() => onAnswer('stressed')} variant="outline" className="w-full h-14 justify-start text-base">{labels[2]}</Button>
+    </div>
+  </Card>
+);
