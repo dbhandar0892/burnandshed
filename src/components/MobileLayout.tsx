@@ -39,7 +39,7 @@ export const MobileLayout = () => {
           completeRitualRelease();
           navigate('ritual');
           returnTimerRef.current = null;
-        }, getRitualReleaseDuration(pending));
+        }, getRitualReleaseDuration(pending) + PAUSE_AFTER_RELEASE_MS);
       }
       previous = current;
     });
