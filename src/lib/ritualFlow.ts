@@ -39,6 +39,8 @@ export const consumeRitualReturn = () => {
   return shouldReturn;
 };
 
+export const PAUSE_AFTER_RELEASE_MS = 900;
+
 export const getRitualReleaseDuration = (release: PendingRitualRelease) => {
   if (release.type === 'shed') return 3400;
   if (release.type === 'shred') return 3250;
