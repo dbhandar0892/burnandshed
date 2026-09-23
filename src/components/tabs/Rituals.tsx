@@ -54,7 +54,7 @@ export const Rituals = () => {
       setPhase('in');
       setSecondsLeft(RESET_SECONDS);
       setStep(2);
-    }, 2600);
+    }, 4500);
     return () => window.clearTimeout(timer);
   }, [step]);
 
