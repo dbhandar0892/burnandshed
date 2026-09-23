@@ -13,16 +13,8 @@ import {
   Wind,
   Smile,
   Sparkles,
-  Target,
 } from 'lucide-react';
-import {
-  ActivitySnapshot,
-  ActivityType,
-  getActivitySnapshot,
-  startOfWeek,
-  subscribeActivity,
-  weekIndex,
-} from '@/lib/activity';
+import { ActivitySnapshot, getActivitySnapshot, subscribeActivity } from '@/lib/activity';
 
 interface BadgeDef {
   id: string;
@@ -120,73 +112,8 @@ const featureBadges: BadgeDef[] = [
   },
 ];
 
-interface Challenge {
-  title: string;
-  description: string;
-  target: number;
-  types: ActivityType[];
-}
-
-const weeklyChallenges: Challenge[] = [
-  {
-    title: 'Three Releases',
-    description: 'Burn, shed, or shred 3 notes this week',
-    target: 3,
-    types: ['burn', 'shed', 'shred'],
-  },
-  {
-    title: 'Breathing Room',
-    description: 'Finish 2 breathing resets this week',
-    target: 2,
-    types: ['breathe'],
-  },
-  {
-    title: 'Fire Week',
-    description: 'Burn 3 notes this week',
-    target: 3,
-    types: ['burn'],
-  },
-  {
-    title: 'Laugh It Off',
-    description: 'Read 5 jokes this week',
-    target: 5,
-    types: ['laugh'],
-  },
-  {
-    title: 'Mix It Up',
-    description: 'Use 4 tools or sessions this week, any kind',
-    target: 4,
-    types: ['burn', 'shed', 'shred', 'breathe', 'laugh'],
-  },
-  {
-    title: 'Shred Day',
-    description: 'Shred 3 notes this week',
-    target: 3,
-    types: ['shred'],
-  },
-  {
-    title: 'Wash It Away',
-    description: 'Shed 3 notes this week',
-    target: 3,
-    types: ['shed'],
-  },
-];
-
 export const LetGoTracker = () => {
   const stats = useSyncExternalStore(subscribeActivity, getActivitySnapshot, getActivitySnapshot);
-
-  const weekStart = startOfWeek().getTime();
-  const challenge = weeklyChallenges[weekIndex() % weeklyChallenges.length];
-  const challengeProgress = Math.min(
-    challenge.types.reduce((sum, type) => sum + stats.week[type], 0),
-    challenge.target,
-  );
-  const challengeDone = challengeProgress >= challenge.target;
-
-  const daysLeft = Math.max(
-    1,
-    7 - Math.floor((Date.now() - weekStart) / (1000 * 60 * 60 * 24)),
-  );
 
   const getStreakMessage = () => {
     if (stats.releases === 0) return 'Ready to start your journey?';
@@ -301,43 +228,6 @@ export const LetGoTracker = () => {
         </div>
       </div>
 
-      {/* Weekly challenge */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-bold text-foreground tracking-tight">This Week's Challenge</h3>
-        <Card
-          className={`p-6 rounded-2xl border transition-all duration-300 ${
-            challengeDone
-              ? 'bg-gradient-success text-white border-success/30 shadow-success'
-              : 'bg-gradient-to-br from-card to-muted/30 border-border/50 shadow-medium'
-          }`}
-        >
-          <div className="flex items-start space-x-4">
-            <div className={`p-3 rounded-xl ${challengeDone ? 'bg-white/20' : 'bg-muted'}`}>
-              <Target className={`h-7 w-7 ${challengeDone ? 'text-white' : 'text-primary'}`} />
-            </div>
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center space-x-2">
-                <h4 className={`font-bold text-base ${challengeDone ? 'text-white' : 'text-foreground'}`}>
-                  {challenge.title}
-                </h4>
-                {challengeDone && (
-                  <Badge variant="secondary" className="text-xs font-bold">
-                    ✓ Complete
-                  </Badge>
-                )}
-              </div>
-              <p className={`text-sm font-medium ${challengeDone ? 'text-white/90' : 'text-muted-foreground'}`}>
-                {challenge.description}
-              </p>
-              <Progress value={(challengeProgress / challenge.target) * 100} className="h-2" />
-              <p className={`text-xs font-medium ${challengeDone ? 'text-white/80' : 'text-muted-foreground'}`}>
-                {challengeProgress}/{challenge.target} · {daysLeft} day{daysLeft === 1 ? '' : 's'} left
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
       <div className="space-y-4">
         <h3 className="text-xl font-bold text-foreground tracking-tight">Milestones</h3>
         <div className="grid grid-cols-1 gap-4">{milestoneBadges.map(renderBadge)}</div>
@@ -350,7 +240,7 @@ export const LetGoTracker = () => {
 
       <div className="text-center mt-auto pt-4">
         <p className="text-sm text-muted-foreground font-medium">
-          🌟 Badges are yours forever — challenges refresh every Monday
+          🌟 Badges are yours forever
         </p>
       </div>
     </div>
