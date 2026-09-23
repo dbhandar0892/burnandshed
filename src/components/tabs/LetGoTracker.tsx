@@ -244,6 +244,11 @@ export const LetGoTracker = () => {
         </div>
       </div>
 
+      <div className="flex-1 space-y-4">
+        <h3 className="text-xl font-bold text-foreground tracking-tight">Explorer Badges</h3>
+        <div className="grid grid-cols-1 gap-4">{featureBadges.map(renderBadge)}</div>
+      </div>
+
       <div className="space-y-4">
         <h3 className="text-xl font-bold text-foreground tracking-tight">
           This Month{' '}
@@ -272,7 +277,11 @@ export const LetGoTracker = () => {
           </div>
           <p className="text-xs text-muted-foreground text-center mt-4">Resets on the 1st of each month. Lifetime totals above never reset.</p>
         </Card>
+        <p className="text-center text-base text-primary font-semibold leading-relaxed px-4">
+          {monthlyMessage()}
+        </p>
       </div>
+
 
       <div className="space-y-4">
         <h3 className="text-xl font-bold text-foreground tracking-tight">Milestones</h3>
