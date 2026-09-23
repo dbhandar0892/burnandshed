@@ -364,6 +364,15 @@ export const Rituals = () => {
           <Button onClick={reset} variant="outline" className="w-full"><RotateCcw className="h-4 w-4" /> Begin another ritual</Button>
         </Card>
       )}
+
+      {step === 11 && (
+        <Card className="p-8 rounded-lg shadow-medium space-y-5 text-center animate-fade-in">
+          <p className="text-4xl" aria-hidden="true">💛</p>
+          <h3 className="font-bold text-xl text-foreground leading-snug">Sometimes letting it out is enough for now.</h3>
+          <p className="text-muted-foreground leading-relaxed">You don't have to feel better all at once.</p>
+          <Button onClick={reset} variant="outline" className="w-full"><RotateCcw className="h-4 w-4" /> Begin another ritual</Button>
+        </Card>
+      )}
     </div>
   );
 };
