@@ -238,6 +238,36 @@ export const LetGoTracker = () => {
       </div>
 
       <div className="space-y-4">
+        <h3 className="text-xl font-bold text-foreground tracking-tight">
+          This Month{' '}
+          <span className="text-sm font-medium text-muted-foreground">
+            ({new Date().toLocaleString(undefined, { month: 'long', year: 'numeric' })})
+          </span>
+        </h3>
+        <Card className="p-5 border-border/50 shadow-medium rounded-2xl">
+          <div className="text-center mb-4">
+            <div className="text-4xl font-bold text-primary">{stats.month.releases}</div>
+            <div className="text-sm font-bold text-foreground">Releases this month</div>
+          </div>
+          <div className="grid grid-cols-5 gap-2 text-center">
+            {[
+              ['Burned', stats.month.burn],
+              ['Shed', stats.month.shed],
+              ['Shredded', stats.month.shred],
+              ['Breaths', stats.month.breathe],
+              ['Laughs', stats.month.laugh],
+            ].map(([label, n]) => (
+              <div key={label as string}>
+                <div className="text-xl font-bold text-foreground">{n}</div>
+                <div className="text-[10px] font-semibold text-muted-foreground">{label}</div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground text-center mt-4">Resets on the 1st of each month. Lifetime totals above never reset.</p>
+        </Card>
+      </div>
+
+      <div className="space-y-4">
         <h3 className="text-xl font-bold text-foreground tracking-tight">Milestones</h3>
         <div className="grid grid-cols-1 gap-4">{milestoneBadges.map(renderBadge)}</div>
       </div>
