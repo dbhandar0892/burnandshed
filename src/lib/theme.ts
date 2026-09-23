@@ -2,18 +2,14 @@ import { useSyncExternalStore } from 'react';
 import { getPremium, subscribePremium } from './premium';
 
 export type ThemeMode = 'light' | 'dark';
-export type Palette = 'violet' | 'ember' | 'ocean' | 'forest';
+export type Palette = 'violet';
 
 export const PALETTES: { id: Palette; label: string; swatch: string; premium: boolean }[] = [
   { id: 'violet', label: 'Violet', swatch: 'hsl(250 75% 62%)', premium: false },
-  { id: 'ember', label: 'Ember', swatch: 'hsl(18 88% 52%)', premium: true },
-  { id: 'ocean', label: 'Ocean', swatch: 'hsl(196 78% 45%)', premium: true },
-  { id: 'forest', label: 'Forest', swatch: 'hsl(158 55% 38%)', premium: true },
 ];
 
 const MODE_KEY = 'themeMode';
 const PALETTE_KEY = 'themePalette';
-const RITUAL_PALETTE_MIGRATION_KEY = 'ritualPaletteMigrationDone';
 
 interface ThemeState {
   mode: ThemeMode;
@@ -29,14 +25,11 @@ const read = (): ThemeState => ({
 });
 
 export const applyTheme = () => {
-  if (!localStorage.getItem(RITUAL_PALETTE_MIGRATION_KEY)) {
-    localStorage.setItem(PALETTE_KEY, 'violet');
-    localStorage.setItem(RITUAL_PALETTE_MIGRATION_KEY, '1');
-  }
+  localStorage.setItem(PALETTE_KEY, 'violet');
   const stored = read();
   const premium = getPremium().active;
   const mode = premium ? stored.mode : 'light';
-  const palette = premium ? stored.palette : 'violet';
+  const palette: Palette = 'violet';
 
   const root = document.documentElement;
   root.classList.toggle('dark', mode === 'dark');

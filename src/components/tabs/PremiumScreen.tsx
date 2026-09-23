@@ -11,13 +11,13 @@ import {
   TRIAL_LENGTH_DAYS,
   usePremium,
 } from '@/lib/premium';
-import { PALETTES, setPalette, setThemeMode, useTheme } from '@/lib/theme';
+import { setThemeMode, useTheme } from '@/lib/theme';
 
 const PREMIUM_FEATURES = [
   'All 6 breathing sounds — Ambient, Ocean, Rain, Fire, Forest, Deep Hum',
   'Guided Rituals — step-by-step release sessions',
   'All milestone and explorer badges in the tracker',
-  'Dark mode and colour themes',
+  'Light and dark appearance themes',
   'No ads, ever',
 ];
 
@@ -131,32 +131,11 @@ export const PremiumScreen = () => {
             })}
           </div>
 
-          <div className="grid grid-cols-4 gap-3">
-            {PALETTES.map(p => {
-              const selected = theme.palette === p.id && premium.active;
-              return (
-                <button
-                  key={p.id}
-                  disabled={!premium.active}
-                  onClick={() => setPalette(p.id)}
-                  className={`flex flex-col items-center gap-2 py-3 rounded-2xl border transition-all duration-300 ${
-                    selected ? 'border-primary bg-primary/10' : 'border-border bg-card/60'
-                  }`}
-                >
-                  <span
-                    className="h-7 w-7 rounded-full shadow-soft"
-                    style={{ background: p.swatch }}
-                  />
-                  <span className="text-[11px] font-semibold text-muted-foreground">{p.label}</span>
-                </button>
-              );
-            })}
-          </div>
         </Card>
 
         {!premium.active && (
           <p className="text-xs text-center text-muted-foreground font-medium">
-            Dark mode and colour themes unlock with Premium.
+            Light and dark appearance themes unlock with Premium.
           </p>
         )}
       </div>
