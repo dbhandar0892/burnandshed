@@ -30,13 +30,21 @@ type CheckIn = 'better' | 'same' | 'stressed';
 
 export const Rituals = () => {
   const premium = usePremium();
-  const [step, setStep] = useState(() => consumeRitualReturn() ? 2 : 0);
+  const [step, setStep] = useState(0);
   const [text, setText] = useState('');
   const [phase, setPhase] = useState<'in' | 'out'>('in');
   const [secondsLeft, setSecondsLeft] = useState(RESET_SECONDS);
   const [muted, setMuted] = useState(false);
   const [joke, setJoke] = useState('');
   const audioRef = useRef<AudioContext | null>(null);
+
+  useEffect(() => {
+    if (consumeRitualReturn()) {
+      setPhase('in');
+      setSecondsLeft(RESET_SECONDS);
+      setStep(2);
+    }
+  }, []);
 
   const getContext = () => {
     if (!audioRef.current) {
