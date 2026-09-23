@@ -132,6 +132,13 @@ export const LetGoTracker = () => {
     return "You're a master of letting go!";
   };
 
+  const monthlyMessage = () => {
+    const n = stats.month.releases;
+    if (n === 0) return 'A fresh month is waiting for you.';
+    if (n === 1) return 'You gave yourself 1 chance to let go.';
+    return `You gave yourself ${n} chances to let go.`;
+  };
+
   const renderBadge = (badge: BadgeDef) => {
     const Icon = badge.icon;
     const current = Math.min(badge.progress(stats), badge.requirement);
