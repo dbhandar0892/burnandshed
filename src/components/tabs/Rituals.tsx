@@ -11,6 +11,7 @@ import { navigate, ViewId } from '@/lib/nav';
 import { beginRitualRelease, consumeRitualReturn } from '@/lib/ritualFlow';
 import { nextJoke } from '@/lib/jokes';
 import { logActivity } from '@/lib/activity';
+import { SOUNDS, SoundHandle, SoundId, createSoundscape, stopSoundscape } from '@/lib/soundscapes';
 
 const RELEASES: { id: Extract<ViewId, 'burn' | 'shred' | 'shed'>; label: string; icon: typeof Flame }[] = [
   { id: 'burn', label: 'Burn', icon: Flame },
@@ -32,8 +33,10 @@ export const Rituals = () => {
   const [secondsLeft, setSecondsLeft] = useState(RESET_SECONDS);
   const [muted, setMuted] = useState(false);
   const [joke, setJoke] = useState('');
+  const [soundChoice, setSoundChoice] = useState<SoundId>('pad');
   const audioRef = useRef<AudioContext | null>(null);
   const breathCueRef = useRef<{ noise: AudioBufferSourceNode; tone: OscillatorNode; master: GainNode } | null>(null);
+  const scapeRef = useRef<SoundHandle | null>(null);
 
   useEffect(() => {
     if (consumeRitualReturn()) {
