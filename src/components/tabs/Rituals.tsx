@@ -177,7 +177,9 @@ export const Rituals = () => {
 
   useEffect(() => () => {
     stopBreathCue();
+    stopScape();
     audioRef.current?.close().catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!premium.active) {
@@ -323,6 +325,22 @@ export const Rituals = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-foreground tabular-nums">0:{secondsLeft.toString().padStart(2, '0')}</p>
+          <div className="space-y-2">
+            <p className="text-xs font-bold text-muted-foreground">SOUND</p>
+            <div className="grid grid-cols-3 gap-2">
+              {SOUNDS.map(({ id, label, icon: Icon }) => (
+                <Button
+                  key={id}
+                  variant={soundChoice === id ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSoundChoice(id)}
+                  className="flex-col gap-1 h-14 text-[11px] font-bold"
+                >
+                  <Icon className="h-4 w-4" />{label}
+                </Button>
+              ))}
+            </div>
+          </div>
           <div className="flex justify-center">
             <Button
               variant="outline"
