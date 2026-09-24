@@ -42,11 +42,12 @@ export const BreathingReset = () => {
   // Soundscape control — restarts when sound choice changes
   useEffect(() => {
     if (isActive && musicEnabled) {
-      soundHandleRef.current = createSoundscape(audioContextRef, sound, volume);
+      if (!audioContextRef.current) audioContextRef.current = new AudioContext();
+      soundHandleRef.current = createSoundscape(audioContextRef.current, sound, volume);
     }
 
     return () => {
-      stopSoundscape(audioContextRef, soundHandleRef.current);
+      stopSoundscape(audioContextRef.current, soundHandleRef.current);
       soundHandleRef.current = null;
     };
   }, [isActive, musicEnabled, sound]);
