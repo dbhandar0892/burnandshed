@@ -11,6 +11,7 @@ import { navigate, ViewId } from '@/lib/nav';
 import { beginRitualRelease, consumeRitualReturn } from '@/lib/ritualFlow';
 import { nextJoke } from '@/lib/jokes';
 import { logActivity } from '@/lib/activity';
+import { SOUNDS, SoundHandle, SoundId, createSoundscape, stopSoundscape } from '@/lib/soundscapes';
 
 const RELEASES: { id: Extract<ViewId, 'burn' | 'shred' | 'shed'>; label: string; icon: typeof Flame }[] = [
   { id: 'burn', label: 'Burn', icon: Flame },
@@ -32,8 +33,10 @@ export const Rituals = () => {
   const [secondsLeft, setSecondsLeft] = useState(RESET_SECONDS);
   const [muted, setMuted] = useState(false);
   const [joke, setJoke] = useState('');
+  const [soundChoice, setSoundChoice] = useState<SoundId>('pad');
   const audioRef = useRef<AudioContext | null>(null);
   const breathCueRef = useRef<{ noise: AudioBufferSourceNode; tone: OscillatorNode; master: GainNode } | null>(null);
+  const scapeRef = useRef<SoundHandle | null>(null);
 
   useEffect(() => {
     if (consumeRitualReturn()) {
@@ -126,6 +129,22 @@ export const Rituals = () => {
     breathCueRef.current = { noise, tone: osc, master };
   };
 
+  const stopScape = () => {
+    stopSoundscape(audioRef.current, scapeRef.current);
+    scapeRef.current = null;
+  };
+
+  // Ambient soundscape under the breathing exercise — restarts when the
+  // picked sound changes, silenced by the mute button
+  useEffect(() => {
+    if ((step === 2 || step === 5) && !muted) {
+      const ctx = getContext();
+      if (ctx) scapeRef.current = createSoundscape(ctx, soundChoice, 0.7);
+    }
+    return () => stopScape();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, muted, soundChoice]);
+
   useEffect(() => {
     if (step !== 2 && step !== 5) return;
     playBreathCue('in');
@@ -158,7 +177,9 @@ export const Rituals = () => {
 
   useEffect(() => () => {
     stopBreathCue();
+    stopScape();
     audioRef.current?.close().catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!premium.active) {
@@ -304,6 +325,22 @@ export const Rituals = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-foreground tabular-nums">0:{secondsLeft.toString().padStart(2, '0')}</p>
+          <div className="space-y-2">
+            <p className="text-xs font-bold text-muted-foreground">SOUND</p>
+            <div className="grid grid-cols-3 gap-2">
+              {SOUNDS.map(({ id, label, icon: Icon }) => (
+                <Button
+                  key={id}
+                  variant={soundChoice === id ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSoundChoice(id)}
+                  className="flex-col gap-1 h-14 text-[11px] font-bold"
+                >
+                  <Icon className="h-4 w-4" />{label}
+                </Button>
+              ))}
+            </div>
+          </div>
           <div className="flex justify-center">
             <Button
               variant="outline"
