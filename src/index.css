@@ -39,6 +39,8 @@ All colors MUST be HSL.
     --fire: 20 100% 58%;
     --fire-foreground: 0 0% 100%;
     --fire-glow: 35 100% 60%;
+    --burn-stage-background: 225 18% 7%;
+    --burn-stage-foreground: 0 0% 96%;
 
     /* Enhanced breathing/zen colors */
     --zen: 195 70% 60%;
@@ -236,8 +238,8 @@ All colors MUST be HSL.
   }
 
   .burn-stage {
-    background: hsl(var(--foreground));
-    color: hsl(var(--primary-foreground));
+    background: hsl(var(--burn-stage-background));
+    color: hsl(var(--burn-stage-foreground));
   }
 
   .burn-message {
