@@ -129,6 +129,22 @@ export const Rituals = () => {
     breathCueRef.current = { noise, tone: osc, master };
   };
 
+  const stopScape = () => {
+    stopSoundscape(audioRef.current, scapeRef.current);
+    scapeRef.current = null;
+  };
+
+  // Ambient soundscape under the breathing exercise — restarts when the
+  // picked sound changes, silenced by the mute button
+  useEffect(() => {
+    if ((step === 2 || step === 5) && !muted) {
+      const ctx = getContext();
+      if (ctx) scapeRef.current = createSoundscape(ctx, soundChoice, 0.7);
+    }
+    return () => stopScape();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, muted, soundChoice]);
+
   useEffect(() => {
     if (step !== 2 && step !== 5) return;
     playBreathCue('in');
