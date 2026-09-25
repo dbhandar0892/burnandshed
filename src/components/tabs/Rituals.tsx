@@ -250,6 +250,7 @@ export const Rituals = () => {
   };
 
   const flowIndex = step === 0 ? 0 : step === 1 ? 1 : step === 2 || step === 5 || step === 9 ? 2 : 3;
+  const [jokeQuestion, jokeAnswer] = splitJoke(joke);
 
   return (
     <div className="ritual-theme h-full overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-background to-primary/5">
@@ -376,7 +377,12 @@ export const Rituals = () => {
       {step === 10 && (
         <Card className="p-7 rounded-lg shadow-medium space-y-5 text-center animate-fade-in">
           <div className="text-6xl animate-float" aria-hidden="true">😄</div>
-          <p className="p-5 bg-muted rounded-lg text-foreground font-semibold leading-relaxed text-lg">{joke}</p>
+          <div className="p-5 bg-muted rounded-lg space-y-2">
+            <p className="text-foreground font-semibold leading-relaxed text-lg">{jokeQuestion}</p>
+            {jokeAnswer && (
+              <p className="text-muted-foreground font-semibold leading-relaxed text-lg">{jokeAnswer}</p>
+            )}
+          </div>
           <Button onClick={showNextJoke} variant="outline" className="w-full h-14 font-bold">
             <RefreshCw className="h-5 w-5" /> Next Joke
           </Button>
