@@ -5,6 +5,7 @@ import { Droplets } from 'lucide-react';
 import { toast } from 'sonner';
 import { setVentText, useVentText } from '@/lib/ventText';
 import { logActivity } from '@/lib/activity';
+import { segmentText } from '@/lib/textSegments';
 
 const WAVE_MS = 2400;
 const CHAR_FADE_MS = 900;
@@ -102,6 +103,8 @@ export const ShedIt = () => {
     return delays;
   }, [text]);
 
+  const textSegments = useMemo(() => segmentText(text), [text]);
+
   useEffect(() => () => {
     timerRefs.current.forEach(window.clearTimeout);
     audioContextRef.current?.close().catch(() => undefined);
@@ -158,20 +161,21 @@ export const ShedIt = () => {
         ) : (
           <div className="wash-stage min-h-[200px]" aria-live="polite">
             <div className="wash-message text-2xl leading-relaxed whitespace-pre-wrap">
-              {Array.from(text).map((character, index) => {
-                const delay = charDelays.get(index);
-
-                if (/\s/.test(character)) {
-                  return character === '\n' ? <br key={index} /> : <span key={index}> </span>;
-                }
+              {textSegments.map((segment) => {
+                if (segment.type === 'break') return <br key={`break-${segment.index}`} />;
+                if (segment.type === 'space') return <span key={`space-${segment.index}`}>{segment.text}</span>;
 
                 return (
-                  <span
-                    key={index}
-                    className="wash-character"
-                    style={{ '--wash-delay': `${delay ?? 0}ms` } as React.CSSProperties}
-                  >
-                    <span className="wash-glyph">{character}</span>
+                  <span className="release-word" key={`word-${segment.characters[0]?.index ?? 0}`}>
+                    {segment.characters.map(({ character, index }) => (
+                      <span
+                        key={index}
+                        className="wash-character"
+                        style={{ '--wash-delay': `${charDelays.get(index) ?? 0}ms` } as React.CSSProperties}
+                      >
+                        <span className="wash-glyph">{character}</span>
+                      </span>
+                    ))}
                   </span>
                 );
               })}

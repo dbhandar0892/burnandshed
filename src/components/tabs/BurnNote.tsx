@@ -5,6 +5,7 @@ import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
 import { setVentText, useVentText } from '@/lib/ventText';
 import { logActivity } from '@/lib/activity';
+import { segmentText } from '@/lib/textSegments';
 
 const IGNITER_MS = 1500;
 const IGNITER_LETTER_INTERVAL = 55;
@@ -91,11 +92,14 @@ export const BurnNote = () => {
   }, [text]);
 
   const finalCharacterIndex = useMemo(() => {
-    for (let index = text.length - 1; index >= 0; index -= 1) {
-      if (!/\s/.test(text[index])) return index;
+    const characters = Array.from(text);
+    for (let index = characters.length - 1; index >= 0; index -= 1) {
+      if (!/\s/.test(characters[index])) return index;
     }
     return -1;
   }, [text]);
+
+  const textSegments = useMemo(() => segmentText(text), [text]);
 
   useEffect(() => {
     if (!isBurning || !burnAreaRef.current || !lastCharacterRef.current) return;
@@ -225,31 +229,35 @@ export const BurnNote = () => {
             )}
 
             <div className="burn-message text-2xl leading-relaxed whitespace-pre-wrap" aria-live="polite">
-              {Array.from(text).map((character, index) => {
-                const rank = burnOrder.get(index);
-                const isWhitespace = /\s/.test(character);
-                const delay = rank === undefined ? 0 : MATCH_SEQUENCE_MS + rank * LETTER_INTERVAL_MS;
-
-                if (isWhitespace) {
-                  return character === '\n' ? <br key={index} /> : <span key={index}> </span>;
-                }
+              {textSegments.map((segment) => {
+                if (segment.type === 'break') return <br key={`break-${segment.index}`} />;
+                if (segment.type === 'space') return <span key={`space-${segment.index}`}>{segment.text}</span>;
 
                 return (
-                  <span
-                    key={index}
-                    ref={index === finalCharacterIndex ? lastCharacterRef : undefined}
-                    className="burn-character"
-                    style={{ '--burn-delay': `${delay}ms` } as React.CSSProperties}
-                  >
-                    <span className="burn-character-flame" aria-hidden="true">
-                      <span className="burn-character-flame-outer" />
-                      <span className="burn-character-flame-middle" />
-                      <span className="burn-character-flame-core" />
-                    </span>
-                    <span className="burn-ember burn-ember-one" aria-hidden="true" />
-                    <span className="burn-ember burn-ember-two" aria-hidden="true" />
-                    <span className="burn-smoke" aria-hidden="true" />
-                    <span className="burn-glyph">{character}</span>
+                  <span className="release-word" key={`word-${segment.characters[0]?.index ?? 0}`}>
+                    {segment.characters.map(({ character, index }) => {
+                      const rank = burnOrder.get(index);
+                      const delay = rank === undefined ? 0 : MATCH_SEQUENCE_MS + rank * LETTER_INTERVAL_MS;
+
+                      return (
+                        <span
+                          key={index}
+                          ref={index === finalCharacterIndex ? lastCharacterRef : undefined}
+                          className="burn-character"
+                          style={{ '--burn-delay': `${delay}ms` } as React.CSSProperties}
+                        >
+                          <span className="burn-character-flame" aria-hidden="true">
+                            <span className="burn-character-flame-outer" />
+                            <span className="burn-character-flame-middle" />
+                            <span className="burn-character-flame-core" />
+                          </span>
+                          <span className="burn-ember burn-ember-one" aria-hidden="true" />
+                          <span className="burn-ember burn-ember-two" aria-hidden="true" />
+                          <span className="burn-smoke" aria-hidden="true" />
+                          <span className="burn-glyph">{character}</span>
+                        </span>
+                      );
+                    })}
                   </span>
                 );
               })}

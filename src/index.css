@@ -245,6 +245,13 @@ All colors MUST be HSL.
   .burn-message {
     position: relative;
     z-index: 2;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .release-word {
+    display: inline-block;
+    white-space: nowrap;
   }
 
   .burn-character {
@@ -551,7 +558,9 @@ All colors MUST be HSL.
   line-height: 1.35;
   text-align: left;
   overflow: hidden;
-  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: normal;
+  word-break: normal;
   animation: shredder-feed-in var(--shred-duration, 2600ms) linear forwards;
 }
 
@@ -640,7 +649,9 @@ All colors MUST be HSL.
   font-size: 0.95rem;
   line-height: 1.35;
   text-align: left;
-  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: normal;
+  word-break: normal;
   box-shadow: 1px 0 0 hsl(0 0% 0% / 0.25);
   -webkit-mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
   mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
@@ -691,7 +702,8 @@ All colors MUST be HSL.
   position: relative;
   z-index: 2;
   color: #fff;
-  word-break: break-word;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .wash-character {
