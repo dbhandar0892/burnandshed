@@ -107,6 +107,14 @@ export const JOKES: string[] = [
 
 const DECK_KEY = 'jokeDeck';
 
+// Splits a joke into its question (setup) and answer (punchline) lines.
+// Jokes without a question (plain one-liners) stay on a single line.
+export const splitJoke = (joke: string): [string, string | null] => {
+  const mark = joke.indexOf('? ');
+  if (mark === -1) return [joke, null];
+  return [joke.slice(0, mark + 1), joke.slice(mark + 2)];
+};
+
 const shuffle = (values: number[]): number[] => {
   const copy = [...values];
   for (let i = copy.length - 1; i > 0; i -= 1) {

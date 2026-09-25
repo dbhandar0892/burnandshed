@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { logActivity } from '@/lib/activity';
-import { nextJoke } from '@/lib/jokes';
+import { nextJoke, splitJoke } from '@/lib/jokes';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Laugh, RefreshCw } from 'lucide-react';

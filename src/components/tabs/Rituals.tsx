@@ -9,7 +9,7 @@ import { PremiumLock } from '@/components/PremiumLock';
 import { setVentText } from '@/lib/ventText';
 import { navigate, ViewId } from '@/lib/nav';
 import { beginRitualRelease, consumeRitualReturn } from '@/lib/ritualFlow';
-import { nextJoke } from '@/lib/jokes';
+import { nextJoke, splitJoke } from '@/lib/jokes';
 import { logActivity } from '@/lib/activity';
 import { SOUNDS, SoundHandle, SoundId, createSoundscape, stopSoundscape } from '@/lib/soundscapes';
 
