@@ -8,7 +8,6 @@ import { LetGoTracker } from './tabs/LetGoTracker';
 import { Rituals } from './tabs/Rituals';
 import { PremiumScreen } from './tabs/PremiumScreen';
 import { navigate, useView, ViewId } from '@/lib/nav';
-import { usePremium } from '@/lib/premium';
 import { useEffect, useRef } from 'react';
 import { getActivitySnapshot, subscribeActivity } from '@/lib/activity';
 import { completeRitualRelease, getPendingRitualRelease, getRitualReleaseDuration } from '@/lib/ritualFlow';
