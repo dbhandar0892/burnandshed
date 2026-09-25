@@ -32,7 +32,7 @@ export const Rituals = () => {
   const [text, setText] = useState('');
   const [phase, setPhase] = useState<'in' | 'out'>('in');
   const [secondsLeft, setSecondsLeft] = useState(RESET_SECONDS);
-  const [muted, setMuted] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
   const [joke, setJoke] = useState('');
   const [soundChoice, setSoundChoice] = useState<SoundId>('pad');
   const audioRef = useRef<AudioContext | null>(null);
@@ -78,7 +78,7 @@ export const Rituals = () => {
 
   // Soft breath cue: rising airy swell on inhale, falling on exhale
   const playBreathCue = (dir: 'in' | 'out') => {
-    if (muted) return;
+    if (!soundOn) return;
     stopBreathCue();
     const ctx = getContext();
     if (!ctx) return;
@@ -129,16 +129,16 @@ export const Rituals = () => {
     scapeRef.current = null;
   };
 
-  // Ambient soundscape under the breathing exercise — restarts when the
-  // picked sound changes, silenced by the mute button
+  // Ambient soundscape under the breathing exercise — only plays after the
+  // user taps the play button, and restarts when the picked sound changes
   useEffect(() => {
-    if ((step === 2 || step === 5) && !muted) {
+    if ((step === 2 || step === 5) && soundOn) {
       const ctx = getContext();
       if (ctx) scapeRef.current = createSoundscape(ctx, soundChoice, 0.7);
     }
     return () => stopScape();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, muted, soundChoice]);
+  }, [step, soundOn, soundChoice]);
 
   useEffect(() => {
     if (step !== 2 && step !== 5) return;
@@ -168,7 +168,7 @@ export const Rituals = () => {
       stopBreathCue();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, muted]);
+  }, [step, soundOn]);
 
   useEffect(() => () => {
     stopBreathCue();
@@ -338,12 +338,13 @@ export const Rituals = () => {
           </div>
           <div className="flex justify-center">
             <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setMuted(m => !m)}
-              aria-label={muted ? 'Unmute breathing sound' : 'Mute breathing sound'}
+              variant={soundOn ? 'default' : 'outline'}
+              onClick={() => setSoundOn(on => !on)}
+              className="w-full max-w-xs h-12 font-bold rounded-2xl"
+              aria-label={soundOn ? 'Stop breathing sound' : 'Play breathing sound'}
             >
-              {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+              {soundOn ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+              {soundOn ? 'Sound on — tap to stop' : 'Play breathing sound'}
             </Button>
           </div>
         </Card>
