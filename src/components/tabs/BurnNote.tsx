@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
-import { consumeVentText } from '@/lib/ventText';
+import { clearVentText, peekVentText } from '@/lib/ventText';
 import { logActivity } from '@/lib/activity';
 import { segmentText } from '@/lib/textSegments';
 
@@ -68,7 +68,9 @@ const playMatchAndFire = (fireDuration: number, startDelaySeconds = 0) => {
 };
 
 export const BurnNote = () => {
-  const [text, setText] = useState(() => consumeVentText() ?? '');
+  const [text, setText] = useState(() => peekVentText() ?? '');
+  // The ritual handed its words over once — drop them so they never resurface.
+  useEffect(() => { clearVentText(); }, []);
   const [igniterActive, setIgniterActive] = useState(false);
   const [isBurning, setIsBurning] = useState(false);
   const [animationReady, setAnimationReady] = useState(false);
