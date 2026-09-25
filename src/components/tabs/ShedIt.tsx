@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Droplets } from 'lucide-react';
 import { toast } from 'sonner';
-import { consumeVentText } from '@/lib/ventText';
+import { clearVentText, peekVentText } from '@/lib/ventText';
 import { logActivity } from '@/lib/activity';
 import { segmentText } from '@/lib/textSegments';
 
@@ -82,7 +82,9 @@ const playWashSound = (durationMs: number) => {
 };
 
 export const ShedIt = () => {
-  const [text, setText] = useState(() => consumeVentText() ?? '');
+  const [text, setText] = useState(() => peekVentText() ?? '');
+  // The ritual handed its words over once — drop them so they never resurface.
+  useEffect(() => { clearVentText(); }, []);
   const [isWashing, setIsWashing] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const timerRefs = useRef<number[]>([]);

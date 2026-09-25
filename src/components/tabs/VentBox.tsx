@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Scissors } from 'lucide-react';
 import { toast } from 'sonner';
-import { consumeVentText } from '@/lib/ventText';
+import { clearVentText, peekVentText } from '@/lib/ventText';
 import { logActivity } from '@/lib/activity';
 
 const SHRED_DURATION_MS = 2800;
@@ -90,7 +90,9 @@ const playShredSound = (duration: number) => {
 };
 
 export const VentBox = () => {
-  const [text, setText] = useState(() => consumeVentText() ?? '');
+  const [text, setText] = useState(() => peekVentText() ?? '');
+  // The ritual handed its words over once — drop them so they never resurface.
+  useEffect(() => { clearVentText(); }, []);
   const [isShedding, setIsShedding] = useState(false);
   const audioContextRef = useRef<{ audioContext: AudioContext; sources: AudioBufferSourceNode[] } | null>(null);
 
