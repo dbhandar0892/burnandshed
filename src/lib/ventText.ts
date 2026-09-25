@@ -1,23 +1,14 @@
-import { useSyncExternalStore } from 'react';
-
-// Shared text between Burn It Note and Vent Box so the same message
-// can be burned or shredded from either screen.
-let ventText = '';
-const listeners = new Set<() => void>();
-
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-};
-
-const getSnapshot = () => ventText;
+// One-time handoff of vented text from the Guided Ritual to the chosen
+// release tab (Burn / Shed / Shred). Text is NOT shared between tabs —
+// each tab keeps its own private text, and a handoff is consumed once.
+let pendingText: string | null = null;
 
 export const setVentText = (next: string) => {
-  if (ventText === next) return;
-  ventText = next;
-  listeners.forEach((listener) => listener());
+  pendingText = next;
 };
 
-export const useVentText = () => useSyncExternalStore(subscribe, getSnapshot);
+export const consumeVentText = (): string | null => {
+  const text = pendingText;
+  pendingText = null;
+  return text;
+};
