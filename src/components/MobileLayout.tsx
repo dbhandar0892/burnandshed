@@ -8,7 +8,6 @@ import { LetGoTracker } from './tabs/LetGoTracker';
 import { Rituals } from './tabs/Rituals';
 import { PremiumScreen } from './tabs/PremiumScreen';
 import { navigate, useView, ViewId } from '@/lib/nav';
-import { usePremium } from '@/lib/premium';
 import { useEffect, useRef } from 'react';
 import { getActivitySnapshot, subscribeActivity } from '@/lib/activity';
 import { completeRitualRelease, getPendingRitualRelease, getRitualReleaseDuration } from '@/lib/ritualFlow';
@@ -26,7 +25,6 @@ const tabs: { id: ViewId; icon: typeof Flame; label: string; component: () => JS
 
 export const MobileLayout = () => {
   const activeTab = useView();
-  const premium = usePremium();
   const returnTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -59,17 +57,6 @@ export const MobileLayout = () => {
       {/* Header with enhanced gradient and depth */}
       <header className="bg-gradient-calm px-6 py-5 text-center shadow-medium relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-mesh-calm opacity-40" />
-
-        <button
-          onClick={() => navigate('premium')}
-          aria-label="Premium"
-          className={`absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 ${
-            premium.active ? 'bg-white/25 text-white' : 'bg-white/15 text-white/90'
-          }`}
-        >
-          <Sparkles className="h-4 w-4" />
-          <span className="text-[11px] font-bold">{premium.active ? 'Premium' : 'Upgrade'}</span>
-        </button>
 
         <div className="relative z-10 flex flex-col items-center">
           <img
