@@ -11,6 +11,7 @@ import { navigate, ViewId } from '@/lib/nav';
 import { beginRitualRelease, consumeRitualReturn } from '@/lib/ritualFlow';
 import { nextJoke, splitJoke } from '@/lib/jokes';
 import { logActivity } from '@/lib/activity';
+import { getSharedAudioContext } from '@/lib/sharedAudio';
 import { SOUNDS, SoundHandle, SoundId, createSoundscape, stopSoundscape } from '@/lib/soundscapes';
 
 const RELEASES: { id: Extract<ViewId, 'burn' | 'shred' | 'shed'>; label: string; icon: typeof Flame }[] = [
@@ -58,15 +59,9 @@ export const Rituals = () => {
   }, [step]);
 
   const getContext = () => {
-    if (!audioRef.current) {
-      const Ctx = window.AudioContext || (window as typeof window & {
-        webkitAudioContext?: typeof AudioContext;
-      }).webkitAudioContext;
-      if (!Ctx) return null;
-      audioRef.current = new Ctx();
-    }
-    if (audioRef.current.state === 'suspended') audioRef.current.resume().catch(() => undefined);
-    return audioRef.current;
+    const ctx = getSharedAudioContext();
+    audioRef.current = ctx;
+    return ctx;
   };
 
   const stopBreathCue = () => {
@@ -178,7 +173,6 @@ export const Rituals = () => {
   useEffect(() => () => {
     stopBreathCue();
     stopScape();
-    audioRef.current?.close().catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
