@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { logActivity } from '@/lib/activity';
-import { nextJoke } from '@/lib/jokes';
+import { nextJoke, splitJoke } from '@/lib/jokes';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Laugh, RefreshCw } from 'lucide-react';
 
 export const LaughBreak = () => {
   const [currentJoke, setCurrentJoke] = useState(() => nextJoke());
+  const [jokeQuestion, jokeAnswer] = splitJoke(currentJoke);
 
   const getNewJoke = () => {
     setCurrentJoke(nextJoke());
@@ -30,8 +31,13 @@ export const LaughBreak = () => {
           <div className="text-center space-y-6">
             <div className="text-7xl animate-float">😄</div>
             <p className="text-xl text-foreground leading-relaxed font-semibold">
-              {currentJoke}
+              {jokeQuestion}
             </p>
+            {jokeAnswer && (
+              <p className="text-xl text-muted-foreground leading-relaxed font-semibold">
+                {jokeAnswer}
+              </p>
+            )}
           </div>
         </Card>
       </div>
