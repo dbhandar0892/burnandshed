@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Scissors } from 'lucide-react';
 import { toast } from 'sonner';
-import { setVentText, useVentText } from '@/lib/ventText';
+import { consumeVentText } from '@/lib/ventText';
 import { logActivity } from '@/lib/activity';
 
 const SHRED_DURATION_MS = 2800;
@@ -90,8 +90,7 @@ const playShredSound = (duration: number) => {
 };
 
 export const VentBox = () => {
-  const text = useVentText();
-  const setText = setVentText;
+  const [text, setText] = useState(() => consumeVentText() ?? '');
   const [isShedding, setIsShedding] = useState(false);
   const audioContextRef = useRef<{ audioContext: AudioContext; sources: AudioBufferSourceNode[] } | null>(null);
 

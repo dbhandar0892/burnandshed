@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Flame } from 'lucide-react';
 import { toast } from 'sonner';
-import { setVentText, useVentText } from '@/lib/ventText';
+import { consumeVentText } from '@/lib/ventText';
 import { logActivity } from '@/lib/activity';
 import { segmentText } from '@/lib/textSegments';
 
@@ -68,8 +68,7 @@ const playMatchAndFire = (fireDuration: number, startDelaySeconds = 0) => {
 };
 
 export const BurnNote = () => {
-  const text = useVentText();
-  const setText = setVentText;
+  const [text, setText] = useState(() => consumeVentText() ?? '');
   const [igniterActive, setIgniterActive] = useState(false);
   const [isBurning, setIsBurning] = useState(false);
   const [animationReady, setAnimationReady] = useState(false);
