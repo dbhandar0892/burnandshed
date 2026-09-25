@@ -12,6 +12,7 @@ import {
   usePremium,
 } from '@/lib/premium';
 import { setThemeMode, useTheme } from '@/lib/theme';
+import { navigate } from '@/lib/nav';
 
 const PREMIUM_FEATURES = [
   'All 6 breathing sounds — Ambient, Ocean, Rain, Fire, Forest, Deep Hum',
@@ -64,6 +65,7 @@ export const PremiumScreen = () => {
             onClick={() => {
               startTrial();
               toast.success(`${TRIAL_LENGTH_DAYS}-day free trial started`);
+              navigate('ritual');
             }}
             disabled={hasUsedTrial()}
             className="w-full h-14 rounded-2xl bg-gradient-calm text-white text-lg font-bold shadow-primary hover:opacity-90"
@@ -150,7 +152,10 @@ export const PremiumScreen = () => {
         </div>
         <Switch
           checked={premium.source === 'purchased'}
-          onCheckedChange={checked => setPremiumUnlocked(checked)}
+          onCheckedChange={checked => {
+            setPremiumUnlocked(checked);
+            if (checked) navigate('ritual');
+          }}
         />
       </Card>
     </div>
