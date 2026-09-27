@@ -1,73 +1,91 @@
-# Welcome to your Lovable project
+# Burn & Shed
 
-## Project info
+I want to build a simple mobile app called Forget About It. The app is for people who feel frustrated, angry, or upset and want a quick, private way to let go.
 
-**URL**: https://lovable.dev/projects/b46f5745-3a91-4fdf-9124-84aec13eba7c
+The app should have five main tabs in the bottom navigation bar:
 
-## How can I edit this code?
+Vent Box (Shred It)
 
-There are several ways of editing your application.
+A text input where users type what’s bothering them.
 
-**Use Lovable**
+When they press "Shred It," the text disappears with a fun shredder animation (like paper strips or confetti).
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b46f5745-3a91-4fdf-9124-84aec13eba7c) and start prompting.
+Add sound effects if possible (paper tearing/shredding).
 
-Changes made via Lovable will be committed automatically to this repo.
+The text should not be saved anywhere (privacy is key).
 
-**Use your preferred IDE**
+Burn It Note
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Similar to Vent Box: user writes their frustration.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+On pressing "Burn It," the text fades away with a fire or smoke animation.
 
-Follow these steps:
+Include a crackling fire sound if possible.
+
+Again, don’t save the text.
+
+Laugh Break
+
+A tab that shows quick jokes or memes to lighten the mood.
+
+If easy, connect to a free joke API (like JokeAPI
+) to pull one-liner jokes.
+
+If not, preload some short jokes into the app.
+
+User can tap “Next” to see another joke.
+
+1-Min Breathing Reset
+
+A simple breathing exercise with a calming animation.
+
+Example: a circle expands/contracts with instructions like “Breathe in” / “Breathe out.”
+
+Timer counts down 60 seconds.
+
+Soft background sound or vibration optional.
+
+Let Go Tracker
+
+Tracks how many times the user has shredded or burned notes.
+
+Show total count + streaks (e.g., “You’ve let go 5 times this week”).
+
+Add simple badges like “Zen Starter” or “Let It Go Pro.”
+
+Design Guidelines:
+
+Simple, minimal, calming interface (use soft colors like blue, purple, orange for fire).
+
+Rounded corners, soft shadows, playful animations.
+
+Keep everything lightweight and easy to use.
+
+Extra Notes:
+
+This should be a mobile-first app, ready for iOS and Android.
+
+Local storage only (no cloud or server required for MVP).
+
+This project was built with [Lovable](https://lovable.dev).
+
+**Live app**: https://burnandshed.lovable.app
+
+## Build with Lovable
+
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/b46f5745-3a91-4fdf-9124-84aec13eba7c).
+
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+
+## Development
+
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+git clone <this-repository-url>
+cd <repository-name>
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/b46f5745-3a91-4fdf-9124-84aec13eba7c) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
