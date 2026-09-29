@@ -54,6 +54,8 @@ export const MobileLayout = () => {
   const ActiveComponent =
     activeTab === 'premium'
       ? PremiumScreen
+      : activeTab === 'profile'
+      ? Profile
       : tabs.find(tab => tab.id === activeTab)?.component || BurnNote;
 
   return (

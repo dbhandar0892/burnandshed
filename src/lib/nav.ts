@@ -8,7 +8,8 @@ export type ViewId =
   | 'laugh'
   | 'breathe'
   | 'tracker'
-  | 'premium';
+  | 'premium'
+  | 'profile';
 
 let view: ViewId = 'burn';
 const listeners = new Set<() => void>();
