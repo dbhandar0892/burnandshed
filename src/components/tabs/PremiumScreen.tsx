@@ -67,7 +67,7 @@ export const PremiumScreen = () => {
             {hasUsedTrial() ? 'Trial already used' : `Start ${TRIAL_LENGTH_DAYS}-day free trial`}
           </Button>
           <p className="text-xs text-center text-muted-foreground font-medium">
-            Cancel any time. Billing is not connected yet — this is a preview of the plan.
+            7-day free trial, then $3.99/month or $29.99/year. Cancel any time.
           </p>
         </Card>
       )}
