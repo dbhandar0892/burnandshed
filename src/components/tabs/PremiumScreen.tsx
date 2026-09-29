@@ -3,6 +3,8 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Sparkles, Check, Sun, Moon, Palette as PaletteIcon, Lock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   hasUsedTrial,
@@ -23,9 +25,30 @@ const PREMIUM_FEATURES = [
 ];
 
 
+export const PENDING_TRIAL_KEY = 'burnshed_pending_trial';
+
 export const PremiumScreen = () => {
   const premium = usePremium();
   const theme = useTheme();
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setSignedIn(!!session?.user));
+    supabase.auth.getUser().then(({ data }) => setSignedIn(!!data.user));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const handleStartTrial = () => {
+    if (!signedIn) {
+      sessionStorage.setItem(PENDING_TRIAL_KEY, '1');
+      toast('Sign in to start your free trial');
+      navigate('profile');
+      return;
+    }
+    startTrial();
+    toast.success(`${TRIAL_LENGTH_DAYS}-day free trial started`);
+    navigate('ritual');
+  };
 
   return (
     <div className="h-full overflow-y-auto p-6 space-y-7">
@@ -56,11 +79,7 @@ export const PremiumScreen = () => {
             </div>
           </div>
           <Button
-            onClick={() => {
-              startTrial();
-              toast.success(`${TRIAL_LENGTH_DAYS}-day free trial started`);
-              navigate('ritual');
-            }}
+            onClick={handleStartTrial}
             disabled={hasUsedTrial()}
             className="w-full h-14 rounded-2xl bg-gradient-calm text-white text-lg font-bold shadow-primary hover:opacity-90"
           >

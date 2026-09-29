@@ -7,6 +7,16 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { ArrowLeft, ChevronRight, FileText, LifeBuoy, LogOut, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react';
 import { navigate } from '@/lib/nav';
+import { startTrial, TRIAL_LENGTH_DAYS } from '@/lib/premium';
+import { PENDING_TRIAL_KEY } from '@/components/tabs/PremiumScreen';
+
+const completePendingTrial = () => {
+  if (sessionStorage.getItem(PENDING_TRIAL_KEY) !== '1') return;
+  sessionStorage.removeItem(PENDING_TRIAL_KEY);
+  startTrial();
+  toast.success(`${TRIAL_LENGTH_DAYS}-day free trial started`);
+  navigate('ritual');
+};
 
 const Row = ({ icon: Icon, label, onClick, danger }: { icon: typeof Shield; label: string; onClick: () => void; danger?: boolean }) => (
   <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/60 transition-colors ${danger ? 'text-destructive' : 'text-foreground'}`}>
@@ -23,7 +33,10 @@ export const Profile = () => {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setUser(session?.user ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      if (event === 'SIGNED_IN' && session?.user) completePendingTrial();
+    });
     supabase.auth.getUser().then(({ data }) => { setUser(data.user); setLoading(false); });
     return () => sub.subscription.unsubscribe();
   }, []);
