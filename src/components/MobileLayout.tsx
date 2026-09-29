@@ -1,4 +1,5 @@
-import { Droplets, Scissors, Flame, Laugh, Wind, Trophy, Sparkles } from 'lucide-react';
+import { Droplets, Scissors, Flame, Laugh, Wind, Trophy, Sparkles, UserRound } from 'lucide-react';
+import { Profile } from './tabs/Profile';
 import { ShedIt } from './tabs/ShedIt';
 import { VentBox } from './tabs/VentBox';
 import { BurnNote } from './tabs/BurnNote';
@@ -54,6 +55,8 @@ export const MobileLayout = () => {
   const ActiveComponent =
     activeTab === 'premium'
       ? PremiumScreen
+      : activeTab === 'profile'
+      ? Profile
       : tabs.find(tab => tab.id === activeTab)?.component || BurnNote;
 
   return (
@@ -70,6 +73,13 @@ export const MobileLayout = () => {
           />
           <p className="logo-tagline mt-2 text-[11px] font-bold">Let go and feel better</p>
         </div>
+        <button
+          onClick={() => navigate('profile')}
+          aria-label="Profile"
+          className="absolute top-2 left-2 z-20 h-9 w-9 flex items-center justify-center rounded-full bg-card/80 text-foreground border border-border hover:bg-card"
+        >
+          <UserRound size={18} />
+        </button>
         {!Capacitor.isNativePlatform() && (
           <button
             onClick={() => {
