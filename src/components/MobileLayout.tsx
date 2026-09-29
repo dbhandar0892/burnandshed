@@ -76,9 +76,9 @@ export const MobileLayout = () => {
         <button
           onClick={() => navigate('profile')}
           aria-label="Profile"
-          className="absolute top-2 left-2 z-20 h-9 w-9 flex items-center justify-center rounded-full bg-card/80 text-foreground border border-border hover:bg-card"
+          className="absolute top-2 left-2 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-card text-foreground border border-border shadow-soft hover:bg-muted text-xs font-semibold"
         >
-          <UserRound size={18} />
+          <UserRound size={16} /> Profile
         </button>
         {!Capacitor.isNativePlatform() && (
           <button
