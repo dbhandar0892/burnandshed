@@ -34,9 +34,42 @@ export const Profile = () => {
       .then(({ data }) => setName(data?.display_name ?? ''));
   }, [user]);
 
-  const signIn = async () => {
-    const result = await lovable.auth.signInWithOAuth('apple', { redirect_uri: window.location.origin });
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const signIn = async (provider: 'apple' | 'google') => {
+    const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
     if (result.error) toast.error('Sign in failed. Please try again.');
+  };
+
+  const submitEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const em = email.trim();
+    if (!/^\S+@\S+\.\S+$/.test(em)) return toast.error('Please enter a valid email');
+    setBusy(true);
+    try {
+      if (mode === 'forgot') {
+        const { error } = await supabase.auth.resetPasswordForEmail(em, { redirectTo: `${window.location.origin}/reset-password` });
+        if (error) throw error;
+        toast.success('Check your email for a reset link');
+        setMode('signin');
+      } else if (mode === 'signup') {
+        if (password.length < 8) throw new Error('Password must be at least 8 characters');
+        const { error } = await supabase.auth.signUp({ email: em, password, options: { emailRedirectTo: window.location.origin } });
+        if (error) throw error;
+        toast.success('Check your email to confirm your account');
+        setMode('signin');
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email: em, password });
+        if (error) throw error;
+        toast.success('Signed in');
+      }
+      setPassword('');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Something went wrong');
+    } finally { setBusy(false); }
   };
 
   const saveName = async () => {
@@ -71,7 +104,7 @@ export const Profile = () => {
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : user ? (
           <>
-            <p className="text-sm text-muted-foreground">{user.email ?? 'Signed in with Apple'}</p>
+            <p className="text-sm text-muted-foreground">{user.email ?? 'Signed in'}</p>
             <div className="flex gap-2">
               <Input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" maxLength={60} />
               <Button onClick={saveName}>Save</Button>
@@ -81,7 +114,28 @@ export const Profile = () => {
           <>
             <h2 className="text-lg font-semibold">Your profile</h2>
             <p className="text-sm text-muted-foreground">Sign in to keep your subscription with you across devices.</p>
-            <Button onClick={signIn} className="w-full"> Sign in with Apple</Button>
+            <Button onClick={() => signIn('apple')} className="w-full"> Sign in with Apple</Button>
+            <Button onClick={() => signIn('google')} variant="outline" className="w-full">Continue with Google</Button>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground"><span className="flex-1 h-px bg-border" />or<span className="flex-1 h-px bg-border" /></div>
+            <form onSubmit={submitEmail} className="space-y-2 text-left">
+              <Input type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" maxLength={255} required />
+              {mode !== 'forgot' && (
+                <Input type="password" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" maxLength={72} required />
+              )}
+              <Button type="submit" disabled={busy} className="w-full">
+                {mode === 'signin' ? 'Sign in' : mode === 'signup' ? 'Create account' : 'Send reset link'}
+              </Button>
+            </form>
+            <div className="flex justify-between text-xs">
+              {mode === 'signin' ? (
+                <>
+                  <button className="text-primary" onClick={() => setMode('signup')}>Create account</button>
+                  <button className="text-muted-foreground" onClick={() => setMode('forgot')}>Forgot password?</button>
+                </>
+              ) : (
+                <button className="text-primary" onClick={() => setMode('signin')}>Back to sign in</button>
+              )}
+            </div>
           </>
         )}
       </div>
