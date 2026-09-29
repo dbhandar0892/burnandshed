@@ -7,6 +7,7 @@ import { BreathingReset } from './tabs/BreathingReset';
 import { LetGoTracker } from './tabs/LetGoTracker';
 import { Rituals } from './tabs/Rituals';
 import { PremiumScreen } from './tabs/PremiumScreen';
+import { withPremium } from './PremiumGate';
 import { navigate, useView, ViewId } from '@/lib/nav';
 import { useEffect, useRef } from 'react';
 import { getActivitySnapshot, subscribeActivity } from '@/lib/activity';
@@ -18,9 +19,9 @@ const tabs: { id: ViewId; icon: typeof Flame; label: string; component: () => JS
   { id: 'shed', icon: Droplets, label: 'Shed It', component: ShedIt },
   { id: 'shred', icon: Scissors, label: 'Shred It', component: VentBox },
   { id: 'ritual', icon: Sparkles, label: 'Ritual', component: Rituals },
-  { id: 'laugh', icon: Laugh, label: 'Laugh', component: LaughBreak },
-  { id: 'breathe', icon: Wind, label: 'Breathe', component: BreathingReset },
-  { id: 'tracker', icon: Trophy, label: 'Tracker', component: LetGoTracker },
+  { id: 'laugh', icon: Laugh, label: 'Laugh', component: withPremium(LaughBreak, 'Laugh Break', 'Laugh is a Premium feature', '100 hand-picked jokes to lighten the moment.') },
+  { id: 'breathe', icon: Wind, label: 'Breathe', component: withPremium(BreathingReset, 'Breathe', 'Breathe is a Premium feature', 'Guided breathing with six calming soundscapes.') },
+  { id: 'tracker', icon: Trophy, label: 'Tracker', component: withPremium(LetGoTracker, 'Let Go Tracker', 'Tracker is a Premium feature', 'See your counts, badges, and monthly summary.') },
 ];
 
 export const MobileLayout = () => {
