@@ -22,12 +22,6 @@ const PREMIUM_FEATURES = [
   'No ads, ever',
 ];
 
-const FREE_FEATURES = [
-  'Burn It, Shed It and Shred It — unlimited, full effects',
-  'All 100 jokes',
-  'Breathing reset with the Ambient sound',
-  'Total releases and your badges',
-];
 
 export const PremiumScreen = () => {
   const premium = usePremium();
@@ -90,17 +84,6 @@ export const PremiumScreen = () => {
         </Card>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-xl font-bold text-foreground tracking-tight">Always free</h3>
-        <Card className="p-5 rounded-2xl bg-muted/40 border-border/50 space-y-3">
-          {FREE_FEATURES.map(f => (
-            <div key={f} className="flex items-start gap-3">
-              <Check className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-              <span className="text-sm font-medium text-muted-foreground">{f}</span>
-            </div>
-          ))}
-        </Card>
-      </div>
 
       {/* Appearance */}
       <div className="space-y-4">
