@@ -8,6 +8,9 @@ import { LetGoTracker } from './tabs/LetGoTracker';
 import { Rituals } from './tabs/Rituals';
 import { PremiumScreen } from './tabs/PremiumScreen';
 import { withPremium } from './PremiumGate';
+import { Capacitor } from '@capacitor/core';
+import { toast } from 'sonner';
+import { setPremiumUnlocked } from '@/lib/premium';
 import { navigate, useView, ViewId } from '@/lib/nav';
 import { useEffect, useRef } from 'react';
 import { getActivitySnapshot, subscribeActivity } from '@/lib/activity';
@@ -67,6 +70,18 @@ export const MobileLayout = () => {
           />
           <p className="logo-tagline mt-2 text-[11px] font-bold">Let go and feel better</p>
         </div>
+        {!Capacitor.isNativePlatform() && (
+          <button
+            onClick={() => {
+              localStorage.removeItem('premiumTrialStart');
+              setPremiumUnlocked(false);
+              toast.success('Premium reset — you now see the free version');
+            }}
+            className="absolute top-2 right-2 z-20 text-[10px] font-semibold px-2 py-1 rounded-full bg-card/80 text-muted-foreground border border-border hover:text-foreground"
+          >
+            Reset Premium
+          </button>
+        )}
       </header>
 
       {/* Main Content with smooth transitions */}
