@@ -22,12 +22,6 @@ const PREMIUM_FEATURES = [
   'No ads, ever',
 ];
 
-const FREE_FEATURES = [
-  'Burn It, Shed It and Shred It — unlimited, full effects',
-  'All 100 jokes',
-  'Breathing reset with the Ambient sound',
-  'Total releases and your badges',
-];
 
 export const PremiumScreen = () => {
   const premium = usePremium();
