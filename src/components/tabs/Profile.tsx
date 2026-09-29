@@ -33,7 +33,10 @@ export const Profile = () => {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setUser(session?.user ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      if (event === 'SIGNED_IN' && session?.user) completePendingTrial();
+    });
     supabase.auth.getUser().then(({ data }) => { setUser(data.user); setLoading(false); });
     return () => sub.subscription.unsubscribe();
   }, []);
