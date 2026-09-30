@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   hasUsedTrial,
+  PENDING_TRIAL_KEY,
   setPremiumUnlocked,
   startTrial,
   TRIAL_LENGTH_DAYS,
@@ -24,9 +25,6 @@ const PREMIUM_FEATURES = [
   'No ads, ever',
 ];
 
-
-export const PENDING_TRIAL_KEY = 'burnshed_pending_trial';
-
 export const PremiumScreen = () => {
   const premium = usePremium();
   const theme = useTheme();
@@ -38,14 +36,15 @@ export const PremiumScreen = () => {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  const handleStartTrial = () => {
+  const handleStartTrial = async () => {
     if (!signedIn) {
       localStorage.setItem(PENDING_TRIAL_KEY, '1');
       toast('Sign in to start your free trial');
       navigate('profile');
       return;
     }
-    startTrial();
+    const ok = await startTrial();
+    if (!ok) return toast.error('Could not start your trial. Please try again.');
     toast.success(`${TRIAL_LENGTH_DAYS}-day free trial started`);
     navigate('ritual');
   };
