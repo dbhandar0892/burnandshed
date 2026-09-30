@@ -13,6 +13,10 @@ import { PENDING_TRIAL_KEY } from '@/lib/premium';
 // Sign in view; new users see Create account. Never cleared on sign-out.
 const RETURNING_KEY = 'bs_returning_user';
 const LAST_EMAIL_KEY = 'bs_last_auth_email';
+const rememberAccount = (email?: string) => {
+  localStorage.setItem(RETURNING_KEY, '1');
+  if (email) localStorage.setItem(LAST_EMAIL_KEY, email);
+};
 
 const Row = ({ icon: Icon, label, onClick, danger }: { icon: typeof Shield; label: string; onClick: () => void; danger?: boolean }) => (
   <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/60 transition-colors ${danger ? 'text-destructive' : 'text-foreground'}`}>
@@ -35,10 +39,7 @@ export const Profile = () => {
       // email). INITIAL_SESSION (returning to the page already signed in)
       // intentionally does not navigate, so profile actions stay reachable.
       if (event === 'SIGNED_IN' && session?.user) {
-        // Remember this device has an account, so returning users land on
-        // Sign in instead of Create account next time.
-        localStorage.setItem(RETURNING_KEY, '1');
-        if (session.user.email) localStorage.setItem(LAST_EMAIL_KEY, session.user.email);
+        rememberAccount(session.user.email);
         setTimeout(() => {
           // A pending trial is finished (and navigated) by the Premium sync.
           if (localStorage.getItem(PENDING_TRIAL_KEY) !== '1') {
@@ -48,7 +49,11 @@ export const Profile = () => {
         }, 0);
       }
     });
-    supabase.auth.getUser().then(({ data }) => { setUser(data.user); setLoading(false); });
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) rememberAccount(data.user.email);
+      setUser(data.user);
+      setLoading(false);
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 
@@ -84,6 +89,7 @@ export const Profile = () => {
         if (password.length < 8) throw new Error('Password must be at least 8 characters');
         const { error } = await supabase.auth.signUp({ email: em, password, options: { emailRedirectTo: window.location.origin } });
         if (error) throw error;
+        rememberAccount(em);
         toast.success('Check your email to confirm your account');
         setMode('signin');
       } else {
@@ -107,7 +113,13 @@ export const Profile = () => {
     error ? toast.error('Could not save name') : toast.success('Name saved');
   };
 
-  const signOut = async () => { await supabase.auth.signOut(); toast.success('Signed out'); };
+  const signOut = async () => {
+    rememberAccount(user?.email);
+    setEmail(user?.email ?? '');
+    setMode('signin');
+    await supabase.auth.signOut();
+    toast.success('Signed out');
+  };
 
   const deleteAccount = async () => {
     const { error } = await supabase.functions.invoke('delete-account');
@@ -141,11 +153,11 @@ export const Profile = () => {
           </>
         ) : (
           <>
-            <h2 className="text-lg font-semibold">{returning && mode !== 'signup' ? 'Welcome back' : 'Create your account'}</h2>
+            <h2 className="text-lg font-semibold">{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2>
             <p className="text-sm text-muted-foreground">
-              {returning && mode !== 'signup'
-                ? 'Sign in to pick up where you left off.'
-                : 'Create an account to keep your subscription with you across devices.'}
+              {mode === 'signup'
+                ? 'Create an account to keep your subscription with you across devices.'
+                : 'Sign in to pick up where you left off.'}
             </p>
             <Button onClick={() => signIn('apple')} className="w-full"> Sign in with Apple</Button>
             <Button onClick={() => signIn('google')} variant="outline" className="w-full">Continue with Google</Button>
@@ -162,7 +174,7 @@ export const Profile = () => {
             <div className="flex justify-between text-xs">
               {mode === 'signup' ? (
                 <>
-                  <button className="text-primary" onClick={() => setMode('signin')}>Sign in</button>
+                  <button className="text-primary" onClick={() => setMode('signin')}>Already have an account? Sign in</button>
                   <button className="text-muted-foreground" onClick={() => setMode('forgot')}>Forgot password?</button>
                 </>
               ) : mode === 'signin' ? (
