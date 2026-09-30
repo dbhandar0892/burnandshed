@@ -35,7 +35,19 @@ export const Profile = () => {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) setTimeout(completePendingTrial, 0);
+      // Navigate to Rituals right after an actual sign-in (Apple, Google or
+      // email). INITIAL_SESSION (returning to the page already signed in)
+      // intentionally does not navigate, so profile actions stay reachable.
+      if (event === 'SIGNED_IN' && session?.user) {
+        setTimeout(() => {
+          if (localStorage.getItem(PENDING_TRIAL_KEY) === '1') {
+            completePendingTrial();
+          } else {
+            toast.success('Signed in');
+            navigate('ritual');
+          }
+        }, 0);
+      }
     });
     supabase.auth.getUser().then(({ data }) => { setUser(data.user); setLoading(false); if (data.user) completePendingTrial(); });
     return () => sub.subscription.unsubscribe();
