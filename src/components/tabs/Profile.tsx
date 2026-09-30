@@ -94,7 +94,6 @@ export const Profile = () => {
           return;
         }
         if (error) throw error;
-        toast.success('Signed in');
       }
       setPassword('');
     } catch (err) {
