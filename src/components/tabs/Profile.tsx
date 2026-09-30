@@ -47,7 +47,7 @@ export const Profile = () => {
       .then(({ data }) => setName(data?.display_name ?? ''));
   }, [user]);
 
-  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -145,7 +145,12 @@ export const Profile = () => {
               </Button>
             </form>
             <div className="flex justify-between text-xs">
-              {mode === 'signin' ? (
+              {mode === 'signup' ? (
+                <>
+                  <button className="text-primary" onClick={() => setMode('signin')}>Sign in</button>
+                  <button className="text-muted-foreground" onClick={() => setMode('forgot')}>Forgot password?</button>
+                </>
+              ) : mode === 'signin' ? (
                 <>
                   <button className="text-primary" onClick={() => setMode('signup')}>Create account</button>
                   <button className="text-muted-foreground" onClick={() => setMode('forgot')}>Forgot password?</button>
