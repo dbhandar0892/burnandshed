@@ -30,6 +30,10 @@ export const Profile = () => {
       // email). INITIAL_SESSION (returning to the page already signed in)
       // intentionally does not navigate, so profile actions stay reachable.
       if (event === 'SIGNED_IN' && session?.user) {
+        // Remember this device has an account, so returning users land on
+        // Sign in instead of Create account next time.
+        localStorage.setItem(RETURNING_KEY, '1');
+        if (session.user.email) localStorage.setItem(LAST_EMAIL_KEY, session.user.email);
         setTimeout(() => {
           // A pending trial is finished (and navigated) by the Premium sync.
           if (localStorage.getItem(PENDING_TRIAL_KEY) !== '1') {
@@ -49,8 +53,9 @@ export const Profile = () => {
       .then(({ data }) => setName(data?.display_name ?? ''));
   }, [user]);
 
-  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signup');
-  const [email, setEmail] = useState('');
+  const returning = localStorage.getItem(RETURNING_KEY) === '1';
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(returning ? 'signin' : 'signup');
+  const [email, setEmail] = useState(returning ? localStorage.getItem(LAST_EMAIL_KEY) ?? '' : '');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
 
