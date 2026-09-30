@@ -9,6 +9,11 @@ import { ArrowLeft, ChevronRight, FileText, LifeBuoy, LogOut, RotateCcw, Shield,
 import { navigate } from '@/lib/nav';
 import { PENDING_TRIAL_KEY } from '@/lib/premium';
 
+// Set when this device has ever signed in, so returning users land on the
+// Sign in view; new users see Create account. Never cleared on sign-out.
+const RETURNING_KEY = 'bs_returning_user';
+const LAST_EMAIL_KEY = 'bs_last_auth_email';
+
 const Row = ({ icon: Icon, label, onClick, danger }: { icon: typeof Shield; label: string; onClick: () => void; danger?: boolean }) => (
   <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/60 transition-colors ${danger ? 'text-destructive' : 'text-foreground'}`}>
     <Icon size={18} />
@@ -30,6 +35,10 @@ export const Profile = () => {
       // email). INITIAL_SESSION (returning to the page already signed in)
       // intentionally does not navigate, so profile actions stay reachable.
       if (event === 'SIGNED_IN' && session?.user) {
+        // Remember this device has an account, so returning users land on
+        // Sign in instead of Create account next time.
+        localStorage.setItem(RETURNING_KEY, '1');
+        if (session.user.email) localStorage.setItem(LAST_EMAIL_KEY, session.user.email);
         setTimeout(() => {
           // A pending trial is finished (and navigated) by the Premium sync.
           if (localStorage.getItem(PENDING_TRIAL_KEY) !== '1') {
@@ -49,8 +58,9 @@ export const Profile = () => {
       .then(({ data }) => setName(data?.display_name ?? ''));
   }, [user]);
 
-  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signup');
-  const [email, setEmail] = useState('');
+  const returning = localStorage.getItem(RETURNING_KEY) === '1';
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(returning ? 'signin' : 'signup');
+  const [email, setEmail] = useState(returning ? localStorage.getItem(LAST_EMAIL_KEY) ?? '' : '');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -131,8 +141,12 @@ export const Profile = () => {
           </>
         ) : (
           <>
-            <h2 className="text-lg font-semibold">Your profile</h2>
-            <p className="text-sm text-muted-foreground">Create an account to keep your subscription with you across devices.</p>
+            <h2 className="text-lg font-semibold">{returning && mode !== 'signup' ? 'Welcome back' : 'Create your account'}</h2>
+            <p className="text-sm text-muted-foreground">
+              {returning && mode !== 'signup'
+                ? 'Sign in to pick up where you left off.'
+                : 'Create an account to keep your subscription with you across devices.'}
+            </p>
             <Button onClick={() => signIn('apple')} className="w-full"> Sign in with Apple</Button>
             <Button onClick={() => signIn('google')} variant="outline" className="w-full">Continue with Google</Button>
             <div className="flex items-center gap-2 text-xs text-muted-foreground"><span className="flex-1 h-px bg-border" />or<span className="flex-1 h-px bg-border" /></div>
