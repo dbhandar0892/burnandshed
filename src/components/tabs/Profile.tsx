@@ -131,7 +131,7 @@ export const Profile = () => {
         ) : (
           <>
             <h2 className="text-lg font-semibold">Your profile</h2>
-            <p className="text-sm text-muted-foreground">Sign in to keep your subscription with you across devices.</p>
+            <p className="text-sm text-muted-foreground">Create an account to keep your subscription with you across devices.</p>
             <Button onClick={() => signIn('apple')} className="w-full"> Sign in with Apple</Button>
             <Button onClick={() => signIn('google')} variant="outline" className="w-full">Continue with Google</Button>
             <div className="flex items-center gap-2 text-xs text-muted-foreground"><span className="flex-1 h-px bg-border" />or<span className="flex-1 h-px bg-border" /></div>
