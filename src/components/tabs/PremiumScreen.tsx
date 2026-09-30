@@ -40,7 +40,7 @@ export const PremiumScreen = () => {
 
   const handleStartTrial = () => {
     if (!signedIn) {
-      sessionStorage.setItem(PENDING_TRIAL_KEY, '1');
+      localStorage.setItem(PENDING_TRIAL_KEY, '1');
       toast('Sign in to start your free trial');
       navigate('profile');
       return;
