@@ -106,10 +106,8 @@ export const initPremiumSync = () => {
 
   supabase.auth.onAuthStateChange((event, session) => {
     if (!session?.user) {
-      if (event === 'SIGNED_OUT') {
-        localStorage.removeItem(ACCOUNT_KEY);
-        emit();
-      }
+      // Keep the last account's entitlement on this device after sign-out so
+      // returning members are still recognized and never see the paywall again.
       return;
     }
     const userId = session.user.id;
