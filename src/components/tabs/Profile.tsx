@@ -7,16 +7,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { ArrowLeft, ChevronRight, FileText, LifeBuoy, LogOut, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react';
 import { navigate } from '@/lib/nav';
-import { startTrial, TRIAL_LENGTH_DAYS } from '@/lib/premium';
-import { PENDING_TRIAL_KEY } from '@/components/tabs/PremiumScreen';
-
-export const completePendingTrial = () => {
-  if (localStorage.getItem(PENDING_TRIAL_KEY) !== '1') return;
-  localStorage.removeItem(PENDING_TRIAL_KEY);
-  startTrial();
-  toast.success(`${TRIAL_LENGTH_DAYS}-day free trial started`);
-  navigate('ritual');
-};
+import { PENDING_TRIAL_KEY } from '@/lib/premium';
 
 const Row = ({ icon: Icon, label, onClick, danger }: { icon: typeof Shield; label: string; onClick: () => void; danger?: boolean }) => (
   <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/60 transition-colors ${danger ? 'text-destructive' : 'text-foreground'}`}>
@@ -40,16 +31,15 @@ export const Profile = () => {
       // intentionally does not navigate, so profile actions stay reachable.
       if (event === 'SIGNED_IN' && session?.user) {
         setTimeout(() => {
-          if (localStorage.getItem(PENDING_TRIAL_KEY) === '1') {
-            completePendingTrial();
-          } else {
+          // A pending trial is finished (and navigated) by the Premium sync.
+          if (localStorage.getItem(PENDING_TRIAL_KEY) !== '1') {
             toast.success('Signed in');
             navigate('ritual');
           }
         }, 0);
       }
     });
-    supabase.auth.getUser().then(({ data }) => { setUser(data.user); setLoading(false); if (data.user) completePendingTrial(); });
+    supabase.auth.getUser().then(({ data }) => { setUser(data.user); setLoading(false); });
     return () => sub.subscription.unsubscribe();
   }, []);
 

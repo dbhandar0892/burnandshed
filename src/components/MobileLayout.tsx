@@ -1,6 +1,5 @@
 import { Droplets, Scissors, Flame, Laugh, Wind, Trophy, Sparkles, UserRound } from 'lucide-react';
-import { Profile, completePendingTrial } from './tabs/Profile';
-import { supabase } from '@/integrations/supabase/client';
+import { Profile } from './tabs/Profile';
 import { ShedIt } from './tabs/ShedIt';
 import { VentBox } from './tabs/VentBox';
 import { BurnNote } from './tabs/BurnNote';
@@ -12,7 +11,7 @@ import { PremiumScreen } from './tabs/PremiumScreen';
 import { withPremium } from './PremiumGate';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
-import { setPremiumUnlocked } from '@/lib/premium';
+import { initPremiumSync, setPremiumUnlocked } from '@/lib/premium';
 import { navigate, useView, ViewId } from '@/lib/nav';
 import { useEffect, useRef } from 'react';
 import { getActivitySnapshot, subscribeActivity } from '@/lib/activity';
@@ -34,10 +33,7 @@ export const MobileLayout = () => {
   const returnTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session?.user) setTimeout(completePendingTrial, 0);
-    });
-    return () => sub.subscription.unsubscribe();
+    initPremiumSync();
   }, []);
 
   useEffect(() => {
