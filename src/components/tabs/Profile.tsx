@@ -10,9 +10,9 @@ import { navigate } from '@/lib/nav';
 import { startTrial, TRIAL_LENGTH_DAYS } from '@/lib/premium';
 import { PENDING_TRIAL_KEY } from '@/components/tabs/PremiumScreen';
 
-const completePendingTrial = () => {
-  if (sessionStorage.getItem(PENDING_TRIAL_KEY) !== '1') return;
-  sessionStorage.removeItem(PENDING_TRIAL_KEY);
+export const completePendingTrial = () => {
+  if (localStorage.getItem(PENDING_TRIAL_KEY) !== '1') return;
+  localStorage.removeItem(PENDING_TRIAL_KEY);
   startTrial();
   toast.success(`${TRIAL_LENGTH_DAYS}-day free trial started`);
   navigate('ritual');
@@ -35,9 +35,9 @@ export const Profile = () => {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      if (event === 'SIGNED_IN' && session?.user) completePendingTrial();
+      if (session?.user) setTimeout(completePendingTrial, 0);
     });
-    supabase.auth.getUser().then(({ data }) => { setUser(data.user); setLoading(false); });
+    supabase.auth.getUser().then(({ data }) => { setUser(data.user); setLoading(false); if (data.user) completePendingTrial(); });
     return () => sub.subscription.unsubscribe();
   }, []);
 
