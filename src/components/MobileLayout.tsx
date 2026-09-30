@@ -1,5 +1,6 @@
 import { Droplets, Scissors, Flame, Laugh, Wind, Trophy, Sparkles, UserRound } from 'lucide-react';
-import { Profile } from './tabs/Profile';
+import { Profile, completePendingTrial } from './tabs/Profile';
+import { supabase } from '@/integrations/supabase/client';
 import { ShedIt } from './tabs/ShedIt';
 import { VentBox } from './tabs/VentBox';
 import { BurnNote } from './tabs/BurnNote';
@@ -31,6 +32,13 @@ const tabs: { id: ViewId; icon: typeof Flame; label: string; component: () => JS
 export const MobileLayout = () => {
   const activeTab = useView();
   const returnTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (session?.user) setTimeout(completePendingTrial, 0);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     let previous = getActivitySnapshot();
