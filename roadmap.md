@@ -6,4 +6,4 @@
 - [x] Guided Rituals tab — vent → full Burn/Shred/Shed effect → one-minute breathing reset → check-in → laugh/breathe follow-up → final check-in and gentle support
 - [x] Themes — light/dark appearance; purple app identity with calm green accents limited to Guided Rituals
 - [ ] Real billing — DEFERRED by user (Sep 22, 2026): don't wire it yet, don't delete anything. Premium currently unlocks via a preview toggle / 7-day trial stored on the device; keep this placeholder intact until the user asks to connect a payment provider ($3.99/mo or $29.99/yr)
-- [ ] Present design options for the small top-left Profile button only; wait for user's selection before changing it.
+- [x] Top-left Profile button refined — soft violet icon badge on the white pill; done directly after the user skipped all prototype options

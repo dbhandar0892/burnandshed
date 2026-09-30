@@ -78,9 +78,12 @@ export const MobileLayout = () => {
         <button
           onClick={() => navigate('profile')}
           aria-label="Profile"
-          className="absolute top-2 left-2 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-card text-foreground border border-border shadow-soft hover:bg-muted text-xs font-semibold"
+          className="absolute top-2 left-2 z-20 flex items-center gap-1.5 pl-1.5 pr-3 py-1 rounded-full bg-card text-foreground border border-border/60 shadow-soft hover:bg-muted/60 hover:shadow-medium active:scale-95 transition-all text-xs font-semibold"
         >
-          <UserRound size={16} /> Profile
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <UserRound size={14} />
+          </span>
+          Profile
         </button>
       </header>
 
