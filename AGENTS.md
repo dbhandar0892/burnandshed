@@ -1,0 +1,1 @@
+- Premium trial/status is stored per account in the backend (entitlements table, start_trial RPC) and cached locally; why: signed-in users must keep Premium across devices and sign-ins.
