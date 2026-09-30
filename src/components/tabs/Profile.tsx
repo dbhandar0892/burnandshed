@@ -76,6 +76,11 @@ export const Profile = () => {
         setMode('signin');
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email: em, password });
+        if (error && (error as { code?: string }).code === 'email_not_confirmed') {
+          await supabase.auth.resend({ type: 'signup', email: em, options: { emailRedirectTo: window.location.origin } });
+          toast('Please confirm your email first', { description: `We just sent a new confirmation link to ${em}. Tap it, then sign in. Check your spam folder too.`, duration: 8000 });
+          return;
+        }
         if (error) throw error;
         toast.success('Signed in');
       }
