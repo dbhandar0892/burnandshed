@@ -16,6 +16,7 @@ interface AccountEntitlement {
 }
 
 const listeners = new Set<() => void>();
+let signedIn = false;
 let cache: PremiumState | null = null;
 
 export interface PremiumState {
@@ -24,6 +25,8 @@ export interface PremiumState {
   trialDaysLeft: number;
   /** Whether a trial was ever started on this device or signed-in account. */
   trialUsed: boolean;
+  /** Premium features require being signed in. */
+  signedIn: boolean;
 }
 
 const readAccount = (): AccountEntitlement | null => {
@@ -45,10 +48,11 @@ const build = (): PremiumState => {
   const trialActive = msLeft > 0;
 
   return {
-    active: purchased || trialActive,
+    active: signedIn && (purchased || trialActive),
     source: purchased ? 'purchased' : trialActive ? 'trial' : 'none',
     trialDaysLeft: trialActive ? Math.ceil(msLeft / 86400000) : 0,
     trialUsed: start > 0,
+    signedIn,
   };
 };
 
@@ -104,7 +108,17 @@ export const initPremiumSync = () => {
   if (started) return;
   started = true;
 
+  supabase.auth.getSession().then(({ data }) => {
+    signedIn = Boolean(data.session?.user);
+    emit();
+  });
+
   supabase.auth.onAuthStateChange((event, session) => {
+    const nowSignedIn = Boolean(session?.user);
+    if (nowSignedIn !== signedIn) {
+      signedIn = nowSignedIn;
+      emit();
+    }
     if (!session?.user) {
       // Keep the last account's entitlement on this device after sign-out so
       // returning members are still recognized and never see the paywall again.

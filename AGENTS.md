@@ -1,1 +1,2 @@
 - Premium trial/status is stored per account in the backend (entitlements table, start_trial RPC) and cached locally; why: signed-in users must keep Premium across devices and sign-ins.
+- Premium features require an active sign-in; the account entitlement stays cached on the device after sign-out so returning members are recognized on sign-in; why: user wants signed-out users prompted to sign in.

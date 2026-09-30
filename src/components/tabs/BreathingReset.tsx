@@ -173,7 +173,7 @@ export const BreathingReset = () => {
                 {SOUNDS.map(({ id, label, icon: Icon }) => (
                   <button
                     key={id}
-                    onClick={() => (id === 'pad' || premium.active ? setSoundChoice(id) : navigate('premium'))}
+                    onClick={() => (id === 'pad' || premium.active ? setSoundChoice(id) : navigate(premium.signedIn ? 'premium' : 'profile'))}
                     className={`relative flex flex-col items-center gap-1.5 py-3 rounded-2xl border transition-all duration-300 ${
                       sound === id
                         ? 'bg-primary/15 border-primary text-primary shadow-soft'
@@ -190,7 +190,7 @@ export const BreathingReset = () => {
               </div>
               {!premium.active && (
                 <p className="text-xs text-muted-foreground font-medium px-1">
-                  Ocean, Rain, Fire, Forest and Deep Hum unlock with Premium.
+                  {premium.signedIn ? 'Ocean, Rain, Fire, Forest and Deep Hum unlock with Premium.' : 'Sign in to continue using Ocean, Rain, Fire, Forest and Deep Hum.'}
                 </p>
               )}
             </div>
