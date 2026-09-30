@@ -9,6 +9,11 @@ import { ArrowLeft, ChevronRight, FileText, LifeBuoy, LogOut, RotateCcw, Shield,
 import { navigate } from '@/lib/nav';
 import { PENDING_TRIAL_KEY } from '@/lib/premium';
 
+// Set when this device has ever signed in, so returning users land on the
+// Sign in view; new users see Create account. Never cleared on sign-out.
+const RETURNING_KEY = 'bs_returning_user';
+const LAST_EMAIL_KEY = 'bs_last_auth_email';
+
 const Row = ({ icon: Icon, label, onClick, danger }: { icon: typeof Shield; label: string; onClick: () => void; danger?: boolean }) => (
   <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/60 transition-colors ${danger ? 'text-destructive' : 'text-foreground'}`}>
     <Icon size={18} />
@@ -136,8 +141,12 @@ export const Profile = () => {
           </>
         ) : (
           <>
-            <h2 className="text-lg font-semibold">Your profile</h2>
-            <p className="text-sm text-muted-foreground">Create an account to keep your subscription with you across devices.</p>
+            <h2 className="text-lg font-semibold">{returning && mode !== 'signup' ? 'Welcome back' : 'Create your account'}</h2>
+            <p className="text-sm text-muted-foreground">
+              {returning && mode !== 'signup'
+                ? 'Sign in to pick up where you left off.'
+                : 'Create an account to keep your subscription with you across devices.'}
+            </p>
             <Button onClick={() => signIn('apple')} className="w-full"> Sign in with Apple</Button>
             <Button onClick={() => signIn('google')} variant="outline" className="w-full">Continue with Google</Button>
             <div className="flex items-center gap-2 text-xs text-muted-foreground"><span className="flex-1 h-px bg-border" />or<span className="flex-1 h-px bg-border" /></div>
