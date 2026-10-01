@@ -109,8 +109,14 @@ export const Profile = () => {
 
   const saveName = async () => {
     if (!user) return;
-    const { error } = await supabase.from('profiles').upsert({ id: user.id, display_name: name.trim().slice(0, 60), email: user.email });
-    error ? toast.error('Could not save name') : toast.success('Name saved');
+    const display_name = name.trim().slice(0, 60);
+    const { data, error } = await supabase.from('profiles').update({ display_name }).eq('id', user.id).select('id');
+    let err = error;
+    if (!err && (!data || data.length === 0)) {
+      ({ error: err } = await supabase.from('profiles').insert({ id: user.id, display_name, email: user.email }));
+    }
+    if (err) console.error('saveName failed', err);
+    err ? toast.error('Could not save name') : toast.success('Name saved');
   };
 
   const signOut = async () => {
