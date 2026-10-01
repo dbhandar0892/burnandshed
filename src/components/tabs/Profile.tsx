@@ -18,6 +18,9 @@ const rememberAccount = (email?: string) => {
   if (email) localStorage.setItem(LAST_EMAIL_KEY, email);
 };
 
+// First name only — the app never uses last names.
+const firstNameOf = (n?: string | null) => (n ?? '').trim().split(/\s+/)[0] || '';
+
 const Row = ({ icon: Icon, label, onClick, danger }: { icon: typeof Shield; label: string; onClick: () => void; danger?: boolean }) => (
   <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/60 transition-colors ${danger ? 'text-destructive' : 'text-foreground'}`}>
     <Icon size={18} />
