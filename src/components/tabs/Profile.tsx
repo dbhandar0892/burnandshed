@@ -35,16 +35,17 @@ export const Profile = () => {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      // Navigate to Rituals right after an actual sign-in (Apple, Google or
-      // email). INITIAL_SESSION (returning to the page already signed in)
-      // intentionally does not navigate, so profile actions stay reachable.
+      // Navigate right after an actual sign-in (Apple, Google or email) back to
+      // the feature the user came from. INITIAL_SESSION (returning to the page
+      // already signed in) intentionally does not navigate, so profile actions
+      // stay reachable.
       if (event === 'SIGNED_IN' && session?.user) {
         rememberAccount(session.user.email);
         setTimeout(() => {
           // A pending trial is finished (and navigated) by the Premium sync.
           if (localStorage.getItem(PENDING_TRIAL_KEY) !== '1') {
             toast.success('Signed in');
-            navigate('ritual');
+            navigate(takeSignInReturn() ?? 'ritual');
           }
         }, 0);
       }
