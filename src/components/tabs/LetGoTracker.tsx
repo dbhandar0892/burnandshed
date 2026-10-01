@@ -128,6 +128,14 @@ const featureBadges: BadgeDef[] = [
   },
 ];
 
+const Row = ({ icon: Icon, label, onClick, danger }: { icon: typeof Shield; label: string; onClick: () => void; danger?: boolean }) => (
+  <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/60 transition-colors ${danger ? 'text-destructive' : 'text-foreground'}`}>
+    <Icon size={18} />
+    <span className="flex-1 text-sm font-medium">{label}</span>
+    <ChevronRight size={16} className="text-muted-foreground" />
+  </button>
+);
+
 export const LetGoTracker = () => {
   const stats = useSyncExternalStore(subscribeActivity, getActivitySnapshot, getActivitySnapshot);
   const [user, setUser] = useState<User | null>(null);
