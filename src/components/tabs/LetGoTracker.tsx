@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import type { User } from '@supabase/supabase-js';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -22,7 +22,7 @@ import { ActivitySnapshot, getActivitySnapshot, subscribeActivity } from '@/lib/
 import { navigate } from '@/lib/nav';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { CreditCard, FileText, LifeBuoy, LogOut, RotateCcw, Shield } from 'lucide-react';
+import { CreditCard, FileText, LifeBuoy, LogOut, RotateCcw, Shield, Trash2 } from 'lucide-react';
 
 interface BadgeDef {
   id: string;
@@ -138,7 +138,7 @@ const Row = ({ icon: Icon, label, onClick, danger }: { icon: typeof Shield; labe
 
 export const LetGoTracker = () => {
   const stats = useSyncExternalStore(subscribeActivity, getActivitySnapshot, getActivitySnapshot);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [firstName, setFirstName] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
 
