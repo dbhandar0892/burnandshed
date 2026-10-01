@@ -5,7 +5,7 @@ import { lovable } from '@/integrations/lovable/index';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { ArrowLeft, ChevronRight, FileText, LifeBuoy, LogOut, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CreditCard, FileText, LifeBuoy, LogOut, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react';
 import { navigate } from '@/lib/nav';
 import { PENDING_TRIAL_KEY } from '@/lib/premium';
 
@@ -131,6 +131,11 @@ export const Profile = () => {
 
   const restore = () => toast('Restore purchases will be available once App Store subscriptions are live.');
 
+  const manageSubscription = () => {
+    // Apple handles cancellation, plan changes and refunds — hand the user to their App Store subscriptions.
+    window.open('https://apps.apple.com/account/subscriptions', '_blank');
+  };
+
   return (
     <div className="h-full overflow-y-auto p-5 space-y-5">
       <button onClick={() => navigate('burn')} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
@@ -191,6 +196,7 @@ export const Profile = () => {
       </div>
 
       <div className="bg-card rounded-2xl border border-border shadow-soft divide-y divide-border overflow-hidden">
+        <Row icon={CreditCard} label="Manage subscription" onClick={manageSubscription} />
         <Row icon={RotateCcw} label="Restore purchases" onClick={restore} />
         <Row icon={Shield} label="Privacy Policy" onClick={() => window.open('/privacy', '_blank')} />
         <Row icon={FileText} label="Terms of Use" onClick={() => window.open('/terms', '_blank')} />
