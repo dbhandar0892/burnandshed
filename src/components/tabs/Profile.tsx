@@ -29,6 +29,41 @@ const Row = ({ icon: Icon, label, onClick, danger }: { icon: typeof Shield; labe
   </button>
 );
 
+// After sign-in, save the first name (from Apple/Google when available) and
+// pop up a welcome greeting showing the first name only — never a last name.
+const greetWithFirstName = async (u: User) => {
+  const meta = (u.user_metadata ?? {}) as Record<string, string | undefined>;
+  const metaFirst = firstNameOf(meta.full_name || meta.name);
+  let first = metaFirst;
+  try {
+    const { data } = await supabase.from('profiles').select('display_name').eq('id', u.id).maybeSingle();
+    const stored = firstNameOf(data?.display_name);
+    if (!stored && metaFirst) {
+      const { data: up } = await supabase.from('profiles').update({ display_name: metaFirst }).eq('id', u.id).select('id');
+      if (!up || up.length === 0) {
+        await supabase.from('profiles').insert({ id: u.id, display_name: metaFirst, email: u.email });
+      }
+    }
+    first = stored || metaFirst;
+  } catch (e) {
+    console.error('greetWithFirstName failed', e);
+  }
+  toast.custom(
+    () => (
+      <div className="bg-card border border-border shadow-large rounded-2xl px-4 py-3 flex items-center gap-3">
+        <div className="h-9 w-9 rounded-full bg-primary/15 flex items-center justify-center text-primary shrink-0">
+          <UserRound size={18} />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-foreground">{first ? `Welcome, ${first}` : 'Welcome back'}</p>
+          <p className="text-xs text-muted-foreground">Glad you're here</p>
+        </div>
+      </div>
+    ),
+    { duration: 4000 }
+  );
+};
+
 export const Profile = () => {
   const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState('');
@@ -63,7 +98,7 @@ export const Profile = () => {
   useEffect(() => {
     if (!user) return;
     supabase.from('profiles').select('display_name').eq('id', user.id).maybeSingle()
-      .then(({ data }) => setName(data?.display_name ?? ''));
+      .then(({ data }) => setName(firstNameOf(data?.display_name)));
   }, [user]);
 
   const returning = localStorage.getItem(RETURNING_KEY) === '1';
