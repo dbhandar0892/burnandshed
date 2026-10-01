@@ -1,4 +1,5 @@
-import { useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
+import type { User } from '@supabase/supabase-js';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -19,6 +20,9 @@ import {
 } from 'lucide-react';
 import { ActivitySnapshot, getActivitySnapshot, subscribeActivity } from '@/lib/activity';
 import { navigate } from '@/lib/nav';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { CreditCard, FileText, LifeBuoy, LogOut, RotateCcw, Shield } from 'lucide-react';
 
 interface BadgeDef {
   id: string;
@@ -126,6 +130,47 @@ const featureBadges: BadgeDef[] = [
 
 export const LetGoTracker = () => {
   const stats = useSyncExternalStore(subscribeActivity, getActivitySnapshot, getActivitySnapshot);
+  const [user, setUser] = useState<User | null>(null);
+  const [firstName, setFirstName] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  useEffect(() => {
+    const sync = async () => {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      setUser(u);
+      if (u) {
+        const { data } = await supabase.from('profiles').select('display_name').eq('id', u.id).maybeSingle();
+        const name = data?.display_name?.trim();
+        setFirstName(name ? name.split(/\s+/)[0] : '');
+      } else {
+        setFirstName('');
+      }
+    };
+    sync();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => { sync(); });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    toast.success('Signed out');
+  };
+
+  const deleteAccount = async () => {
+    const { error } = await supabase.functions.invoke('delete-account');
+    if (error) return toast.error('Could not delete account. Please contact support.');
+    await supabase.auth.signOut();
+    setConfirmDelete(false);
+    toast.success('Your account has been deleted');
+  };
+
+  const restore = () => toast('Restore purchases will be available once App Store subscriptions are live.');
+
+  const manageSubscription = () => {
+    // Apple handles cancellation, plan changes and refunds — hand the user to their App Store subscriptions.
+    window.open('https://apps.apple.com/account/subscriptions', '_blank');
+  };
+
 
   const getStreakMessage = () => {
     if (stats.releases === 0) return 'Ready to start your journey?';
@@ -194,7 +239,9 @@ export const LetGoTracker = () => {
         <div className="w-20 h-20 bg-gradient-success rounded-2xl flex items-center justify-center mx-auto animate-float shadow-success">
           <Trophy className="h-10 w-10 text-white drop-shadow-md" />
         </div>
-        <h2 className="text-3xl font-bold text-foreground tracking-tight">Let Go Tracker</h2>
+        <h2 className="text-3xl font-bold text-foreground tracking-tight">
+          {firstName ? `Welcome, ${firstName}` : 'Welcome'}
+        </h2>
         <p className="text-muted-foreground text-base leading-relaxed max-w-xs mx-auto">
           Celebrate your progress and mental wellness journey
         </p>
@@ -294,24 +341,34 @@ export const LetGoTracker = () => {
       </div>
 
 
-      <div className="text-center mt-auto pt-4 space-y-4">
-        <Card
-          onClick={() => navigate('profile')}
-          className="p-4 bg-card/60 border-border/50 shadow-medium rounded-2xl text-left cursor-pointer transition-all duration-300 hover:shadow-large hover:scale-[1.02] active:scale-[0.98]"
-        >
-          <div className="flex items-center space-x-3">
-            <div className="p-2.5 rounded-xl bg-primary/10">
-              <User className="h-5 w-5 text-primary" />
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold text-foreground tracking-tight">Account</h3>
+        <div className="rounded-2xl border border-border bg-card shadow-soft divide-y divide-border overflow-hidden">
+          {user ? (
+            <>
+              <Row icon={CreditCard} label="Manage subscription" onClick={manageSubscription} />
+              <Row icon={RotateCcw} label="Restore purchases" onClick={restore} />
+              <Row icon={Shield} label="Privacy Policy" onClick={() => window.open('/privacy', '_blank')} />
+              <Row icon={FileText} label="Terms of Use" onClick={() => window.open('/terms', '_blank')} />
+              <Row icon={LifeBuoy} label="Contact support" onClick={() => (window.location.href = 'mailto:support@burnandshed.com')} />
+              <Row icon={LogOut} label="Sign out" onClick={signOut} />
+              <Row icon={Trash2} label="Delete account" onClick={() => setConfirmDelete(true)} danger />
+            </>
+          ) : (
+            <Row icon={User} label="Sign in" onClick={() => navigate('profile')} />
+          )}
+        </div>
+
+        {confirmDelete && user && (
+          <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-4 space-y-3">
+            <p className="text-sm">This permanently deletes your account and profile. Subscriptions must be cancelled separately in your Apple ID settings.</p>
+            <div className="flex gap-2">
+              <button className="flex-1 rounded-xl border border-border py-2 text-sm font-medium hover:bg-muted/60" onClick={() => setConfirmDelete(false)}>Cancel</button>
+              <button className="flex-1 rounded-xl bg-destructive py-2 text-sm font-medium text-white" onClick={deleteAccount}>Delete forever</button>
             </div>
-            <div className="flex-1">
-              <h4 className="font-bold text-foreground">Profile</h4>
-              <p className="text-xs text-muted-foreground font-medium">
-                Account, sign in &amp; privacy
-              </p>
-            </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
           </div>
-        </Card>
+        )}
+
         <p className="text-sm text-muted-foreground font-medium">
           🌟 Badges are yours forever
         </p>
