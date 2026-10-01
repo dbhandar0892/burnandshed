@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { ArrowLeft, ChevronRight, CreditCard, FileText, LifeBuoy, LogOut, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react';
-import { navigate } from '@/lib/nav';
+import { navigate, takeSignInReturn } from '@/lib/nav';
 import { PENDING_TRIAL_KEY } from '@/lib/premium';
 
 // Set when this device has ever signed in, so returning users land on the
