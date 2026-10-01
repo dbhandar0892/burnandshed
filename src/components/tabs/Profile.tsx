@@ -196,7 +196,7 @@ export const Profile = () => {
           <>
             <p className="text-sm text-muted-foreground">{user.email ?? 'Signed in'}</p>
             <div className="flex gap-2">
-              <Input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" maxLength={60} />
+              <Input value={name} onChange={e => setName(e.target.value)} placeholder="First name" maxLength={30} />
               <Button onClick={saveName}>Save</Button>
             </div>
           </>
