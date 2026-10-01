@@ -149,7 +149,7 @@ export const LetGoTracker = () => {
       if (u) {
         const { data } = await supabase.from('profiles').select('display_name').eq('id', u.id).maybeSingle();
         const name = data?.display_name?.trim();
-        setFirstName(name ? name.split(/\s+/)[0] : '');
+        setFirstName(name ? name.trim().split(/\s+/)[0].charAt(0).toUpperCase() + name.trim().split(/\s+/)[0].slice(1) : '');
       } else {
         setFirstName('');
       }
