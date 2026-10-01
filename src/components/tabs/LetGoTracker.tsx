@@ -14,8 +14,11 @@ import {
   Smile,
   Sparkles,
   HeartHandshake,
+  User,
+  ChevronRight,
 } from 'lucide-react';
 import { ActivitySnapshot, getActivitySnapshot, subscribeActivity } from '@/lib/activity';
+import { navigate } from '@/lib/nav';
 
 interface BadgeDef {
   id: string;
@@ -291,7 +294,24 @@ export const LetGoTracker = () => {
       </div>
 
 
-      <div className="text-center mt-auto pt-4">
+      <div className="text-center mt-auto pt-4 space-y-4">
+        <Card
+          onClick={() => navigate('profile')}
+          className="p-4 bg-card/60 border-border/50 shadow-medium rounded-2xl text-left cursor-pointer transition-all duration-300 hover:shadow-large hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <div className="flex items-center space-x-3">
+            <div className="p-2.5 rounded-xl bg-primary/10">
+              <User className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-bold text-foreground">Profile</h4>
+              <p className="text-xs text-muted-foreground font-medium">
+                Account, sign in &amp; privacy
+              </p>
+            </div>
+            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+          </div>
+        </Card>
         <p className="text-sm text-muted-foreground font-medium">
           🌟 Badges are yours forever
         </p>
