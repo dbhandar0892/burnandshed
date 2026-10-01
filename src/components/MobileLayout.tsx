@@ -1,4 +1,4 @@
-import { Droplets, Scissors, Flame, Laugh, Wind, Trophy, Sparkles, UserRound } from 'lucide-react';
+import { Droplets, Scissors, Flame, Laugh, Wind, Trophy, Sparkles } from 'lucide-react';
 import { Profile } from './tabs/Profile';
 import { ShedIt } from './tabs/ShedIt';
 import { VentBox } from './tabs/VentBox';
@@ -75,13 +75,6 @@ export const MobileLayout = () => {
           />
           <p className="logo-tagline mt-2 text-[11px] font-bold">Let go and feel better</p>
         </div>
-        <button
-          onClick={() => navigate('profile')}
-          aria-label="Profile"
-          className="absolute top-2 left-2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-card text-primary border border-border/60 shadow-soft hover:bg-muted/60 hover:shadow-medium active:scale-95 transition-all"
-        >
-          <UserRound size={18} />
-        </button>
       </header>
 
       {/* Main Content with smooth transitions */}
