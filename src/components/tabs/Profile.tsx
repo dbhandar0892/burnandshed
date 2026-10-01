@@ -46,9 +46,9 @@ export const Profile = () => {
         setTimeout(() => {
           // A pending trial is finished (and navigated) by the Premium sync.
           if (localStorage.getItem(PENDING_TRIAL_KEY) !== '1') {
-            toast.success('Signed in');
             navigate('ritual');
           }
+          void greetWithFirstName(session.user);
         }, 0);
       }
     });
