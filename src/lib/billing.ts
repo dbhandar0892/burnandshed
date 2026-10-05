@@ -2,10 +2,13 @@ import { Capacitor } from '@capacitor/core';
 import { Purchases, type CustomerInfo, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
 
 /**
- * RevenueCat public Apple SDK key — publishable, safe to keep in code.
- * Replace the placeholder with the real key from the RevenueCat dashboard
- * (Project → Apps → Burn & Shed iOS → public SDK key, starts with "appl_").
+ * RevenueCat public SDK keys — publishable, safe to keep in code.
+ * - TEST key ("test_..."): RevenueCat Test Store, for development testing only.
+ *   It cannot process real App Store purchases.
+ * - APPLE key ("appl_..."): the real iOS app key from the RevenueCat dashboard
+ *   (Project → Apps → Burn & Shed iOS → public SDK key). Required for release.
  */
+export const REVENUECAT_TEST_API_KEY = 'test_ezaikWKHdqoePlfMxLvMlvhbadq';
 export const REVENUECAT_API_KEY = 'appl_REPLACE_WITH_REVENUECAT_SDK_KEY';
 
 /** Entitlement identifier configured in RevenueCat; covers both plans. */
