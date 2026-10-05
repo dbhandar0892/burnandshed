@@ -51,6 +51,23 @@ export const PremiumScreen = () => {
     navigate('ritual');
   };
 
+  const handlePurchase = async (plan: BillingPlan) => {
+    if (!signedIn) {
+      localStorage.setItem(PENDING_TRIAL_KEY, '1');
+      toast('Sign in to start your free trial');
+      navigate('profile');
+      return;
+    }
+    const result = await purchasePlan(plan);
+    if (result.ok) {
+      markAccountPremium();
+      toast.success('Welcome to Premium');
+      navigate('ritual');
+    } else if (!result.cancelled) {
+      toast.error(result.error || 'Purchase failed. Please try again.');
+    }
+  };
+
   return (
     <div className="h-full overflow-y-auto p-6 space-y-7">
       <div className="text-center space-y-3 animate-fade-in">
