@@ -8,12 +8,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   hasUsedTrial,
+  markAccountPremium,
   PENDING_TRIAL_KEY,
   setPremiumUnlocked,
   startTrial,
   TRIAL_LENGTH_DAYS,
   usePremium,
 } from '@/lib/premium';
+import { isNativeBilling, purchasePlan, type BillingPlan } from '@/lib/billing';
 import { setThemeMode, useTheme } from '@/lib/theme';
 import { navigate } from '@/lib/nav';
 
