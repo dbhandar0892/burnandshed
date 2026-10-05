@@ -100,6 +100,17 @@ export const startTrial = async (): Promise<boolean> => {
   return true;
 };
 
+/**
+ * Marks the cached account entitlement as paid after a store-verified purchase
+ * or restore. The backend copy is synced separately by the billing webhook.
+ */
+export const markAccountPremium = () => {
+  const account = readAccount();
+  if (!account) return;
+  localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ ...account, premium: true }));
+  emit();
+};
+
 let syncing = false;
 let started = false;
 
