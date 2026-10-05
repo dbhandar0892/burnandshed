@@ -133,9 +133,11 @@ export const initPremiumSync = () => {
     if (!session?.user) {
       // Keep the last account's entitlement on this device after sign-out so
       // returning members are still recognized and never see the paywall again.
+      void logOutBilling();
       return;
     }
     const userId = session.user.id;
+    void initBilling(userId, markAccountPremium);
     const cached = readAccount();
     if (cached && cached.userId !== userId) {
       localStorage.removeItem(ACCOUNT_KEY);
