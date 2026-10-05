@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { ActivitySnapshot, getActivitySnapshot, subscribeActivity } from '@/lib/activity';
 import { navigate } from '@/lib/nav';
+import { restorePurchases } from '@/lib/billing';
+import { markAccountPremium } from '@/lib/premium';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CreditCard, FileText, LifeBuoy, LogOut, RotateCcw, Shield, Trash2 } from 'lucide-react';
