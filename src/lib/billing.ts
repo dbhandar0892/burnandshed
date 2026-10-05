@@ -2,10 +2,13 @@ import { Capacitor } from '@capacitor/core';
 import { Purchases, type CustomerInfo, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
 
 /**
- * RevenueCat public Apple SDK key — publishable, safe to keep in code.
- * Replace the placeholder with the real key from the RevenueCat dashboard
- * (Project → Apps → Burn & Shed iOS → public SDK key, starts with "appl_").
+ * RevenueCat public SDK keys — publishable, safe to keep in code.
+ * - TEST key ("test_..."): RevenueCat Test Store, for development testing only.
+ *   It cannot process real App Store purchases.
+ * - APPLE key ("appl_..."): the real iOS app key from the RevenueCat dashboard
+ *   (Project → Apps → Burn & Shed iOS → public SDK key). Required for release.
  */
+export const REVENUECAT_TEST_API_KEY = 'test_ezaikWKHdqoePlfMxLvMlvhbadq';
 export const REVENUECAT_API_KEY = 'appl_REPLACE_WITH_REVENUECAT_SDK_KEY';
 
 /** Entitlement identifier configured in RevenueCat; covers both plans. */
@@ -22,7 +25,12 @@ export interface PurchaseResult {
 /** Real store billing only exists inside the installed iOS/Android app. */
 export const isNativeBilling = () => Capacitor.isNativePlatform();
 
-const hasKey = () => REVENUECAT_API_KEY.startsWith('appl_') && !REVENUECAT_API_KEY.includes('REPLACE');
+const hasAppleKey = () => REVENUECAT_API_KEY.startsWith('appl_') && !REVENUECAT_API_KEY.includes('REPLACE');
+
+/** Key to configure with: real Apple key when present, Test Store key otherwise. */
+const activeKey = () => (hasAppleKey() ? REVENUECAT_API_KEY : REVENUECAT_TEST_API_KEY);
+
+const hasKey = () => Boolean(activeKey());
 
 const isPremiumActive = (info: CustomerInfo) => Boolean(info.entitlements.active[ENTITLEMENT_ID]);
 
@@ -34,7 +42,7 @@ const isPremiumActive = (info: CustomerInfo) => Boolean(info.entitlements.active
 export const initBilling = async (userId: string, onPremiumGranted: () => void) => {
   if (!isNativeBilling() || !hasKey()) return;
   try {
-    await Purchases.configure({ apiKey: REVENUECAT_API_KEY, appUserID: userId });
+    await Purchases.configure({ apiKey: activeKey(), appUserID: userId });
     Purchases.addCustomerInfoUpdateListener(info => {
       if (isPremiumActive(info)) onPremiumGranted();
     });
