@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { ArrowLeft, ChevronRight, CreditCard, FileText, LifeBuoy, LogOut, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react';
 import { navigate, takeSignInReturn } from '@/lib/nav';
-import { PENDING_TRIAL_KEY } from '@/lib/premium';
+import { markAccountPremium, PENDING_TRIAL_KEY } from '@/lib/premium';
+import { restorePurchases } from '@/lib/billing';
 
 // Set when this device has ever signed in, so returning users land on the
 // Sign in view; new users see Create account. Never cleared on sign-out.
@@ -136,7 +137,16 @@ export const Profile = () => {
     toast.success('Your account has been deleted');
   };
 
-  const restore = () => toast('Restore purchases will be available once App Store subscriptions are live.');
+  const restore = async () => {
+    const result = await restorePurchases();
+    if (result.ok) {
+      markAccountPremium();
+      toast.success('Premium restored');
+      navigate('ritual');
+    } else if (!result.cancelled) {
+      toast.error(result.error || 'Could not restore purchases.');
+    }
+  };
 
   const manageSubscription = () => {
     // Apple handles cancellation, plan changes and refunds — hand the user to their App Store subscriptions.

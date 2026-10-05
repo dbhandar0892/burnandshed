@@ -8,12 +8,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   hasUsedTrial,
+  markAccountPremium,
   PENDING_TRIAL_KEY,
   setPremiumUnlocked,
   startTrial,
   TRIAL_LENGTH_DAYS,
   usePremium,
 } from '@/lib/premium';
+import { isNativeBilling, purchasePlan, type BillingPlan } from '@/lib/billing';
 import { setThemeMode, useTheme } from '@/lib/theme';
 import { navigate } from '@/lib/nav';
 
@@ -49,6 +51,23 @@ export const PremiumScreen = () => {
     navigate('ritual');
   };
 
+  const handlePurchase = async (plan: BillingPlan) => {
+    if (!signedIn) {
+      localStorage.setItem(PENDING_TRIAL_KEY, '1');
+      toast('Sign in to start your free trial');
+      navigate('profile');
+      return;
+    }
+    const result = await purchasePlan(plan);
+    if (result.ok) {
+      markAccountPremium();
+      toast.success('Welcome to Premium');
+      navigate('ritual');
+    } else if (!result.cancelled) {
+      toast.error(result.error || 'Purchase failed. Please try again.');
+    }
+  };
+
   return (
     <div className="h-full overflow-y-auto p-6 space-y-7">
       <div className="text-center space-y-3 animate-fade-in">
@@ -77,13 +96,31 @@ export const PremiumScreen = () => {
               or $29.99 a year — about $2.50 a month
             </div>
           </div>
-          <Button
-            onClick={handleStartTrial}
-            disabled={hasUsedTrial()}
-            className="w-full h-14 rounded-2xl bg-gradient-calm text-white text-lg font-bold shadow-primary hover:opacity-90"
-          >
-            {hasUsedTrial() ? 'Trial already used' : `Start ${TRIAL_LENGTH_DAYS}-day free trial`}
-          </Button>
+          {isNativeBilling() ? (
+            <div className="space-y-3">
+              <Button
+                onClick={() => handlePurchase('annual')}
+                className="w-full h-14 rounded-2xl bg-gradient-calm text-white text-lg font-bold shadow-primary hover:opacity-90"
+              >
+                Yearly — $29.99/year
+              </Button>
+              <Button
+                onClick={() => handlePurchase('monthly')}
+                variant="outline"
+                className="w-full h-12 rounded-2xl text-base font-bold"
+              >
+                Monthly — $3.99/month
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={handleStartTrial}
+              disabled={hasUsedTrial()}
+              className="w-full h-14 rounded-2xl bg-gradient-calm text-white text-lg font-bold shadow-primary hover:opacity-90"
+            >
+              {hasUsedTrial() ? 'Trial already used' : `Start ${TRIAL_LENGTH_DAYS}-day free trial`}
+            </Button>
+          )}
           <p className="text-xs text-center text-muted-foreground font-medium">
             7-day free trial, then $3.99/month or $29.99/year. Cancel any time.
           </p>

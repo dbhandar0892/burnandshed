@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { ActivitySnapshot, getActivitySnapshot, subscribeActivity } from '@/lib/activity';
 import { navigate } from '@/lib/nav';
+import { restorePurchases } from '@/lib/billing';
+import { markAccountPremium } from '@/lib/premium';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CreditCard, FileText, LifeBuoy, LogOut, RotateCcw, Shield, Trash2 } from 'lucide-react';
@@ -172,7 +174,16 @@ export const LetGoTracker = () => {
     toast.success('Your account has been deleted');
   };
 
-  const restore = () => toast('Restore purchases will be available once App Store subscriptions are live.');
+  const restore = async () => {
+    const result = await restorePurchases();
+    if (result.ok) {
+      markAccountPremium();
+      toast.success('Premium restored');
+      navigate('ritual');
+    } else if (!result.cancelled) {
+      toast.error(result.error || 'Could not restore purchases.');
+    }
+  };
 
   const manageSubscription = () => {
     // Apple handles cancellation, plan changes and refunds — hand the user to their App Store subscriptions.

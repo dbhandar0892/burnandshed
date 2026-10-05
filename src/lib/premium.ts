@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { initBilling, logOutBilling } from '@/lib/billing';
 import { navigate } from '@/lib/nav';
 import { toast } from 'sonner';
 
@@ -100,6 +101,17 @@ export const startTrial = async (): Promise<boolean> => {
   return true;
 };
 
+/**
+ * Marks the cached account entitlement as paid after a store-verified purchase
+ * or restore. The backend copy is synced separately by the billing webhook.
+ */
+export const markAccountPremium = () => {
+  const account = readAccount();
+  if (!account) return;
+  localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ ...account, premium: true }));
+  emit();
+};
+
 let syncing = false;
 let started = false;
 
@@ -122,9 +134,11 @@ export const initPremiumSync = () => {
     if (!session?.user) {
       // Keep the last account's entitlement on this device after sign-out so
       // returning members are still recognized and never see the paywall again.
+      void logOutBilling();
       return;
     }
     const userId = session.user.id;
+    void initBilling(userId, markAccountPremium);
     const cached = readAccount();
     if (cached && cached.userId !== userId) {
       localStorage.removeItem(ACCOUNT_KEY);
