@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { initBilling, logOutBilling } from '@/lib/billing';
 import { navigate } from '@/lib/nav';
 import { toast } from 'sonner';
 
