@@ -25,7 +25,12 @@ export interface PurchaseResult {
 /** Real store billing only exists inside the installed iOS/Android app. */
 export const isNativeBilling = () => Capacitor.isNativePlatform();
 
-const hasKey = () => REVENUECAT_API_KEY.startsWith('appl_') && !REVENUECAT_API_KEY.includes('REPLACE');
+const hasAppleKey = () => REVENUECAT_API_KEY.startsWith('appl_') && !REVENUECAT_API_KEY.includes('REPLACE');
+
+/** Key to configure with: real Apple key when present, Test Store key otherwise. */
+const activeKey = () => (hasAppleKey() ? REVENUECAT_API_KEY : REVENUECAT_TEST_API_KEY);
+
+const hasKey = () => Boolean(activeKey());
 
 const isPremiumActive = (info: CustomerInfo) => Boolean(info.entitlements.active[ENTITLEMENT_ID]);
 
