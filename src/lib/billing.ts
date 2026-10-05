@@ -42,7 +42,7 @@ const isPremiumActive = (info: CustomerInfo) => Boolean(info.entitlements.active
 export const initBilling = async (userId: string, onPremiumGranted: () => void) => {
   if (!isNativeBilling() || !hasKey()) return;
   try {
-    await Purchases.configure({ apiKey: REVENUECAT_API_KEY, appUserID: userId });
+    await Purchases.configure({ apiKey: activeKey(), appUserID: userId });
     Purchases.addCustomerInfoUpdateListener(info => {
       if (isPremiumActive(info)) onPremiumGranted();
     });
