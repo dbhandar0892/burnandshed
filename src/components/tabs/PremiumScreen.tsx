@@ -96,13 +96,31 @@ export const PremiumScreen = () => {
               or $29.99 a year — about $2.50 a month
             </div>
           </div>
-          <Button
-            onClick={handleStartTrial}
-            disabled={hasUsedTrial()}
-            className="w-full h-14 rounded-2xl bg-gradient-calm text-white text-lg font-bold shadow-primary hover:opacity-90"
-          >
-            {hasUsedTrial() ? 'Trial already used' : `Start ${TRIAL_LENGTH_DAYS}-day free trial`}
-          </Button>
+          {isNativeBilling() ? (
+            <div className="space-y-3">
+              <Button
+                onClick={() => handlePurchase('annual')}
+                className="w-full h-14 rounded-2xl bg-gradient-calm text-white text-lg font-bold shadow-primary hover:opacity-90"
+              >
+                Yearly — $29.99/year
+              </Button>
+              <Button
+                onClick={() => handlePurchase('monthly')}
+                variant="outline"
+                className="w-full h-12 rounded-2xl text-base font-bold"
+              >
+                Monthly — $3.99/month
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={handleStartTrial}
+              disabled={hasUsedTrial()}
+              className="w-full h-14 rounded-2xl bg-gradient-calm text-white text-lg font-bold shadow-primary hover:opacity-90"
+            >
+              {hasUsedTrial() ? 'Trial already used' : `Start ${TRIAL_LENGTH_DAYS}-day free trial`}
+            </Button>
+          )}
           <p className="text-xs text-center text-muted-foreground font-medium">
             7-day free trial, then $3.99/month or $29.99/year. Cancel any time.
           </p>
