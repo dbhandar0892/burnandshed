@@ -136,7 +136,16 @@ export const Profile = () => {
     toast.success('Your account has been deleted');
   };
 
-  const restore = () => toast('Restore purchases will be available once App Store subscriptions are live.');
+  const restore = async () => {
+    const result = await restorePurchases();
+    if (result.ok) {
+      markAccountPremium();
+      toast.success('Premium restored');
+      navigate('ritual');
+    } else if (!result.cancelled) {
+      toast.error(result.error || 'Could not restore purchases.');
+    }
+  };
 
   const manageSubscription = () => {
     // Apple handles cancellation, plan changes and refunds — hand the user to their App Store subscriptions.
