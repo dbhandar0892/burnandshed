@@ -1,55 +1,18 @@
-// Minimal, safe service worker that avoids caching Vite chunks to prevent React duplication
-const CACHE_NAME = 'burn-and-shed-v6';
-const PRECACHE = [
-  '/manifest.json',
-  '/favicon.png',
-  '/icon-192.png',
-  '/icon-512.png'
-];
+// One-release cleanup worker at the old path for returning installations.
+function isAppCache(name) {
+  const workboxBucket = /(^|-)precache-v\d+-|(^|-)runtime-|(^|-)googleAnalytics-/.test(name);
+  return name.startsWith('burn-and-shed-') || (workboxBucket && name.endsWith(self.registration.scope));
+}
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE))
-  );
-  self.skipWaiting();
-});
-
-self.addEventListener('fetch', (event) => {
-  const req = event.request;
-  const url = new URL(req.url);
-
-  // Only handle same-origin GET requests
-  if (req.method !== 'GET' || url.origin !== self.location.origin) return;
-
-  const pathname = url.pathname;
-  const isPrecached = PRECACHE.includes(pathname);
-  const isNavigation = req.mode === 'navigate' || pathname === '/' || pathname === '/index.html';
-
-  // Detect Vite dev/build assets and JS/CSS chunks - never cache them
-  const isViteAsset =
-    pathname.startsWith('/node_modules/.vite/') ||
-    pathname.includes('/@react-refresh') ||
-    pathname.includes('/assets/') ||
-    pathname.endsWith('.js') ||
-    pathname.endsWith('.css') ||
-    url.searchParams.has('v');
-
-  if (isNavigation || !isPrecached || isViteAsset) {
-    // Network-only for runtime/content and all module chunks
-    return; // Let the default browser fetch proceed (no caching)
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', event => event.waitUntil((async () => {
+  try {
+    const names = await caches.keys();
+    await Promise.allSettled(names.filter(isAppCache).map(name => caches.delete(name)));
+    await self.clients.claim();
+    const windows = await self.clients.matchAll({ type: 'window' });
+    await Promise.allSettled(windows.map(client => client.navigate(client.url)));
+  } finally {
+    await self.registration.unregister();
   }
-
-  // Cache-first for a tiny set of safe, static app-shell files
-  event.respondWith(
-    caches.match(req).then((cached) => cached || fetch(req))
-  );
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => (k === CACHE_NAME ? undefined : caches.delete(k))))
-    )
-  );
-  self.clients.claim();
-});
+})()));
