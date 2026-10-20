@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Resolve npm installation conflict between Capacitor 7 and RevenueCat; verify dependency installation without force flags.
+
 - [x] Correct native launch configuration to load bundled dist, remove shell-worker registration, and verify fresh web launch plus launch safeguard tests.
 - [ ] Verify rebuilt iOS archive on device before App Store resubmission — blocked on Mac/Xcode access; build web assets, sync iOS, inspect packaged assets/config, and test cold launch.
 
