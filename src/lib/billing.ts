@@ -33,6 +33,10 @@ const activeKey = () => (hasAppleKey() ? REVENUECAT_API_KEY : REVENUECAT_TEST_AP
 const hasKey = () => Boolean(activeKey());
 
 const isPremiumActive = (info: CustomerInfo) => Boolean(info.entitlements.active[ENTITLEMENT_ID]);
+let billingReady: Promise<void> | null = null;
+let billingUserId: string | null = null;
+let premiumCallback: (() => void) | null = null;
+let listening = false;
 
 /**
  * Configures RevenueCat for the signed-in account and starts listening for
@@ -41,13 +45,25 @@ const isPremiumActive = (info: CustomerInfo) => Boolean(info.entitlements.active
  */
 export const initBilling = async (userId: string, onPremiumGranted: () => void) => {
   if (!isNativeBilling() || !hasKey()) return;
+  premiumCallback = onPremiumGranted;
+  if (billingUserId !== userId || !billingReady) {
+    const previous = billingReady;
+    billingUserId = userId;
+    billingReady = (async () => {
+      await previous?.catch(() => undefined);
+      await Purchases.configure({ apiKey: activeKey(), appUserID: userId });
+      if (!listening) {
+        await Purchases.addCustomerInfoUpdateListener(info => {
+          if (info.originalAppUserId === billingUserId && isPremiumActive(info)) premiumCallback?.();
+        });
+        listening = true;
+      }
+      const { customerInfo } = await Purchases.getCustomerInfo();
+      if (billingUserId === userId && isPremiumActive(customerInfo)) premiumCallback?.();
+    })();
+  }
   try {
-    await Purchases.configure({ apiKey: activeKey(), appUserID: userId });
-    Purchases.addCustomerInfoUpdateListener(info => {
-      if (isPremiumActive(info)) onPremiumGranted();
-    });
-    const { customerInfo } = await Purchases.getCustomerInfo();
-    if (isPremiumActive(customerInfo)) onPremiumGranted();
+    await billingReady;
   } catch (e) {
     console.warn('Billing init failed', e);
   }
@@ -56,7 +72,12 @@ export const initBilling = async (userId: string, onPremiumGranted: () => void) 
 /** Detaches the store from the account on sign-out. */
 export const logOutBilling = async () => {
   if (!isNativeBilling() || !hasKey()) return;
+  const pending = billingReady;
+  billingUserId = null;
+  premiumCallback = null;
+  billingReady = null;
   try {
+    await pending;
     await Purchases.logOut();
   } catch {
     // not configured yet — nothing to do
@@ -74,6 +95,8 @@ const findPackage = (plan: BillingPlan, packages: PurchasesPackage[]): Purchases
 export const purchasePlan = async (plan: BillingPlan): Promise<PurchaseResult> => {
   if (!isNativeBilling() || !hasKey()) return { ok: false, error: 'Store billing is only available in the installed app.' };
   try {
+    if (!billingReady || !billingUserId) return { ok: false, error: 'Please sign in before choosing a subscription.' };
+    await billingReady;
     const offerings = await Purchases.getOfferings();
     const current = offerings.current;
     if (!current || current.availablePackages.length === 0) {
@@ -94,6 +117,8 @@ export const purchasePlan = async (plan: BillingPlan): Promise<PurchaseResult> =
 export const restorePurchases = async (): Promise<PurchaseResult> => {
   if (!isNativeBilling() || !hasKey()) return { ok: false, error: 'Restore is only available in the installed app.' };
   try {
+    if (!billingReady || !billingUserId) return { ok: false, error: 'Please sign in before restoring purchases.' };
+    await billingReady;
     const { customerInfo } = await Purchases.restorePurchases();
     return isPremiumActive(customerInfo)
       ? { ok: true }
