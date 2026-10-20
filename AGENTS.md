@@ -4,3 +4,4 @@
 - Billing is Apple IAP via RevenueCat (@revenuecat/purchases-capacitor) in src/lib/billing.ts, native-only; web keeps the placeholder trial. The revenuecat-webhook edge function (shared-secret auth) is the authoritative sync of entitlements.premium — clients never update that column directly; why: prevents client-side privilege escalation.
 - Native release configuration must load bundled dist with no server.url; why: App Store launch must not depend on a development preview website.
 - App launch uses Sonner with the existing theme store and no shell-worker registration; keep the legacy worker cleanup scoped to app caches, because stale chunks can cause blank launches.
+- Pin the Capacitor family together and use a RevenueCat plugin whose declared peer range supports that major; keep npm and Bun locks synchronized, because incompatible plugin updates prevent native dependency installation.
