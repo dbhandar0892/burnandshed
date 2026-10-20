@@ -1,6 +1,7 @@
 # Roadmap
 
-- [ ] Fix App Store blank launch: bundle native app locally, remove stale launch worker, and verify web launch; rebuilt iOS archive must be tested on a Mac/device.
+- [x] Correct native launch configuration to load bundled dist, remove shell-worker registration, and verify fresh web launch plus launch safeguard tests.
+- [ ] Verify rebuilt iOS archive on device before App Store resubmission — blocked on Mac/Xcode access; build web assets, sync iOS, inspect packaged assets/config, and test cold launch.
 
 - [x] Logo for Burn & Shed — concept 2 selected and added to the header, favicon, and PWA icons
 - [x] Softer shed effect — wash-away wave added as the new "Shed It" tab; shredder kept untouched as "Shred It" (words only)
