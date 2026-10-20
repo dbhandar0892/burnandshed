@@ -181,6 +181,15 @@ export const Profile = () => {
                 ? 'Create an account to keep your subscription with you across devices.'
                 : 'Sign in to pick up where you left off.'}
             </p>
+            <div className="rounded-2xl border border-primary/25 bg-primary/10 p-4 text-left space-y-1.5">
+              <div className="text-sm font-bold text-foreground">Burn &amp; Shed Premium</div>
+              <div className="text-sm text-foreground">
+                <span className="font-bold text-primary">7-day free trial</span>, then $3.99/month or $29.99/year (about $2.50/month).
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Guided Rituals, all 6 breathing sounds, every badge, and light/dark themes. Cancel any time.
+              </p>
+            </div>
             <Button onClick={() => signIn('apple')} className="w-full"> Sign in with Apple</Button>
             <Button onClick={() => signIn('google')} variant="outline" className="w-full">Continue with Google</Button>
             <div className="flex items-center gap-2 text-xs text-muted-foreground"><span className="flex-1 h-px bg-border" />or<span className="flex-1 h-px bg-border" /></div>
