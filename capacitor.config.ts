@@ -4,10 +4,7 @@ const config: CapacitorConfig = {
   appId: 'app.lovable.b46f57453a914fdf912484aec13eba7c',
   appName: 'Burn & Shed',
   webDir: 'dist',
-  server: {
-    url: 'https://b46f5745-3a91-4fdf-9124-84aec13eba7c.lovableproject.com?forceHideBadge=true',
-    cleartext: true
-  },
+  // Release builds load the bundled webDir, never a development preview URL.
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,

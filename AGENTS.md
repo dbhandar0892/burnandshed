@@ -2,3 +2,5 @@
 - Premium features require an active sign-in; the account entitlement stays cached on the device after sign-out so returning members are recognized on sign-in; why: user wants signed-out users prompted to sign in.
 - After a sign-in triggered by a gated feature, return the user to that feature (nav.ts records the origin view when navigating to Profile; Profile reads it on SIGNED_IN, falling back to Rituals); why: user wants sign-in to land back where they clicked, not always on Ritual.
 - Billing is Apple IAP via RevenueCat (@revenuecat/purchases-capacitor) in src/lib/billing.ts, native-only; web keeps the placeholder trial. The revenuecat-webhook edge function (shared-secret auth) is the authoritative sync of entitlements.premium — clients never update that column directly; why: prevents client-side privilege escalation.
+- Native release configuration must load bundled dist with no server.url; why: App Store launch must not depend on a development preview website.
+- App launch uses Sonner with the existing theme store and no shell-worker registration; keep the legacy worker cleanup scoped to app caches, because stale chunks can cause blank launches.

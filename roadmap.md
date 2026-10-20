@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Fix App Store blank launch: bundle native app locally, remove stale launch worker, and verify web launch; rebuilt iOS archive must be tested on a Mac/device.
+
 - [x] Logo for Burn & Shed — concept 2 selected and added to the header, favicon, and PWA icons
 - [x] Softer shed effect — wash-away wave added as the new "Shed It" tab; shredder kept untouched as "Shred It" (words only)
 - [x] Free/Premium split built: free = all release effects unlimited, 100 jokes, Ambient breathe sound, totals and badges. Premium = all 6 breathe sounds, guided rituals, and light/dark themes (no history)

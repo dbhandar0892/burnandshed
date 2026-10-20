@@ -3,23 +3,17 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { applyTheme } from "./lib/theme";
+import { cleanupLegacyAppWorker } from "./lib/launch";
 
 applyTheme();
 
-// Register service worker for PWA
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        console.log('ServiceWorker registered:', registration);
-      })
-      .catch((error) => {
-        console.log('ServiceWorker registration failed:', error);
-      });
-  });
-}
+// Keep home-screen metadata, but do not let old app caches control launch.
+void cleanupLegacyAppWorker();
 
-createRoot(document.getElementById("root")!).render(
+const root = document.getElementById("root");
+if (!root) throw new Error("Burn & Shed launch element is missing.");
+
+createRoot(root).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
