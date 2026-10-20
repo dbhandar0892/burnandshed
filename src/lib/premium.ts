@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { initBilling, logOutBilling } from '@/lib/billing';
+import { initBilling, logOutBilling, isNativeBilling } from '@/lib/billing';
+import { hasPremiumAccess } from '@/lib/purchaseFlow';
 import { navigate } from '@/lib/nav';
 import { toast } from 'sonner';
 
@@ -18,6 +19,7 @@ interface AccountEntitlement {
 
 const listeners = new Set<() => void>();
 let signedIn = false;
+let signedInUserId: string | null = null;
 let cache: PremiumState | null = null;
 
 export interface PremiumState {
@@ -41,15 +43,17 @@ const readAccount = (): AccountEntitlement | null => {
 
 const build = (): PremiumState => {
   const account = readAccount();
-  const purchased = localStorage.getItem(KEY) === '1' || Boolean(account?.premium);
+  const native = isNativeBilling();
+  const previewUnlocked = localStorage.getItem(KEY) === '1';
+  const purchased = Boolean(account?.premium) || (!native && previewUnlocked);
   const localRaw = Number.parseInt(localStorage.getItem(TRIAL_KEY) || '0', 10);
   const localStart = Number.isFinite(localRaw) && localRaw > 0 ? localRaw : 0;
   const start = Math.max(localStart, account?.trialStart ?? 0);
   const msLeft = start ? start + TRIAL_DAYS * 86400000 - Date.now() : 0;
-  const trialActive = msLeft > 0;
+  const trialActive = !native && msLeft > 0;
 
   return {
-    active: signedIn && (purchased || trialActive),
+    active: hasPremiumAccess(native, signedIn, Boolean(account?.premium), previewUnlocked, trialActive),
     source: purchased ? 'purchased' : trialActive ? 'trial' : 'none',
     trialDaysLeft: trialActive ? Math.ceil(msLeft / 86400000) : 0,
     trialUsed: start > 0,
@@ -95,6 +99,7 @@ const saveAccount = (row: { user_id: string; trial_started_at: string | null; pr
  * on the account, so it follows the person across devices and sign-ins.
  */
 export const startTrial = async (): Promise<boolean> => {
+  if (isNativeBilling()) return false;
   const { data, error } = await supabase.rpc('start_trial');
   if (error || !data) return false;
   saveAccount(data as { user_id: string; trial_started_at: string | null; premium: boolean });
@@ -107,8 +112,8 @@ export const startTrial = async (): Promise<boolean> => {
  */
 export const markAccountPremium = () => {
   const account = readAccount();
-  if (!account) return;
-  localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ ...account, premium: true }));
+  if (!signedInUserId) return;
+  localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ userId: signedInUserId, trialStart: account?.userId === signedInUserId ? account.trialStart : 0, premium: true }));
   emit();
 };
 
@@ -122,10 +127,12 @@ export const initPremiumSync = () => {
 
   supabase.auth.getSession().then(({ data }) => {
     signedIn = Boolean(data.session?.user);
+    signedInUserId = data.session?.user.id ?? null;
     emit();
   });
 
   supabase.auth.onAuthStateChange((event, session) => {
+    signedInUserId = session?.user.id ?? null;
     const nowSignedIn = Boolean(session?.user);
     if (nowSignedIn !== signedIn) {
       signedIn = nowSignedIn;
@@ -150,8 +157,14 @@ export const initPremiumSync = () => {
     setTimeout(async () => {
       const hadPremium = getPremium().active;
       const pending = localStorage.getItem(PENDING_TRIAL_KEY) === '1';
-      // Every signed-in account gets its one-time trial automatically.
-      const ok = await startTrial();
+      // Sign-in loads access only. Native trials always require Apple's purchase sheet.
+      const { data } = await supabase.from('entitlements').select('user_id, trial_started_at, premium').eq('user_id', userId).maybeSingle();
+      if (signedInUserId !== userId) { syncing = false; return; }
+      if (data) {
+        const locallyConfirmed = readAccount();
+        saveAccount({ ...data, premium: data.premium || Boolean(locallyConfirmed?.userId === userId && locallyConfirmed.premium) });
+      }
+      const ok = pending && !isNativeBilling() ? await startTrial() : false;
       syncing = false;
       if (pending) {
         localStorage.removeItem(PENDING_TRIAL_KEY);

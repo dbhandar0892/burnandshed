@@ -1,5 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Purchases, type CustomerInfo, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
+import { findPlanPackage, type BillingPlan } from './purchaseFlow';
+export type { BillingPlan } from './purchaseFlow';
 
 /**
  * RevenueCat public SDK keys — publishable, safe to keep in code.
@@ -13,8 +15,6 @@ export const REVENUECAT_API_KEY = 'appl_REPLACE_WITH_REVENUECAT_SDK_KEY';
 
 /** Entitlement identifier configured in RevenueCat; covers both plans. */
 const ENTITLEMENT_ID = 'premium';
-
-export type BillingPlan = 'monthly' | 'annual';
 
 export interface PurchaseResult {
   ok: boolean;
@@ -64,8 +64,7 @@ export const logOutBilling = async () => {
 };
 
 const findPackage = (plan: BillingPlan, packages: PurchasesPackage[]): PurchasesPackage | undefined => {
-  const id = plan === 'annual' ? '$rc_annual' : '$rc_monthly';
-  return packages.find(p => p.identifier === id) ?? packages[plan === 'annual' ? 1 : 0] ?? packages[0];
+  return findPlanPackage(plan, packages);
 };
 
 /**
