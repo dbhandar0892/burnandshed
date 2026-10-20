@@ -41,7 +41,7 @@ export const takeSignInReturn = (): ViewId | null => {
   try {
     const target = localStorage.getItem(RETURN_KEY) as ViewId | null;
     localStorage.removeItem(RETURN_KEY);
-    if (target && target !== 'profile' && target !== 'premium') return target;
+    if (target && target !== 'profile') return target;
   } catch { /* ignore */ }
   return null;
 };
