@@ -2,8 +2,8 @@ import { afterEach, expect, test } from 'bun:test';
 import config from '../../capacitor.config';
 import { cleanupLegacyAppWorker } from './launch';
 
-const originals = new Map<string, PropertyDescriptor | undefined>();
-function mockGlobal(name: string, value: unknown) {
+const originals = new Map();
+function mockGlobal(name, value) {
   originals.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
   Object.defineProperty(globalThis, name, { value, configurable: true });
 }
@@ -21,8 +21,8 @@ test('native release loads bundled app instead of a remote preview', () => {
 });
 
 test('startup removes legacy shell worker and caches without touching messaging', async () => {
-  const removedWorkers: string[] = [];
-  const removedCaches: string[] = [];
+  const removedWorkers = [];
+  const removedCaches = [];
   mockGlobal('navigator', { serviceWorker: { getRegistrations: async () =>
     ['sw.js', 'firebase-messaging-sw.js'].map(path => ({
       active: { scriptURL: `https://burnandshed.com/${path}` },
@@ -31,7 +31,7 @@ test('startup removes legacy shell worker and caches without touching messaging'
   mockGlobal('window', { location: { origin: 'https://burnandshed.com' }, caches: {} });
   mockGlobal('caches', {
     keys: async () => ['burn-and-shed-v6', 'firebase-messaging'],
-    delete: async (key: string) => { removedCaches.push(key); return true; },
+    delete: async (key) => { removedCaches.push(key); return true; },
   });
   await cleanupLegacyAppWorker();
   expect(removedWorkers).toEqual(['sw.js']);
