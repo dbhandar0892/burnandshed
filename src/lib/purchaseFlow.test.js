@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { DEFAULT_BILLING_PLAN, findPlanPackage, getPurchaseDestination, hasPremiumAccess } from './purchaseFlow';
+import { DEFAULT_BILLING_PLAN, findPlanPackage, getPurchaseDestination, hasPremiumAccess, showsPlanPage } from './purchaseFlow';
 
 test('annual is the initially selected plan', () => {
   expect(DEFAULT_BILLING_PLAN).toBe('annual');
@@ -25,4 +25,11 @@ test('signed-out members cannot use Premium even with a paid entitlement', () =>
 test('confirmed purchase returns to Rituals; cancellation stays on plan selection', () => {
   expect(getPurchaseDestination(true)).toBe('ritual');
   expect(getPurchaseDestination(false)).toBe('premium');
+});
+
+test('returning devices go straight to sign-in instead of the plan page', () => {
+  expect(showsPlanPage(false, true, false)).toBe(true); // first visit shows the plans
+  expect(showsPlanPage(false, true, true)).toBe(false); // returning device: sign-in only
+  expect(showsPlanPage(false, false, true)).toBe(false);
+  expect(showsPlanPage(true, true, true)).toBe(true); // signed in users still see plans
 });
