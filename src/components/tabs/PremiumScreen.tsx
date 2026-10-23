@@ -13,7 +13,7 @@ const FEATURES = [
   'Guided Rituals to release stress',
   'All 6 calming breathing sounds',
   'Unlock every badge',
-  'Complete laugh library — 100 jokes',
+  'Complete laugh library',
 ];
 
 export const PremiumScreen = () => {
