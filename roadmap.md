@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Returning-device sign-in opens the sign-in form without trial/pricing promotions; subscription choices stay on the Premium page.
+
 - [x] Guided Rituals purchase flow: Explore Premium → choose annual/monthly plan → Apple confirmation → Guided Rituals; selected plan survives required sign-in, native auto-trial and preview bypass removed. Browser handoff and seven safeguard tests passed; actual Apple confirmation remains blocked on release configuration/device access below.
 
 - [x] Resolve npm installation conflict: compatible packages pinned, npm lock synchronized, and clean npm ci passed without force flags.

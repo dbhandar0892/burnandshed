@@ -16,6 +16,10 @@ export const getPurchaseDestination = (confirmed: boolean) => confirmed ? 'ritua
 /** Set once this device has ever opened the Premium plan page. */
 export const PREMIUM_PLANS_SEEN_KEY = 'bs_premium_plans_seen';
 
+/** A remembered account or plan visit opens authentication in sign-in mode. */
+export const getInitialAuthMode = (rememberedAccount: boolean, seenPlans: boolean) =>
+  rememberedAccount || seenPlans ? 'signin' as const : 'signup' as const;
+
 /** Returning devices skip Explore Premium and go straight to the sign-in page. */
 export const showsPlanPage = (signedIn: boolean, explore: boolean, seenPlans: boolean) =>
   signedIn || (explore && !seenPlans);

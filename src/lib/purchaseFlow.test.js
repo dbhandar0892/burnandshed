@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { DEFAULT_BILLING_PLAN, findPlanPackage, getPurchaseDestination, hasPremiumAccess, showsPlanPage } from './purchaseFlow';
+import { DEFAULT_BILLING_PLAN, findPlanPackage, getInitialAuthMode, getPurchaseDestination, hasPremiumAccess, showsPlanPage } from './purchaseFlow';
 
 test('annual is the initially selected plan', () => {
   expect(DEFAULT_BILLING_PLAN).toBe('annual');
@@ -32,4 +32,11 @@ test('returning devices go straight to sign-in instead of the plan page', () => 
   expect(showsPlanPage(false, true, true)).toBe(false); // returning device: sign-in only
   expect(showsPlanPage(false, false, true)).toBe(false);
   expect(showsPlanPage(true, true, true)).toBe(true); // signed in users still see plans
+});
+
+test('remembered devices open sign-in, not account creation', () => {
+  expect(getInitialAuthMode(true, false)).toBe('signin');
+  expect(getInitialAuthMode(false, true)).toBe('signin');
+  expect(getInitialAuthMode(true, true)).toBe('signin');
+  expect(getInitialAuthMode(false, false)).toBe('signup');
 });
