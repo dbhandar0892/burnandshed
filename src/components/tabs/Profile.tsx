@@ -9,6 +9,7 @@ import { ArrowLeft, ChevronRight, CreditCard, FileText, LifeBuoy, LogOut, Rotate
 import { navigate, takeSignInReturn } from '@/lib/nav';
 import { markAccountPremium, PENDING_TRIAL_KEY } from '@/lib/premium';
 import { restorePurchases } from '@/lib/billing';
+import { getInitialAuthMode, PREMIUM_PLANS_SEEN_KEY } from '@/lib/purchaseFlow';
 
 // Set when this device has ever signed in, so returning users land on the
 // Sign in view; new users see Create account. Never cleared on sign-out.
@@ -66,7 +67,8 @@ export const Profile = () => {
   }, [user]);
 
   const returning = localStorage.getItem(RETURNING_KEY) === '1';
-  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(returning ? 'signin' : 'signup');
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(() =>
+    getInitialAuthMode(returning, localStorage.getItem(PREMIUM_PLANS_SEEN_KEY) === '1'));
   const [email, setEmail] = useState(returning ? localStorage.getItem(LAST_EMAIL_KEY) ?? '' : '');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -181,15 +183,6 @@ export const Profile = () => {
                 ? 'Create an account to keep your subscription with you across devices.'
                 : 'Sign in to pick up where you left off.'}
             </p>
-            <div className="rounded-2xl border border-primary/25 bg-primary/10 p-4 text-left space-y-1.5">
-              <div className="text-sm font-bold text-foreground">Burn &amp; Shed Premium</div>
-              <div className="text-sm text-foreground">
-                <span className="font-bold text-primary">7-day free trial</span>, then $3.99/month or $29.99/year (about $2.50/month).
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Guided Rituals, all 6 breathing sounds, every badge, and the complete laugh library. Cancel any time.
-              </p>
-            </div>
             <Button onClick={() => signIn('apple')} className="w-full"> Sign in with Apple</Button>
             <Button onClick={() => signIn('google')} variant="outline" className="w-full">Continue with Google</Button>
             <div className="flex items-center gap-2 text-xs text-muted-foreground"><span className="flex-1 h-px bg-border" />or<span className="flex-1 h-px bg-border" /></div>
