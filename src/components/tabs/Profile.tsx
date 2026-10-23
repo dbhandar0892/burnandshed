@@ -187,7 +187,7 @@ export const Profile = () => {
                 <span className="font-bold text-primary">7-day free trial</span>, then $3.99/month or $29.99/year (about $2.50/month).
               </div>
               <p className="text-xs text-muted-foreground">
-                Guided Rituals, all 6 breathing sounds, every badge, and light/dark themes. Cancel any time.
+                Guided Rituals, all 6 breathing sounds, every badge, and the complete laugh library. Cancel any time.
               </p>
             </div>
             <Button onClick={() => signIn('apple')} className="w-full"> Sign in with Apple</Button>
