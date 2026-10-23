@@ -191,7 +191,7 @@ export const Rituals = () => {
         <PremiumLock
           explore
           title="Guided Rituals is a Premium feature"
-          description="Move through a complete release, a one-minute reset, and gentle check-ins."
+          description="Move through a complete release, a one-minute reset, gentle check-ins, and a laugh when you need one."
         />
       </div>
     );
