@@ -11,7 +11,7 @@ import { navigate } from '@/lib/nav';
 
 const FEATURES = [
   'Guided Rituals to release stress',
-  'All 6 calming breathing sounds',
+  'Calming sounds with guided breathing',
   'Unlock every badge',
   'Complete laugh library',
 ];
