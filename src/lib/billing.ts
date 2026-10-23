@@ -11,7 +11,7 @@ export type { BillingPlan } from './purchaseFlow';
  *   (Project → Apps → Burn & Shed iOS → public SDK key). Required for release.
  */
 export const REVENUECAT_TEST_API_KEY = 'test_ezaikWKHdqoePlfMxLvMlvhbadq';
-export const REVENUECAT_API_KEY = 'appl_REPLACE_WITH_REVENUECAT_SDK_KEY';
+export const REVENUECAT_API_KEY = 'appl_GJWniOhbJmJykBMkpDKAtWmPOIX';
 
 /** Entitlement identifier configured in RevenueCat; covers both plans. */
 const ENTITLEMENT_ID = 'premium';
