@@ -12,3 +12,10 @@ export const hasPremiumAccess = (native: boolean, signedIn: boolean, accountPrem
   signedIn && (accountPremium || (!native && (previewUnlocked || trialActive)));
 
 export const getPurchaseDestination = (confirmed: boolean) => confirmed ? 'ritual' as const : 'premium' as const;
+
+/** Set once this device has ever opened the Premium plan page. */
+export const PREMIUM_PLANS_SEEN_KEY = 'bs_premium_plans_seen';
+
+/** Returning devices skip Explore Premium and go straight to the sign-in page. */
+export const showsPlanPage = (signedIn: boolean, explore: boolean, seenPlans: boolean) =>
+  signedIn || (explore && !seenPlans);

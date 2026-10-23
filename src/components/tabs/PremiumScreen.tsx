@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Sparkles, CheckCircle2, ArrowLeft, Loader2, Sun, Moon, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { hasUsedTrial, markAccountPremium, setPremiumUnlocked, startTrial, usePremium } from '@/lib/premium';
 import { isNativeBilling, purchasePlan, restorePurchases, type BillingPlan } from '@/lib/billing';
-import { DEFAULT_BILLING_PLAN, PENDING_PLAN_KEY, getPurchaseDestination } from '@/lib/purchaseFlow';
+import { DEFAULT_BILLING_PLAN, PENDING_PLAN_KEY, PREMIUM_PLANS_SEEN_KEY, getPurchaseDestination } from '@/lib/purchaseFlow';
 import { setThemeMode, useTheme } from '@/lib/theme';
 import { navigate } from '@/lib/nav';
 
@@ -22,6 +22,11 @@ export const PremiumScreen = () => {
   const native = isNativeBilling();
   const [plan, setPlan] = useState<BillingPlan>(() => localStorage.getItem(PENDING_PLAN_KEY) === 'monthly' ? 'monthly' : DEFAULT_BILLING_PLAN);
   const [busy, setBusy] = useState(false);
+  // Remember that this device has seen the plans, so returning users skip
+  // Explore Premium and go straight to the sign-in page next time.
+  useEffect(() => {
+    localStorage.setItem(PREMIUM_PLANS_SEEN_KEY, '1');
+  }, []);
 
   const selectPlan = (next: BillingPlan) => {
     setPlan(next);
