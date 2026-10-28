@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { lovable } from '@/integrations/lovable/index';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 import {
-  appOriginForUserAgent,
   buildHandoffUrl,
   parseHashParams,
 } from '@/lib/authHandoff';
@@ -30,7 +30,7 @@ export const NativeAuthStart = () => {
       .signInWithOAuth(provider, { redirect_uri: `${window.location.origin}/auth/native-bridge` })
       .then(result => {
         if (alive && result.error) setFailed(true);
-      });
+      }).catch(() => { if (alive) setFailed(true); });
     return () => {
       alive = false;
     };
@@ -53,53 +53,63 @@ export const NativeAuthStart = () => {
 };
 
 export const NativeAuthBridge = () => {
-  const [state, setState] = useState<'wait' | 'signed' | 'error'>('wait');
+  const [state, setState] = useState<'wait' | 'signed' | 'error' | 'return'>('wait');
+  const [returnUrl, setReturnUrl] = useState<string | null>(null);
+  const [callbackParams] = useState(() => parseHashParams(window.location.hash));
 
   useEffect(() => {
     let alive = true;
 
-    // The OAuth return carries the session in the URL. Feed it to Supabase in
-    // case automatic detection has not consumed it yet.
-    const params = parseHashParams(window.location.hash);
-    if (params.access_token && params.refresh_token) {
-      void supabase.auth.setSession({
-        access_token: params.access_token,
-        refresh_token: params.refresh_token,
-      });
+    let pollTimer: ReturnType<typeof setTimeout> | undefined;
+    // Independent deadline: a stalled session request must not spin forever.
+    const deadline = setTimeout(() => {
+      if (alive) { alive = false; setState('error'); }
+      if (pollTimer) clearTimeout(pollTimer);
+    }, 15000);
+    const finish = (tokens: { access_token: string; refresh_token: string }) => {
+      if (!alive) return;
+      clearTimeout(deadline);
+      const target = buildHandoffUrl(navigator.userAgent, tokens);
       history.replaceState(null, '', window.location.pathname + window.location.search);
-    }
-
-    const started = Date.now();
+      if (!target) { setState('signed'); return; }
+      setReturnUrl(target);
+      setState('return');
+      // Safari needs a registered custom scheme, not capacitor://localhost.
+      window.location.href = target;
+    };
     const poll = async () => {
       if (!alive) return;
-      const { data } = await supabase.auth.getSession();
-      const session = data.session;
-      if (session) {
-        alive = false;
-        const target = buildHandoffUrl(navigator.userAgent, {
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-        });
-        if (!target) {
-          // Plain web browser: nothing to hand back to.
-          setState('signed');
-          return;
-        }
-        window.location.href = target;
-        return;
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (!alive) return;
+        if (error) { clearTimeout(deadline); setState('error'); return; }
+        if (data.session) { finish(data.session); return; }
+        pollTimer = setTimeout(() => { void poll(); }, 400);
+      } catch {
+        if (alive) { clearTimeout(deadline); setState('error'); }
       }
-      if (Date.now() - started > 15000) {
-        setState('error');
-        return;
-      }
-      setTimeout(poll, 400);
     };
-    void poll();
+    // Pass fresh OAuth tokens directly back; the app validates and persists
+    // them. Waiting for Safari's own session hydration can deadlock here.
+    if (callbackParams.access_token && callbackParams.refresh_token) {
+      finish({ access_token: callbackParams.access_token, refresh_token: callbackParams.refresh_token });
+    } else { void poll(); }
 
     return () => {
       alive = false;
+      clearTimeout(deadline);
+      if (pollTimer) clearTimeout(pollTimer);
     };
-  }, []);
+  }, [callbackParams]);
+
+  if (state === 'return' && returnUrl) {
+    return (
+      <Shell>
+        <p className="text-sm text-muted-foreground">Your sign-in is ready.</p>
+        <Button asChild><a href={returnUrl} rel="noreferrer">Return to Burn &amp; Shed</a></Button>
+      </Shell>
+    );
+  }
 
   if (state === 'signed') {
     return (

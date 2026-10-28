@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Repair Safari callback: registered iOS return link, native warm/cold listeners, direct callback-token handoff, return button and independent timeout. Browser callback checks and 14 safeguards passed.
+- [ ] Verify real Google sign-in returns from Safari into the rebuilt iPhone app — blocked on publishing the updated hosted callback and Mac/iPhone access; preview account session was unavailable.
+
 - [x] Returning-device sign-in opens the sign-in form without trial/pricing promotions; subscription choices stay on the Premium page.
 
 - [x] Guided Rituals purchase flow: Explore Premium → choose annual/monthly plan → Apple confirmation → Guided Rituals; selected plan survives required sign-in, native auto-trial and preview bypass removed. Browser handoff and seven safeguard tests passed; actual Apple confirmation remains blocked on release configuration/device access below.
