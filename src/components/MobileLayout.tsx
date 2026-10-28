@@ -64,7 +64,7 @@ export const MobileLayout = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-md mx-auto shadow-large">
       {/* Header with enhanced gradient and depth */}
-      <header className="bg-gradient-calm px-6 py-5 text-center shadow-medium relative overflow-hidden">
+      <header className="bg-gradient-calm px-6 py-5 text-center shadow-medium relative overflow-hidden sticky top-0 z-30">
         <div className="absolute inset-0 bg-gradient-mesh-calm opacity-40" />
 
         <div className="relative z-10 flex flex-col items-center">
@@ -85,7 +85,7 @@ export const MobileLayout = () => {
       </main>
 
       {/* Bottom Navigation with modern design */}
-      <nav className="bg-card/80 backdrop-blur-lg border-t border-border/50 p-2 shadow-large">
+      <nav className="bg-card/80 backdrop-blur-lg border-t border-border/50 p-2 shadow-large sticky bottom-0 z-30">
         <div className="flex justify-between items-center gap-0.5">
           {tabs.map((tab) => {
             const Icon = tab.icon;
