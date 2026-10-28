@@ -4,7 +4,6 @@ import { lovable } from '@/integrations/lovable/index';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import {
-  appOriginForUserAgent,
   buildHandoffUrl,
   parseHashParams,
 } from '@/lib/authHandoff';
@@ -56,13 +55,17 @@ export const NativeAuthStart = () => {
 export const NativeAuthBridge = () => {
   const [state, setState] = useState<'wait' | 'signed' | 'error' | 'return'>('wait');
   const [returnUrl, setReturnUrl] = useState<string | null>(null);
+  const [callbackParams] = useState(() => parseHashParams(window.location.hash));
 
   useEffect(() => {
     let alive = true;
 
     let pollTimer: ReturnType<typeof setTimeout> | undefined;
     // Independent deadline: a stalled session request must not spin forever.
-    const deadline = setTimeout(() => { if (alive) setState('error'); }, 15000);
+    const deadline = setTimeout(() => {
+      if (alive) { alive = false; setState('error'); }
+      if (pollTimer) clearTimeout(pollTimer);
+    }, 15000);
     const finish = (tokens: { access_token: string; refresh_token: string }) => {
       if (!alive) return;
       clearTimeout(deadline);
@@ -74,7 +77,6 @@ export const NativeAuthBridge = () => {
       // Safari needs a registered custom scheme, not capacitor://localhost.
       window.location.href = target;
     };
-    const params = parseHashParams(window.location.hash);
     const poll = async () => {
       if (!alive) return;
       try {
@@ -89,8 +91,8 @@ export const NativeAuthBridge = () => {
     };
     // Pass fresh OAuth tokens directly back; the app validates and persists
     // them. Waiting for Safari's own session hydration can deadlock here.
-    if (params.access_token && params.refresh_token) {
-      finish({ access_token: params.access_token, refresh_token: params.refresh_token });
+    if (callbackParams.access_token && callbackParams.refresh_token) {
+      finish({ access_token: callbackParams.access_token, refresh_token: callbackParams.refresh_token });
     } else { void poll(); }
 
     return () => {
@@ -98,7 +100,7 @@ export const NativeAuthBridge = () => {
       clearTimeout(deadline);
       if (pollTimer) clearTimeout(pollTimer);
     };
-  }, []);
+  }, [callbackParams]);
 
   if (state === 'return' && returnUrl) {
     return (
