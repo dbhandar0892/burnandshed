@@ -2,7 +2,8 @@ import { useSyncExternalStore } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { initBilling, logOutBilling, isNativeBilling } from '@/lib/billing';
 import { hasPremiumAccess } from '@/lib/purchaseFlow';
-import { navigate } from '@/lib/nav';
+import { navigate, takeSignInReturn } from '@/lib/nav';
+import { POST_SIGNIN_RETURN_KEY } from '@/lib/authHandoff';
 import { toast } from 'sonner';
 
 const KEY = 'premiumUnlocked'; // preview unlock placeholder for real billing
@@ -120,6 +121,14 @@ export const markAccountPremium = () => {
 let syncing = false;
 let started = false;
 
+/** One-shot: after a sign-in that reloaded the page (web OAuth return or the
+ * native handoff), send the user back to the feature they came from. */
+const consumePostSignInReturn = (): void => {
+  if (localStorage.getItem(POST_SIGNIN_RETURN_KEY) !== '1') return;
+  localStorage.removeItem(POST_SIGNIN_RETURN_KEY);
+  navigate(takeSignInReturn() ?? 'ritual');
+};
+
 /** Keeps Premium status in sync with the signed-in account. Call once at app start. */
 export const initPremiumSync = () => {
   if (started) return;
@@ -129,6 +138,9 @@ export const initPremiumSync = () => {
     signedIn = Boolean(data.session?.user);
     signedInUserId = data.session?.user.id ?? null;
     emit();
+    // The session can already exist when the page reloads right after sign-in
+    // (OAuth return or native handoff), so the SIGNED_IN event never fires.
+    if (signedIn) consumePostSignInReturn();
   });
 
   supabase.auth.onAuthStateChange((event, session) => {
@@ -137,6 +149,10 @@ export const initPremiumSync = () => {
     if (nowSignedIn !== signedIn) {
       signedIn = nowSignedIn;
       emit();
+    }
+    if (event === 'SIGNED_IN' && session?.user) {
+      // A pending trial is finished (and navigated) by the Premium sync below.
+      if (localStorage.getItem(PENDING_TRIAL_KEY) !== '1') consumePostSignInReturn();
     }
     if (!session?.user) {
       // Keep the last account's entitlement on this device after sign-out so

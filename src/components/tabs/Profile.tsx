@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { ArrowLeft, ChevronRight, CreditCard, FileText, LifeBuoy, LogOut, RotateCcw, Shield, Trash2, UserRound } from 'lucide-react';
-import { navigate, takeSignInReturn } from '@/lib/nav';
+import { navigate } from '@/lib/nav';
+import { isNativeApp, startNativeSocialSignIn } from '@/lib/nativeAuth';
 import { markAccountPremium, PENDING_TRIAL_KEY } from '@/lib/premium';
 import { restorePurchases } from '@/lib/billing';
 import { getInitialAuthMode, PREMIUM_PLANS_SEEN_KEY } from '@/lib/purchaseFlow';
@@ -37,17 +38,16 @@ export const Profile = () => {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      // Navigate right after an actual sign-in (Apple, Google or email) back to
-      // the feature the user came from. INITIAL_SESSION (returning to the page
-      // already signed in) intentionally does not navigate, so profile actions
-      // stay reachable.
+      // Post-sign-in routing lives in the Premium sync so it also runs after
+      // the page reload that web OAuth and the native sign-in handoff cause.
+      // INITIAL_SESSION (returning to the page already signed in) does not
+      // navigate, so profile actions stay reachable.
       if (event === 'SIGNED_IN' && session?.user) {
         rememberAccount(session.user.email);
         setTimeout(() => {
           // A pending trial is finished (and navigated) by the Premium sync.
           if (localStorage.getItem(PENDING_TRIAL_KEY) !== '1') {
             toast.success('Signed in');
-            navigate(takeSignInReturn() ?? 'ritual');
           }
         }, 0);
       }
@@ -74,6 +74,12 @@ export const Profile = () => {
   const [busy, setBusy] = useState(false);
 
   const signIn = async (provider: 'apple' | 'google') => {
+    if (isNativeApp()) {
+      // The native WebView cannot serve the OAuth routes; sign in on the
+      // hosted site and come back with the session tokens.
+      startNativeSocialSignIn(provider);
+      return;
+    }
     const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
     if (result.error) toast.error('Sign in failed. Please try again.');
   };
