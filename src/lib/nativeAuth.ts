@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
-import { parseAuthHandoff } from './authHandoff';
+import { parseAuthHandoff, POST_SIGNIN_RETURN_KEY } from './authHandoff';
 
 // Social sign-in only works on hosted origins: Lovable's OAuth proxy serves
 // the /~oauth routes there, not inside the native app bundle. The native
@@ -23,10 +23,13 @@ export const startNativeSocialSignIn = (provider: SocialProvider): void => {
 export const handleAuthHandoff = async (): Promise<void> => {
   const tokens = parseAuthHandoff(window.location.hash);
   if (!tokens) return;
+  let ok = false;
   try {
     await supabase.auth.setSession(tokens);
+    ok = true;
   } catch {
     // Expired or invalid handoff: stay signed out; the user can sign in again.
   }
   history.replaceState(null, '', window.location.pathname + window.location.search);
+  if (ok) localStorage.setItem(POST_SIGNIN_RETURN_KEY, '1');
 };
