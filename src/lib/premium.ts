@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { initBilling, logOutBilling, isNativeBilling } from '@/lib/billing';
 import { hasPremiumAccess } from '@/lib/purchaseFlow';
 import { navigate, takeSignInReturn } from '@/lib/nav';
+import { POST_SIGNIN_RETURN_KEY } from '@/lib/authHandoff';
 import { toast } from 'sonner';
 
 const KEY = 'premiumUnlocked'; // preview unlock placeholder for real billing
