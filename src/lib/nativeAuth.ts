@@ -37,9 +37,11 @@ export const initNativeAuthLinks = async (): Promise<void> => {
   const complete = async (url: string) => {
     const tokens = parseNativeCallback(url);
     if (!tokens) return;
-    const ok = await restoreHandoffSession(tokens);
+    await restoreHandoffSession(tokens);
     try { await Browser.close(); } catch { /* Already closed by iOS. */ }
-    if (ok) window.location.replace('/');
+    // Premium's auth listener restores the originating feature on warm return;
+    // its initial session check does the same after a cold launch. Do not
+    // reload here: that would discard the just-restored feature selection.
   };
   await App.addListener('appUrlOpen', ({ url }) => { void complete(url); });
   const launch = await App.getLaunchUrl();
