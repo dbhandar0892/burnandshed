@@ -1,4 +1,5 @@
 import ResetPassword from "./pages/ResetPassword";
+import { NativeAuthBridge, NativeAuthStart } from "./pages/NativeAuth";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 // TooltipProvider removed to avoid runtime issue; Radix tooltips work without global provider
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,6 +18,8 @@ const App = () => (
         <Route path="/" element={<Index />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/auth/native" element={<NativeAuthStart />} />
+        <Route path="/auth/native-bridge" element={<NativeAuthBridge />} />
         <Route path="/terms" element={<Terms />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
