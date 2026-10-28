@@ -4,7 +4,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { applyTheme } from "./lib/theme";
 import { cleanupLegacyAppWorker } from "./lib/launch";
-import { handleAuthHandoff } from "./lib/nativeAuth";
+import { handleAuthHandoff, initNativeAuthLinks } from "./lib/nativeAuth";
 import { POST_SIGNIN_RETURN_KEY } from "./lib/authHandoff";
 
 applyTheme();
@@ -23,7 +23,7 @@ const root = document.getElementById("root");
 if (!root) throw new Error("Burn & Shed launch element is missing.");
 
 // Consume any sign-in handoff before first render so the app starts signed in.
-void handleAuthHandoff().finally(() => {
+void initNativeAuthLinks().then(handleAuthHandoff).finally(() => {
   createRoot(root).render(
     <React.StrictMode>
       <App />

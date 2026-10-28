@@ -77,7 +77,8 @@ export const Profile = () => {
     if (isNativeApp()) {
       // The native WebView cannot serve the OAuth routes; sign in on the
       // hosted site and come back with the session tokens.
-      startNativeSocialSignIn(provider);
+      try { await startNativeSocialSignIn(provider); }
+      catch { toast.error('Sign in could not start. Please try again.'); }
       return;
     }
     const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
