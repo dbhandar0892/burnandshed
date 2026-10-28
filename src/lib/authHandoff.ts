@@ -1,6 +1,10 @@
 // Pure helpers for the native social sign-in handoff. No imports, so it stays
 // testable in isolation.
 
+/** localStorage flag marking that the next signed-in boot should return the
+ * user to the feature they came from (set by the OAuth return and handoff). */
+export const POST_SIGNIN_RETURN_KEY = 'bs_return_after_signin';
+
 /** Hash parameter names that carry session tokens back into the app. */
 export const HANDOFF_ACCESS_PARAM = 'bs_at';
 export const HANDOFF_REFRESH_PARAM = 'bs_rt';

@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { initBilling, logOutBilling, isNativeBilling } from '@/lib/billing';
 import { hasPremiumAccess } from '@/lib/purchaseFlow';
-import { navigate } from '@/lib/nav';
+import { navigate, takeSignInReturn } from '@/lib/nav';
 import { toast } from 'sonner';
 
 const KEY = 'premiumUnlocked'; // preview unlock placeholder for real billing
