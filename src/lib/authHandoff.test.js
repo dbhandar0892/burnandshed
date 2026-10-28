@@ -4,6 +4,7 @@ import {
   buildHandoffUrl,
   parseAuthHandoff,
   parseHashParams,
+  parseNativeCallback,
 } from './authHandoff';
 
 const TOKENS = {
@@ -13,7 +14,7 @@ const TOKENS = {
 
 test('handoff tokens round-trip through a URL hash, including plus signs', () => {
   const url = buildHandoffUrl('iPhone UA', TOKENS);
-  expect(url).toBe(`capacitor://localhost/#bs_at=${encodeURIComponent(TOKENS.access_token)}&bs_rt=${encodeURIComponent(TOKENS.refresh_token)}`);
+  expect(url).toBe(`burnandshed://auth/callback#bs_at=${encodeURIComponent(TOKENS.access_token)}&bs_rt=${encodeURIComponent(TOKENS.refresh_token)}`);
   const hash = url.slice(url.indexOf('#'));
   expect(parseAuthHandoff(hash)).toEqual(TOKENS);
 });
@@ -30,8 +31,15 @@ test('hash params are decoded without turning + into spaces', () => {
 });
 
 test('handoff targets the app origin of the right platform', () => {
-  expect(appOriginForUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)')).toBe('capacitor://localhost/');
-  expect(appOriginForUserAgent('Mozilla/5.0 (Linux; Android 14; Pixel 8)')).toBe('https://localhost/');
+  expect(appOriginForUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)')).toBe('burnandshed://auth/callback');
+  expect(appOriginForUserAgent('Mozilla/5.0 (Linux; Android 14; Pixel 8)')).toBe('burnandshed://auth/callback');
   expect(appOriginForUserAgent('Mozilla/5.0 (Macintosh) Safari')).toBe('');
   expect(buildHandoffUrl('Mozilla/5.0 (Macintosh) Safari', TOKENS)).toBeNull();
+});
+
+test('native return accepts only the registered auth link', () => {
+  expect(parseNativeCallback(buildHandoffUrl('iPhone', TOKENS))).toEqual(TOKENS);
+  expect(parseNativeCallback('https://example.com/#bs_at=a&bs_rt=b')).toBeNull();
+  expect(parseNativeCallback('burnandshed://other/callback#bs_at=a&bs_rt=b')).toBeNull();
+  expect(parseNativeCallback('burnandshed://auth/other#bs_at=a&bs_rt=b')).toBeNull();
 });

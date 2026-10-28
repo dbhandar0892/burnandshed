@@ -8,6 +8,7 @@ export const POST_SIGNIN_RETURN_KEY = 'bs_return_after_signin';
 /** Hash parameter names that carry session tokens back into the app. */
 export const HANDOFF_ACCESS_PARAM = 'bs_at';
 export const HANDOFF_REFRESH_PARAM = 'bs_rt';
+export const NATIVE_CALLBACK_URL = 'burnandshed://auth/callback';
 
 export interface HandoffTokens {
   access_token: string;
@@ -45,8 +46,7 @@ export const parseAuthHandoff = (hash: string): HandoffTokens | null => {
 /** Origin the native app WebView loads its bundle from, per platform.
  * Empty string on plain web browsers, which must not be redirected there. */
 export const appOriginForUserAgent = (userAgent: string): string => {
-  if (/iPhone|iPad|iPod/i.test(userAgent)) return 'capacitor://localhost/';
-  if (/Android/i.test(userAgent)) return 'https://localhost/';
+  if (/iPhone|iPad|iPod|Android/i.test(userAgent)) return NATIVE_CALLBACK_URL;
   return '';
 };
 
@@ -57,4 +57,15 @@ export const buildHandoffUrl = (userAgent: string, tokens: HandoffTokens): strin
   if (!origin) return null;
   const hash = `${HANDOFF_ACCESS_PARAM}=${encodeURIComponent(tokens.access_token)}&${HANDOFF_REFRESH_PARAM}=${encodeURIComponent(tokens.refresh_token)}`;
   return `${origin}#${hash}`;
+};
+
+/** Only accept the app's registered authentication callback. */
+export const parseNativeCallback = (url: string): HandoffTokens | null => {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'burnandshed:' || parsed.hostname !== 'auth' || parsed.pathname !== '/callback') return null;
+    return parseAuthHandoff(parsed.hash);
+  } catch {
+    return null;
+  }
 };
