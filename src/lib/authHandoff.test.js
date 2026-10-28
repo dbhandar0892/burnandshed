@@ -14,7 +14,7 @@ const TOKENS = {
 test('handoff tokens round-trip through a URL hash, including plus signs', () => {
   const url = buildHandoffUrl('iPhone UA', TOKENS);
   expect(url).toBe(`capacitor://localhost/#bs_at=${encodeURIComponent(TOKENS.access_token)}&bs_rt=${encodeURIComponent(TOKENS.refresh_token)}`);
-  const hash = url!.slice(url!.indexOf('#'));
+  const hash = url.slice(url.indexOf('#'));
   expect(parseAuthHandoff(hash)).toEqual(TOKENS);
 });
 
